@@ -57,7 +57,8 @@ spfx/
 │   ├── 05-extensions.md            Application Customizer header/footer
 │   ├── 06-provisioning.md          Procédure de déploiement pas à pas
 │   ├── 07-securite-gouvernance.md  Permissions, groupes, cycle de vie
-│   └── 08-plan-migration.md        Phasage, charges, risques
+│   ├── 08-plan-migration.md        Phasage, charges, risques
+│   └── 09-lot1-demarrage.md        ★ Démarrage et tests de validation
 ├── provisioning/
 │   ├── site-scripts/               JSON de création des listes
 │   ├── site-designs/               Association scripts → designs
@@ -95,6 +96,30 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 ```
 
 État actuel de la validation : **20 listes, 155 champs, 0 erreur**.
+
+---
+
+## 4 bis. État d'avancement du code
+
+### Livré — Lot 1 (validation de la stack)
+
+| Web Part | Liste lue | Statut |
+|---|---|---|
+| IKA — Actualités | `Actualites` | Complet |
+| IKA — Liens rapides | `LiensRapides` | Complet |
+| IKA — Documents | `Documents` | Complet |
+| IKA — Événements | `Evenements` | Complet |
+| IKA — Annuaire équipe | `Collaborateurs` | Complet |
+
+Socle partagé : `DataService`, `IIkaModels`, `spUtils`, `Icon` (43 icônes).
+Compilation TypeScript **strict** : 0 erreur.
+
+Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests.
+
+### À faire — Lots 2 à 6
+
+15 Web Parts restantes + l'Application Customizer, détaillées et chiffrées
+dans `docs/03-migration-composants.md` §3 et `docs/08-plan-migration.md` §2.
 
 ---
 
