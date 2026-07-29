@@ -226,3 +226,104 @@ header immédiatement, puis hydrater la navigation.
 - [ ] Bundle < 200 Ko
 - [ ] Testé dans l'onglet Teams
 - [ ] Navigation clavier complète (Tab, Échap)
+
+---
+
+## 10. Implémentation livrée
+
+### Fichiers
+
+```
+src/extensions/ikaChrome/
+├── IkaChromeApplicationCustomizer.ts            Orchestration
+├── IkaChromeApplicationCustomizer.manifest.json GUID 1e7a6b9d-…
+└── components/
+    ├── IkaHeader.tsx    Nav + recherche + méga-menu + profil + mobile
+    ├── IkaFooter.tsx    Logo + description + réseaux + contact
+    └── SocialIcon.tsx   5 icônes sociales en SVG inline
+```
+
+Support : `services/NavigationService.ts`, `models/IChromeModels.ts`,
+`common/hooks/useClickOutside.ts`, `common/hooks/useLiveClock.ts`.
+
+### Rendu progressif — le choix structurant
+
+L'extension s'exécute sur **chaque page**. Bloquer `onInit` sur un appel
+réseau retarderait l'affichage de tout l'intranet.
+
+Le flux retenu :
+
+1. `onInit` masque l'en-tête natif et **rend immédiatement** le header avec
+   la navigation statique (`STATIC_PRIMARY_NAV`) — zéro attente réseau
+2. `_hydrate()` charge en arrière-plan la navigation du hub et les
+   paramètres société
+3. Un second rendu remplace le contenu dès que les données arrivent
+
+L'utilisateur voit donc toujours un header complet et fonctionnel, même si
+le réseau est lent ou si une liste est inaccessible.
+
+### Repli en cascade
+
+Chaque source de données a un repli explicite :
+
+| Source | Si échec |
+|---|---|
+| Navigation du hub | `STATIC_PRIMARY_NAV` (5 sites en dur) |
+| `ParametresSite` | Footer sans coordonnées ni réseaux sociaux |
+| Photo de profil M365 | Initiales sur fond navy (`onError`) |
+| Cache session | Requête directe |
+
+Aucun `throw` ne remonte : un header cassé casserait toutes les pages.
+
+### `changedEvent` — le piège à ne pas reproduire
+
+```ts
+this.context.placeholderProvider.changedEvent.add(this, this._renderChrome);
+this._renderChrome();
+```
+
+Les placeholders **ne sont pas garantis disponibles** au moment de `onInit`.
+Sans l'abonnement à `changedEvent`, le header disparaît aléatoirement selon
+la vitesse de chargement de la page. L'appel direct qui suit couvre le cas où
+ils sont déjà prêts.
+
+`onDispose` **retire** l'abonnement puis démonte les deux racines React —
+sans cela, chaque navigation fuit de la mémoire.
+
+### Écarts assumés avec la maquette
+
+| Maquette | Implémentation | Raison |
+|---|---|---|
+| Cloche de notifications | **Supprimée** | Décorative, aucune source de données |
+| Badge « 119 documents » | **Supprimé** | Compteur inventé, coûterait 5 requêtes |
+| Compteurs par département | **Supprimés** | Idem |
+| Bouton « Déconnexion » | **Supprimé** | Géré par le shell M365 |
+| `⌘K` sur la recherche | **Supprimé** | Raccourci non implémenté dans la maquette |
+| Recherche locale (état) | Redirige vers la **recherche SharePoint** | Fonctionnelle immédiatement |
+| Utilisateur « Landry » en dur | `pageContext.user` | Utilisateur réel |
+| Liens `/services`, `/blog` | **Supprimés** | Jamais implémentés (`AGENTS.md` §8) |
+| `/profile` | Delve (`delve.office.com`) | Profil M365 réel |
+| `/settings` | Paramètres du site, **admins uniquement** | `isSiteAdmin` |
+
+Le principe appliqué : **ne pas porter un élément d'interface qui ment**.
+Un badge « 119 » codé en dur ou une cloche qui ne notifie rien dégradent la
+confiance dans l'intranet.
+
+### Logo
+
+Le logo est lu depuis `{hub}/SiteAssets/logo.png`. À téléverser lors du
+provisioning :
+
+```powershell
+Connect-PnPOnline -Url $hubUrl -Interactive
+Add-PnPFile -Path ".\Logo-IKA-SOLUTION-4.jpg" -Folder "SiteAssets" -NewFileName "logo.png"
+```
+
+### Déploiement automatique
+
+`config/elements.xml` déclare la `CustomAction`. Associé à la seconde feature
+de `package-solution.json`, l'extension s'active **sur tous les sites** dès
+l'installation du package — sans script par site.
+
+Pour un pilotage manuel site par site, utiliser `Add-PnPCustomAction`
+(voir §7).

@@ -101,6 +101,17 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 
 ## 4 bis. État d'avancement du code
 
+### Livré — Socle (phase 2)
+
+| Élément | Rôle |
+|---|---|
+| `IkaChrome` | Application Customizer — header + footer sur tous les sites |
+| `DataService` | Accès REST aux listes + cache session |
+| `NavigationService` | Navigation du hub + repli statique |
+| `Icon` | 43 icônes SVG inline, zéro dépendance |
+| `spUtils` | Dates, images, devises, `cn()` |
+| `useClickOutside` / `useLiveClock` | Hooks partagés |
+
 ### Livré — Lot 1 (validation de la stack)
 
 | Web Part | Liste lue | Statut |
@@ -111,15 +122,19 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 | IKA — Événements | `Evenements` | Complet |
 | IKA — Annuaire équipe | `Collaborateurs` | Complet |
 
-Socle partagé : `DataService`, `IIkaModels`, `spUtils`, `Icon` (43 icônes).
-Compilation TypeScript **strict** : 0 erreur.
+**27 fichiers TypeScript compilés en mode `strict` : 0 erreur.**
 
-Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests.
+```bash
+npm install --no-save typescript@5.8 @types/react@17 @types/react-dom@17
+npx tsc -p config/typecheck/tsconfig.json
+```
+
+Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 
 ### À faire — Lots 2 à 6
 
-15 Web Parts restantes + l'Application Customizer, détaillées et chiffrées
-dans `docs/03-migration-composants.md` §3 et `docs/08-plan-migration.md` §2.
+14 Web Parts restantes, détaillées et chiffrées dans
+`docs/03-migration-composants.md` §3 et `docs/08-plan-migration.md` §2.
 
 ---
 

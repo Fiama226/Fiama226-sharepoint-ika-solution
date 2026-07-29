@@ -1,4 +1,3 @@
-import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { SPHttpClient, SPHttpClientResponse } from "@microsoft/sp-http";
 
 import {
@@ -26,25 +25,34 @@ interface ICacheEntry<T> {
   payload: T;
 }
 
+export interface ISPRequestContext {
+  spHttpClient: SPHttpClient;
+  pageContext: {
+    web: { absoluteUrl: string };
+    legacyPageContext?: unknown;
+  };
+}
+
 export class DataService {
-  private readonly _context: WebPartContext;
+  private readonly _context: ISPRequestContext;
   private readonly _webUrl: string;
   private readonly _hubUrl: string;
 
-  public constructor(context: WebPartContext, hubUrl?: string) {
+  public constructor(context: ISPRequestContext, hubUrl?: string) {
     this._context = context;
     this._webUrl = context.pageContext.web.absoluteUrl;
     this._hubUrl = hubUrl || this._resolveHubUrl();
   }
 
   private _resolveHubUrl(): string {
-    const legacy = this._context.pageContext.legacyPageContext as {
-      hubSiteId?: string;
-regionalSettings?: unknown;
-    };
+    const legacy = this._context.pageContext.legacyPageContext as
+      | { hubSiteId?: string }
+      | undefined;
+
     if (!legacy || !legacy.hubSiteId) {
       return this._webUrl;
     }
+
     const origin = new URL(this._webUrl).origin;
     return `${origin}/sites/ika-intranet`;
   }
