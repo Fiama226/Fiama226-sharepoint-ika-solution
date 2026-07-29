@@ -4,7 +4,7 @@ import { IPropertyPaneConfiguration } from "@microsoft/sp-property-pane";
 export interface WebPartContext {
   spHttpClient: SPHttpClient;
   pageContext: {
-    web: { absoluteUrl: string; serverRelativeUrl: string };
+    web: { absoluteUrl: string; serverRelativeUrl: string; title: string; id: { toString(): string } };
     user: { displayName: string; email: string; loginName: string };
     legacyPageContext?: unknown;
   };

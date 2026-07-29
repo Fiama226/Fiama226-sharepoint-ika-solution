@@ -7,6 +7,7 @@ import {
   IDepartement,
   IDocumentItem,
   IEventItem,
+  IFaqItem,
   IHeroSlide,
   IIndicator,
   IMission,
@@ -326,6 +327,24 @@ export class DataService {
           new Date(a.Birthdate as string).getDate() -
           new Date(b.Birthdate as string).getDate()
       );
+  }
+
+  public async getFaq(category?: string): Promise<IFaqItem[]> {
+    const categoryFilter = category
+      ? ` and FaqCategory eq '${category.replace(/'/g, "''")}'`
+      : "";
+
+    const endpoint =
+      `lists/getByTitle('FAQ')/items` +
+      `?$select=Id,Title,Answer,FaqCategory,SortOrder,IsActive,ViewCount,Created,Modified` +
+      `&$filter=IsActive eq 1${categoryFilter}` +
+      `&$orderby=SortOrder asc&$top=100`;
+
+    return this._get<IFaqItem>(
+      this._hubUrl,
+      endpoint,
+      `faq.${category || "all"}`
+    );
   }
 
   public async getCompanyInfo(): Promise<ICompanyInfo> {

@@ -114,15 +114,25 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 
 ### Livré — Lot 1 (validation de la stack)
 
-| Web Part | Liste lue | Statut |
-|---|---|---|
-| IKA — Actualités | `Actualites` | Complet |
-| IKA — Liens rapides | `LiensRapides` | Complet |
-| IKA — Documents | `Documents` | Complet |
-| IKA — Événements | `Evenements` | Complet |
-| IKA — Annuaire équipe | `Collaborateurs` | Complet |
+| Web Part | Liste lue |
+|---|---|
+| IKA — Actualités | `Actualites` |
+| IKA — Liens rapides | `LiensRapides` |
+| IKA — Documents | `Documents` |
+| IKA — Événements | `Evenements` |
+| IKA — Annuaire équipe | `Collaborateurs` |
 
-**27 fichiers TypeScript compilés en mode `strict` : 0 erreur.**
+### Livré — Lot 2 (sites départementaux)
+
+| Web Part | Liste lue |
+|---|---|
+| IKA — Bannière département | `Departements` |
+| IKA — En-tête de page | — (propriétés) |
+| IKA — FAQ | `FAQ` |
+| IKA — Bandeau d'annonces | `Annonces` |
+| IKA — Liste des annonces | `Annonces` |
+
+**10 Web Parts + 1 extension. 43 fichiers TypeScript compilés en `strict` : 0 erreur.**
 
 ```bash
 npm install --no-save typescript@5.8 @types/react@17 @types/react-dom@17
@@ -131,10 +141,10 @@ npx tsc -p config/typecheck/tsconfig.json
 
 Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 
-### À faire — Lots 2 à 6
+### À faire — Lots 3 à 6
 
-14 Web Parts restantes, détaillées et chiffrées dans
-`docs/03-migration-composants.md` §3 et `docs/08-plan-migration.md` §2.
+9 Web Parts restantes (accueil et pages dédiées), détaillées et chiffrées
+dans `docs/03-migration-composants.md` §3 et `docs/08-plan-migration.md` §2.
 
 ---
 
