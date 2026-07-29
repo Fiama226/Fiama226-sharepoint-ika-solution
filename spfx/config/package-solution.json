@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "ika-intranet-client-side-solution",
+    "id": "3e9a7c15-4b28-4d6f-91a3-5c7e8f0b2d64",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "IKA Solution",
+      "websiteUrl": "https://ikasolution.com",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": ""
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Composants intranet IKA Solution"
+      },
+      "longDescription": {
+        "default": "Web parts et extensions de l'intranet IKA Solution : actualités, documents, équipe, événements, organigramme, projets et bordereaux de prix."
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "IKA Intranet — Web Parts",
+        "description": "Déploie l'ensemble des web parts IKA Solution",
+        "id": "4f0b8d26-5c39-4e70-82b4-6d8f901c3e75",
+        "version": "1.0.0.0"
+      },
+      {
+        "title": "IKA Intranet — Extension de chrome",
+        "description": "Déploie le header et le footer IKA sur les sites du hub",
+        "id": "501c9e37-6d4a-4f81-93c5-7e9012d4f086",
+        "version": "1.0.0.0",
+        "assets": {
+          "elementManifests": ["elements.xml"]
+        }
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/ika-intranet.sppkg"
+  }
+}

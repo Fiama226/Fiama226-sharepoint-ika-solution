@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
+  "actions": [
+    {
+      "verb": "createSPList",
+      "listName": "DonneesFinancieres",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setTitle",
+          "title": "Données financières"
+        },
+        {
+          "verb": "setDescription",
+          "description": "Séries chiffrées alimentant les graphiques du tableau de bord comptabilité."
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e01-6f70-4182-ec93-345678901241}\" Type=\"Choice\" Name=\"SeriesType\" StaticName=\"SeriesType\" DisplayName=\"Type de série\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Chiffre d'affaires</CHOICE><CHOICE>Charges</CHOICE><CHOICE>Résultat</CHOICE><CHOICE>Trésorerie</CHOICE><CHOICE>Budget</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e02-6f70-4182-ec93-345678901242}\" Type=\"Currency\" Name=\"Amount\" StaticName=\"Amount\" DisplayName=\"Valeur\" Required=\"TRUE\" Decimals=\"2\" LCID=\"1036\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e03-6f70-4182-ec93-345678901243}\" Type=\"Number\" Name=\"FiscalYear\" StaticName=\"FiscalYear\" DisplayName=\"Année\" Required=\"TRUE\" Decimals=\"0\" Indexed=\"TRUE\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e04-6f70-4182-ec93-345678901244}\" Type=\"Number\" Name=\"FiscalMonth\" StaticName=\"FiscalMonth\" DisplayName=\"Mois\" Required=\"FALSE\" Decimals=\"0\" Min=\"1\" Max=\"12\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e05-6f70-4182-ec93-345678901245}\" Type=\"Choice\" Name=\"FiscalQuarter\" StaticName=\"FiscalQuarter\" DisplayName=\"Trimestre\" Required=\"FALSE\" Format=\"Dropdown\"><CHOICES><CHOICE>T1</CHOICE><CHOICE>T2</CHOICE><CHOICE>T3</CHOICE><CHOICE>T4</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e06-6f70-4182-ec93-345678901246}\" Type=\"Choice\" Name=\"CurrencyCode\" StaticName=\"CurrencyCode\" DisplayName=\"Devise\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>XOF</CHOICE><CHOICE>EUR</CHOICE><CHOICE>USD</CHOICE></CHOICES><Default>XOF</Default></Field>",
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{cd3d4e07-6f70-4182-ec93-345678901247}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"TRUE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": true
+        }
+      ]
+    }
+  ],
+  "bindata": {},
+  "version": 1
+}
