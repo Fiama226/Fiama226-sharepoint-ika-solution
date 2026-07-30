@@ -132,15 +132,20 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 | IKA — Bandeau d'annonces | `Annonces` |
 | IKA — Liste des annonces | `Annonces` |
 
-### Livré — Lot 3 (page d'accueil)
+### Livré — Lots 3 et 4 (page d'accueil complète)
 
 | Web Part | Listes lues |
 |---|---|
 | IKA — Carrousel d'accueil | `HeroSlides`, `Missions`, `Indicateurs` |
 | IKA — Actualités (grille accueil) | `Actualites` |
 | IKA — Panneau d'accès rapide | `Documents`, `LiensRapides`, `Evenements` |
+| IKA — Galerie photos | `Galerie` |
+| IKA — Notre équipe (accueil) | `Collaborateurs` |
+| IKA — Collaborateur du mois & Projets | `CollaborateurDuMois`, `Projets` |
 
-**13 Web Parts + 1 extension. 53 fichiers TypeScript compilés en `strict` : 0 erreur.**
+**16 Web Parts + 1 extension. 63 fichiers TypeScript compilés en `strict` : 0 erreur.**
+
+La page d'accueil est **intégralement portée**.
 
 ```bash
 npm install --no-save typescript@5.8 @types/react@17 @types/react-dom@17
@@ -149,12 +154,17 @@ npx tsc -p config/typecheck/tsconfig.json
 
 Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 
-### À faire — Lots 4 à 6
+### À faire — Lots 5 et 6 (pages dédiées)
 
-6 Web Parts restantes : `IkaGallery`, `IkaTeamDirectoryHome`,
-`IkaIntranetSections` (accueil) puis `IkaOrgChart`, `IkaTimeline`,
-`IkaFinanceCharts`, `IkaPriceSheet` (pages dédiées). Détail et charges
-dans `docs/03-migration-composants.md` §3 et `docs/08-plan-migration.md` §2.
+| Web Part | Source | Charge |
+|---|---|---|
+| `IkaOrgChart` | `app/organigramme/page.tsx` | 6 j/h |
+| `IkaTimeline` | `app/histoire/page.tsx` | 4 j/h |
+| `IkaFinanceCharts` | `finance-charts.tsx` | 4 j/h |
+| `IkaPriceSheet` | `app/Bordereaudesprix/page.tsx` | 6 j/h |
+
+Détail dans `docs/03-migration-composants.md` §3 et
+`docs/08-plan-migration.md` §2.
 
 ---
 

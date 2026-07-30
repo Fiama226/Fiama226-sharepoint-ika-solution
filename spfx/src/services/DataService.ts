@@ -6,8 +6,10 @@ import {
   ICompanyInfo,
   IDepartement,
   IDocumentItem,
+  IEmployeeOfMonth,
   IEventItem,
   IFaqItem,
+  IGalleryImage,
   IHeroSlide,
   IIndicator,
   IMission,
@@ -327,6 +329,48 @@ export class DataService {
           new Date(a.Birthdate as string).getDate() -
           new Date(b.Birthdate as string).getDate()
       );
+  }
+
+  public async getGalleryImages(top: number = 12): Promise<IGalleryImage[]> {
+    const endpoint =
+      `lists/getByTitle('Galerie')/items` +
+      `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
+      `&$filter=FSObjType eq 0` +
+      `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
+
+    return this._get<IGalleryImage>(this._hubUrl, endpoint, `gallery.${top}`);
+  }
+
+  public async getEmployeeOfMonth(): Promise<IEmployeeOfMonth | undefined> {
+    const select = [
+      "Id",
+      "Title",
+      "DisplayRole",
+      "Quote",
+      "NominatedBy",
+      "Photo",
+      "PeriodStart",
+      "IsCurrent",
+      "Created",
+      "Modified",
+      "Employee/Id",
+      "Employee/Title",
+      "Department/Id",
+      "Department/Title",
+    ].join(",");
+
+    const endpoint =
+      `lists/getByTitle('CollaborateurDuMois')/items` +
+      `?$select=${select}&$expand=Employee,Department` +
+      `&$filter=IsCurrent eq 1&$orderby=PeriodStart desc&$top=1`;
+
+    const items = await this._get<IEmployeeOfMonth>(
+      this._hubUrl,
+      endpoint,
+      "employeeOfMonth"
+    );
+
+    return items.length > 0 ? items[0] : undefined;
   }
 
   public async getFaq(category?: string): Promise<IFaqItem[]> {
