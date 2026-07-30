@@ -10,52 +10,9 @@ import {
   cn,
   formatDate,
 } from "../../../common/utils/spUtils";
+import { divisionStyle } from "../../../common/utils/divisionStyle";
 
 const ALL = "Tous";
-
-const DIVISION_STYLE: Record<string, { bg: string; text: string; icon: string }> =
-  {
-    "Direction Générale": {
-      bg: "ika-bg-violet-100",
-      text: "ika-text-violet-700",
-      icon: "Building2",
-    },
-    Engineering: {
-      bg: "ika-bg-blue-100",
-      text: "ika-text-blue-700",
-      icon: "Code2",
-    },
-    "Ventes & Marketing": {
-      bg: "ika-bg-orange-100",
-      text: "ika-text-orange-700",
-      icon: "Megaphone",
-    },
-    Comptabilité: {
-      bg: "ika-bg-emerald-100",
-      text: "ika-text-emerald-700",
-      icon: "Calculator",
-    },
-    Administration: {
-      bg: "ika-bg-slate-100",
-      text: "ika-text-slate-700",
-      icon: "Briefcase",
-    },
-    "Support Technique": {
-      bg: "ika-bg-cyan-100",
-      text: "ika-text-cyan-700",
-      icon: "Headphones",
-    },
-  };
-
-const FALLBACK_STYLE = {
-  bg: "ika-bg-slate-100",
-  text: "ika-text-slate-700",
-  icon: "Users",
-};
-
-function styleFor(division: string): typeof FALLBACK_STYLE {
-  return DIVISION_STYLE[division] || FALLBACK_STYLE;
-}
 
 function isBirthdaySoon(iso: string | undefined): boolean {
   if (!iso) return false;
@@ -88,7 +45,7 @@ const MemberModal: React.FC<{
   const { member, onClose } = props;
   const trapOptions = React.useMemo(() => ({ onClose }), [onClose]);
   const containerRef = useFocusTrap<HTMLDivElement>(true, trapOptions);
-  const style = styleFor(member.Division);
+  const style = divisionStyle(member.Division);
 
   return (
     <div
@@ -271,7 +228,7 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
     return (
       <div className="ika-grid ika-grid-cols-1 ika-gap-4 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4">
         {filtered.map((member) => {
-          const style = styleFor(member.Division);
+          const style = divisionStyle(member.Division);
           const soon = showBirthdays && isBirthdaySoon(member.Birthdate);
 
           return (

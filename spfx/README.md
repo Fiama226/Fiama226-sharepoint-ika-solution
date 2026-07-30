@@ -143,8 +143,6 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 | IKA — Notre équipe (accueil) | `Collaborateurs` |
 | IKA — Collaborateur du mois & Projets | `CollaborateurDuMois`, `Projets` |
 
-**16 Web Parts + 1 extension. 63 fichiers TypeScript compilés en `strict` : 0 erreur.**
-
 La page d'accueil est **intégralement portée**.
 
 ```bash
@@ -154,17 +152,20 @@ npx tsc -p config/typecheck/tsconfig.json
 
 Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 
-### À faire — Lots 5 et 6 (pages dédiées)
+### Livré — Lots 5 et 6 (pages dédiées)
 
-| Web Part | Source | Charge |
-|---|---|---|
-| `IkaOrgChart` | `app/organigramme/page.tsx` | 6 j/h |
-| `IkaTimeline` | `app/histoire/page.tsx` | 4 j/h |
-| `IkaFinanceCharts` | `finance-charts.tsx` | 4 j/h |
-| `IkaPriceSheet` | `app/Bordereaudesprix/page.tsx` | 6 j/h |
+| Web Part | Listes lues |
+|---|---|
+| IKA — Organigramme | `Collaborateurs` |
+| IKA — Frise chronologique | `Histoire`, `Missions`, `Indicateurs` |
+| IKA — Tableau de bord financier | `DonneesFinancieres` |
+| IKA — Bordereau des prix | — (saisie en page) |
 
-Détail dans `docs/03-migration-composants.md` §3 et
-`docs/08-plan-migration.md` §2.
+**20 Web Parts + 1 extension — portage terminé.**
+**79 fichiers TypeScript compilés en `strict` : 0 erreur, 0 dépendance externe.**
+
+Un aperçu statique du design de l'organigramme est disponible dans
+`docs/orgchart-preview.html` (à ouvrir dans un navigateur).
 
 ---
 

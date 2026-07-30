@@ -289,42 +289,42 @@ export const LiveClock: React.FC<ILiveClockProps> = (props) => { /* ... */ };
 Changements : supprimer `"use client"`, utiliser `import * as React`
 (imposé par la configuration TypeScript de SPFx), typer explicitement.
 
-### 4.5 `recharts` — attention au poids
+### 4.5 `recharts` et `xlsx` — remplacés, pas externalisés
 
-`finance-charts.tsx` utilise `recharts` (~500 Ko minifié). Dans un bundle SPFx,
-cela dépasse largement le budget conseillé de 1 Mo par web part.
+La conception initiale prévoyait d'externaliser ces deux librairies via CDN.
+**Le portage a retenu une autre solution : les supprimer.**
 
-**Solution** — externaliser via CDN dans `config/config.json` :
-```json
-{
-  "externals": {
-    "recharts": {
-      "path": "https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js",
-      "globalName": "Recharts",
-      "globalDependencies": ["react", "react-dom"]
-    }
-  }
-}
-```
+| Librairie | Poids | Décision |
+|---|---|---|
+| `recharts` | ~500 Ko | Remplacée par des **graphiques SVG natifs** |
+| `xlsx` | ~900 Ko | Remplacée par un **export CSV natif** |
+| `file-saver` | ~5 Ko | Remplacée par `Blob` + `URL.createObjectURL` |
+| `lucide-react` | ~50 Ko | Remplacée par `common/utils/Icon.tsx` |
+| `react-icons` | ~30 Ko | Remplacée par `SocialIcon.tsx` |
 
-> Vérifier au préalable que la politique de sécurité du tenant autorise les
-> CDN externes. Si ce n'est pas le cas, héberger le fichier dans une
-> bibliothèque `SiteAssets` du hub et pointer l'URL interne.
->
-> **Attention** : `recharts` v3 (présent dans la maquette) exige React 18+.
-> Avec React 17, il faut rester en **recharts v2.x**.
+Pourquoi ne pas externaliser :
 
-### 4.6 `xlsx` + `file-saver` — le bordereau de prix
+1. **`recharts` v3 exige React 18** — incompatible avec SPFx 1.23.2. Il aurait
+   fallu figer la v2, non maintenue à terme.
+2. **Les CDN externes sont souvent bloqués** par les politiques de sécurité
+   tenant. Le repli (héberger dans `SiteAssets`) ajoute une étape de
+   déploiement manuel à chaque montée de version.
+3. **Le bundle est téléchargé sur chaque page.** ~1,5 Mo évités.
 
-`Bordereaudesprix/page.tsx` exporte en Excel côté client. Ces deux librairies
-fonctionnent en SPFx sans modification. Deux points de vigilance :
+`src/webparts/financeCharts/components/charts.tsx` fournit `AreaChart`,
+`DonutChart` et `BarList` en SVG pur — avec `role="img"`, `aria-label`
+descriptif et `<title>` sur chaque segment, ce que `recharts` ne fait pas
+nativement.
 
-- `xlsx` pèse ~900 Ko → externaliser également
-- `saveAs()` déclenche un téléchargement : fonctionne, mais **bloqué dans
-  l'onglet Teams**. Prévoir un repli : enregistrer le fichier dans une
-  bibliothèque SharePoint et afficher le lien.
+**Résultat : le code SPFx n'a aucune dépendance externe.** Seuls les paquets
+`@microsoft/sp-*` et React sont requis.
 
----
+#### Export CSV plutôt qu'Excel
+
+`saveAs()` de `file-saver` est **bloqué dans l'onglet Teams**. L'export CSV
+utilise l'API navigateur standard (`Blob` + ancre temporaire) avec un BOM
+UTF-8 pour qu'Excel ouvre correctement les accents. Le séparateur est le
+point-virgule, attendu par Excel en locale française.
 
 ## 5. Ordre de développement recommandé
 

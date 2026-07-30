@@ -9,7 +9,9 @@ import {
   IEmployeeOfMonth,
   IEventItem,
   IFaqItem,
+  IFinanceData,
   IGalleryImage,
+  IMilestone,
   IHeroSlide,
   IIndicator,
   IMission,
@@ -371,6 +373,29 @@ export class DataService {
     );
 
     return items.length > 0 ? items[0] : undefined;
+  }
+
+  public async getFinanceData(fiscalYear?: number): Promise<IFinanceData[]> {
+    const yearFilter = fiscalYear ? `&$filter=FiscalYear eq ${fiscalYear}` : "";
+    const endpoint =
+      `lists/getByTitle('DonneesFinancieres')/items` +
+      `?$select=Id,Title,SeriesType,Amount,FiscalYear,FiscalMonth,FiscalQuarter,CurrencyCode,SortOrder,Created,Modified` +
+      `${yearFilter}&$orderby=FiscalYear desc,FiscalMonth asc,SortOrder asc&$top=500`;
+
+    return this._get<IFinanceData>(
+      this._webUrl,
+      endpoint,
+      `finance.${fiscalYear || "all"}`
+    );
+  }
+
+  public async getMilestones(): Promise<IMilestone[]> {
+    const endpoint =
+      `lists/getByTitle('Histoire')/items` +
+      `?$select=Id,Title,Year,Quarter,MilestoneDescription,MilestoneImage,IconName,Tag,TagColorClass,Side,Stat1Label,Stat1Value,Stat2Label,Stat2Value,SortOrder,Created,Modified` +
+      `&$orderby=SortOrder asc&$top=50`;
+
+    return this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
   }
 
   public async getFaq(category?: string): Promise<IFaqItem[]> {

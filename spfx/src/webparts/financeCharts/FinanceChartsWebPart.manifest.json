@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "5a1c0d3f-9e2b-4f6c-a209-7d3e1f5a6b8a",
+  "alias": "FinanceChartsWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab"],
+  "supportsThemeVariants": true,
+  "flexibleLayoutSizing": {
+    "supportsDynamicResizing": true,
+    "defaultRowHeight": 20,
+    "defaultColumnWidth": 12
+  },
+  "preconfiguredEntries": [
+    {
+      "groupId": "6f2b1c48-0d3a-4e7b-9a15-000000000000",
+      "group": { "default": "IKA Solution" },
+      "title": { "default": "IKA — Tableau de bord financier" },
+      "description": {
+        "default": "Indicateurs et graphiques financiers : CA, charges, résultat, trésorerie."
+      },
+      "officeFabricIconFontName": "BarChart4",
+      "properties": {
+        "title": "Tableau de bord financier",
+        "description": "Suivi du chiffre d'affaires, des charges et de la trésorerie."
+      }
+    }
+  ]
+}
