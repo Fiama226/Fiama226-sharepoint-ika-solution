@@ -1,0 +1,578 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
+  "actions": [
+    {
+      "verb": "createSPList",
+      "listName": "Departements",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setTitle",
+          "title": "Départements"
+        },
+        {
+          "verb": "setDescription",
+          "description": "Référentiel des départements. Alimente la navigation et les cartes de l'accueil."
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{d4e5f601-7081-4293-9da4-5e6f70819234}\" Type=\"Text\" Name=\"Slug\" StaticName=\"Slug\" DisplayName=\"Identifiant\" Required=\"TRUE\" EnforceUniqueValues=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"64\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Accroche",
+          "internalName": "Tagline",
+          "id": "d4e5f602-7081-4293-9da4-5e6f70819235",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Note",
+          "displayName": "Description",
+          "internalName": "DeptDescription",
+          "id": "d4e5f603-7081-4293-9da4-5e6f70819236",
+          "isRequired": true,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Titre hero",
+          "internalName": "HeroTitle",
+          "id": "d4e5f604-7081-4293-9da4-5e6f70819237",
+          "isRequired": true,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Note",
+          "displayName": "Sous-titre hero",
+          "internalName": "HeroSubtitle",
+          "id": "d4e5f605-7081-4293-9da4-5e6f70819238",
+          "isRequired": true,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{d4e5f606-7081-4293-9da4-5e6f70819239}\" Type=\"Choice\" Name=\"Accent\" StaticName=\"Accent\" DisplayName=\"Couleur d'accent\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>navy</CHOICE><CHOICE>cyan</CHOICE></CHOICES><Default>navy</Default></Field>",
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Icône",
+          "internalName": "IconName",
+          "id": "d4e5f607-7081-4293-9da4-5e6f7081923a",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{d4e5f608-7081-4293-9da4-5e6f7081923b}\" Type=\"URL\" Name=\"SiteUrl\" StaticName=\"SiteUrl\" DisplayName=\"URL du site\" Required=\"TRUE\" Format=\"Hyperlink\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Classes d'accent",
+          "internalName": "AccentClasses",
+          "id": "d4e5f609-7081-4293-9da4-5e6f7081923c",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Classe de badge",
+          "internalName": "BadgeClasses",
+          "id": "d4e5f60a-7081-4293-9da4-5e6f7081923d",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{d4e5f60b-7081-4293-9da4-5e6f7081923e}\" Type=\"Number\" Name=\"MemberCount\" StaticName=\"MemberCount\" DisplayName=\"Nombre de membres\" Required=\"FALSE\" Decimals=\"0\" />",
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{d4e5f60c-7081-4293-9da4-5e6f7081923f}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"TRUE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": true
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Collaborateurs",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Annuaire des collaborateurs. Alimente l'organigramme, l'équipe et les anniversaires."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "User",
+          "displayName": "Compte M365",
+          "internalName": "UserAccount",
+          "id": "e5f60701-8192-43a4-8eb5-6f7081923456",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Fonction",
+          "internalName": "JobTitle",
+          "id": "e5f60702-8192-43a4-8eb5-6f7081923457",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Email",
+          "internalName": "Email",
+          "id": "e5f60703-8192-43a4-8eb5-6f7081923458",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Téléphone",
+          "internalName": "Phone",
+          "id": "e5f60704-8192-43a4-8eb5-6f7081923459",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Localisation",
+          "internalName": "OfficeLocation",
+          "id": "e5f60705-8192-43a4-8eb5-6f708192345a",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de naissance",
+          "internalName": "Birthdate",
+          "id": "e5f60706-8192-43a4-8eb5-6f708192345b",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{e5f60707-8192-43a4-8eb5-6f708192345c}\" Type=\"Thumbnail\" Name=\"Photo\" StaticName=\"Photo\" DisplayName=\"Photo\" Required=\"FALSE\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{e5f60708-8192-43a4-8eb5-6f708192345d}\" Type=\"Number\" Name=\"HierarchyLevel\" StaticName=\"HierarchyLevel\" DisplayName=\"Niveau hiérarchique\" Required=\"TRUE\" Decimals=\"0\" Min=\"0\" Max=\"9\"><Default>3</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{e5f60709-8192-43a4-8eb5-6f708192345e}\" Type=\"Choice\" Name=\"Division\" StaticName=\"Division\" DisplayName=\"Direction\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Direction Générale</CHOICE><CHOICE>Engineering</CHOICE><CHOICE>Ventes &amp; Marketing</CHOICE><CHOICE>Comptabilité</CHOICE><CHOICE>Administration</CHOICE><CHOICE>Support Technique</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{e5f6070a-8192-43a4-8eb5-6f708192345f}\" Type=\"URL\" Name=\"LinkedInUrl\" StaticName=\"LinkedInUrl\" DisplayName=\"LinkedIn\" Required=\"FALSE\" Format=\"Hyperlink\" />",
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date d'entrée",
+          "internalName": "HireDate",
+          "id": "e5f6070b-8192-43a4-8eb5-6f7081923460",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Boolean",
+          "displayName": "Actif",
+          "internalName": "IsActive",
+          "id": "e5f6070c-8192-43a4-8eb5-6f7081923461",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{e5f6070d-8192-43a4-8eb5-6f7081923462}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"FALSE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": false
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Annonces",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Annonces internes : mariages, naissances, anniversaires, événements."
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{f6070801-92a3-44b5-9fc6-708192345678}\" Type=\"Choice\" Name=\"AnnouncementType\" StaticName=\"AnnouncementType\" DisplayName=\"Type\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Mariage</CHOICE><CHOICE>Anniversaire</CHOICE><CHOICE>Naissance</CHOICE><CHOICE>Événement</CHOICE><CHOICE>Départ</CHOICE><CHOICE>Arrivée</CHOICE><CHOICE>Promotion</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Note",
+          "displayName": "Détail",
+          "internalName": "Detail",
+          "id": "f6070802-92a3-44b5-9fc6-708192345679",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Emoji",
+          "internalName": "Emoji",
+          "id": "f6070803-92a3-44b5-9fc6-70819234567a",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de l'événement",
+          "internalName": "AnnouncementDate",
+          "id": "f6070804-92a3-44b5-9fc6-70819234567b",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de fin d'affichage",
+          "internalName": "DisplayUntil",
+          "id": "f6070805-92a3-44b5-9fc6-70819234567c",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{f6070806-92a3-44b5-9fc6-70819234567d}\" Type=\"Choice\" Name=\"Priority\" StaticName=\"Priority\" DisplayName=\"Priorité\" Required=\"FALSE\" Format=\"Dropdown\"><CHOICES><CHOICE>Normale</CHOICE><CHOICE>Haute</CHOICE></CHOICES><Default>Normale</Default></Field>",
+          "addToDefaultView": false
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Projets",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Suivi des projets affichés sur l'accueil."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Équipe responsable",
+          "internalName": "ProjectLead",
+          "id": "07081901-a3b4-45c6-80d7-819234567890",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "User",
+          "displayName": "Chef de projet",
+          "internalName": "ProjectManager",
+          "id": "07081902-a3b4-45c6-80d7-819234567891",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{07081903-a3b4-45c6-80d7-819234567892}\" Type=\"Number\" Name=\"Progress\" StaticName=\"Progress\" DisplayName=\"Avancement\" Required=\"TRUE\" Decimals=\"0\" Min=\"0\" Max=\"100\"><Default>0</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{07081904-a3b4-45c6-80d7-819234567893}\" Type=\"Choice\" Name=\"ProjectStatus\" StaticName=\"ProjectStatus\" DisplayName=\"Statut\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>À l'heure</CHOICE><CHOICE>À risque</CHOICE><CHOICE>En retard</CHOICE><CHOICE>Terminé</CHOICE></CHOICES><Default>À l'heure</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Échéance",
+          "internalName": "DueDate",
+          "id": "07081905-a3b4-45c6-80d7-819234567894",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{07081906-a3b4-45c6-80d7-819234567895}\" Type=\"Number\" Name=\"TasksDone\" StaticName=\"TasksDone\" DisplayName=\"Tâches terminées\" Required=\"TRUE\" Decimals=\"0\" Min=\"0\"><Default>0</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{07081907-a3b4-45c6-80d7-819234567896}\" Type=\"Number\" Name=\"TasksTotal\" StaticName=\"TasksTotal\" DisplayName=\"Tâches totales\" Required=\"TRUE\" Decimals=\"0\" Min=\"1\"><Default>1</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Boolean",
+          "displayName": "Visible sur l'accueil",
+          "internalName": "ShowOnHome",
+          "id": "07081908-a3b4-45c6-80d7-819234567897",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{07081909-a3b4-45c6-80d7-819234567898}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"FALSE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": false
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Galerie",
+      "templateType": 109,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Photothèque de l'entreprise : événements, formations, projets."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Légende",
+          "internalName": "Caption",
+          "id": "18192a01-b4c5-46d7-91e8-92345678901a",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{18192a02-b4c5-46d7-91e8-92345678901b}\" Type=\"Choice\" Name=\"GalleryCategory\" StaticName=\"GalleryCategory\" DisplayName=\"Catégorie\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Événements</CHOICE><CHOICE>Formation</CHOICE><CHOICE>Projets</CHOICE><CHOICE>Équipe</CHOICE><CHOICE>Bureaux</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de prise de vue",
+          "internalName": "PhotoDate",
+          "id": "18192a03-b4c5-46d7-91e8-92345678901c",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Boolean",
+          "displayName": "Mise en avant",
+          "internalName": "IsFeatured",
+          "id": "18192a04-b4c5-46d7-91e8-92345678901d",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Texte alternatif",
+          "internalName": "AltText",
+          "id": "18192a05-b4c5-46d7-91e8-92345678901e",
+          "isRequired": true,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{18192a06-b4c5-46d7-91e8-92345678901f}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"FALSE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": false
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "HeroSlides",
+      "templateType": 101,
+      "subactions": [
+        {
+          "verb": "setTitle",
+          "title": "Diapositives d'accueil"
+        },
+        {
+          "verb": "setDescription",
+          "description": "Images et messages du carrousel de la page d'accueil."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Légende",
+          "internalName": "Caption",
+          "id": "292a3b01-c5d6-47e8-82f9-345678901234",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Sous-titre",
+          "internalName": "SubCaption",
+          "id": "292a3b02-c5d6-47e8-82f9-345678901235",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{292a3b03-c5d6-47e8-82f9-345678901236}\" Type=\"URL\" Name=\"SlideLink\" StaticName=\"SlideLink\" DisplayName=\"Lien\" Required=\"FALSE\" Format=\"Hyperlink\" />",
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Texte du bouton",
+          "internalName": "CtaLabel",
+          "id": "292a3b04-c5d6-47e8-82f9-345678901237",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{292a3b05-c5d6-47e8-82f9-345678901238}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"TRUE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Boolean",
+          "displayName": "Actif",
+          "internalName": "IsActive",
+          "id": "292a3b06-c5d6-47e8-82f9-345678901239",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de début",
+          "internalName": "StartDate",
+          "id": "292a3b07-c5d6-47e8-82f9-34567890123a",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de fin",
+          "internalName": "EndDate",
+          "id": "292a3b08-c5d6-47e8-82f9-34567890123b",
+          "isRequired": false,
+          "addToDefaultView": false
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Texte alternatif",
+          "internalName": "AltText",
+          "id": "292a3b09-c5d6-47e8-82f9-34567890123c",
+          "isRequired": true,
+          "addToDefaultView": false
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "ParametresSite",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setTitle",
+          "title": "Paramètres du site"
+        },
+        {
+          "verb": "setDescription",
+          "description": "Paramètres de configuration de l'intranet (société, contact, réseaux sociaux)."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Note",
+          "displayName": "Valeur",
+          "internalName": "SettingValue",
+          "id": "3a3b4c01-d6e7-48f9-930a-456789012345",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Description",
+          "internalName": "SettingDescription",
+          "id": "3a3b4c02-d6e7-48f9-930a-456789012346",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{3a3b4c03-d6e7-48f9-930a-456789012347}\" Type=\"Choice\" Name=\"SettingCategory\" StaticName=\"SettingCategory\" DisplayName=\"Catégorie\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Société</CHOICE><CHOICE>Affichage</CHOICE><CHOICE>Contact</CHOICE><CHOICE>Réseaux sociaux</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "FAQ",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Questions fréquentes des collaborateurs."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Note",
+          "displayName": "Réponse",
+          "internalName": "Answer",
+          "id": "4b4c5d01-e7f8-490a-841b-567890123456",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{4b4c5d02-e7f8-490a-841b-567890123457}\" Type=\"Choice\" Name=\"FaqCategory\" StaticName=\"FaqCategory\" DisplayName=\"Catégorie\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>RH</CHOICE><CHOICE>IT</CHOICE><CHOICE>Comptabilité</CHOICE><CHOICE>Général</CHOICE><CHOICE>Sécurité</CHOICE></CHOICES><Default>Général</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{4b4c5d03-e7f8-490a-841b-567890123458}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"TRUE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Boolean",
+          "displayName": "Actif",
+          "internalName": "IsActive",
+          "id": "4b4c5d04-e7f8-490a-841b-567890123459",
+          "isRequired": false,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{4b4c5d05-e7f8-490a-841b-56789012345a}\" Type=\"Number\" Name=\"ViewCount\" StaticName=\"ViewCount\" DisplayName=\"Nombre de vues\" Required=\"FALSE\" Decimals=\"0\"><Default>0</Default></Field>",
+          "addToDefaultView": false
+        }
+      ]
+    },
+    {
+      "verb": "applyTheme",
+      "themeName": "IKA Solution"
+    }
+  ],
+  "bindata": {},
+  "version": 1
+}

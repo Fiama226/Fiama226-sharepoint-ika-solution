@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction
+      Title="IKA Chrome"
+      Location="ClientSideExtension.ApplicationCustomizer"
+      ClientSideComponentId="1e7a6b9d-5c8f-4d2a-e46b-3b9c7d1e2f46"
+      ClientSideComponentProperties="{&quot;navigationSource&quot;:&quot;hub&quot;,&quot;showFooter&quot;:true,&quot;showSearch&quot;:true,&quot;showDocumentsMenu&quot;:true,&quot;footerDescription&quot;:&quot;&quot;}">
+  </CustomAction>
+</Elements>
