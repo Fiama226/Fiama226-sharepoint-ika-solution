@@ -284,6 +284,119 @@ foreach ($c in $collaborateurs) {
     Add-ItemIfMissing -ListName "Collaborateurs" -Values $c
 }
 
+# ------------------------------------------------------------------
+# News - source : data/news.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== News ===" -ForegroundColor Cyan
+
+$newsItems = @(
+    @{ Title = "IKA Solution retient un nouveau contrat avec la Mairie de Lyon"; Excerpt = "Un projet de modernisation du SI métropolitain sur 18 mois, démarrage en septembre."; Scope = "global"; Category = "projet"; AuthorDisplay = "Direction Commerciale"; PublishDate = "2026-06-28"; Highlighted = $true }
+    @{ Title = "Rentrée 2026 : nouvel open-space pôle ingénierie"; Excerpt = "Le plateau technique déménage au 4e étage. Visite guidée prévue le 5 septembre."; Scope = "global"; Category = "entreprise"; AuthorDisplay = "Direction des opérations"; PublishDate = "2026-06-21" }
+    @{ Title = "Webinaire : cybersécurité et bonnes pratiques"; Excerpt = "Session obligatoire pour tous les collaborateurs, inscriptions ouvertes sur l'intranet."; Scope = "global"; Category = "evenement"; AuthorDisplay = "RSSI"; PublishDate = "2026-06-15" }
+    @{ Title = "Résultats semestriels en hausse de +12 %"; Excerpt = "Le CA progresse grâce au pôle Cloud et aux missions d'infogérance."; Scope = "global"; Category = "finance"; AuthorDisplay = "Direction Générale"; PublishDate = "2026-06-10" }
+    @{ Title = "Clôture annuelle 2025 : échéances et jalons"; Excerpt = "Préparation de la liasse fiscale, dates limites et points de blocage à traiter."; Scope = "comptabilite"; Category = "finance"; AuthorDisplay = "Awa Kaboré"; PublishDate = "2026-06-30"; Highlighted = $true }
+    @{ Title = "Nouveau workflow de validation des notes de frais"; Excerpt = "Saisie 100 % en ligne, validation manager sous 48 h, remboursement J+3."; Scope = "comptabilite"; Category = "admin"; AuthorDisplay = "Contrôle de gestion"; PublishDate = "2026-06-22" }
+    @{ Title = "Reporting mensuel : nouveau modèle Power BI"; Excerpt = "Tableaux de bord financier partagés en accès libre à la direction."; Scope = "comptabilite"; Category = "finance"; AuthorDisplay = "Contrôle de gestion"; PublishDate = "2026-06-12" }
+    @{ Title = "Campagne d'entretiens annuels 2026 ouverte"; Excerpt = "Réservez votre créneau avec votre manager entre le 1er et le 30 septembre."; Scope = "administration"; Category = "rh"; AuthorDisplay = "RH"; PublishDate = "2026-06-29"; Highlighted = $true }
+    @{ Title = "Mise à jour du règlement intérieur"; Excerpt = "Télétravail, plages horaires et astreintes : consultez la nouvelle version."; Scope = "administration"; Category = "rh"; AuthorDisplay = "RH"; PublishDate = "2026-06-18" }
+    @{ Title = "CSE : inscriptions sortie d'été"; Excerpt = "Journée de cohésion le 12 juillet, inscriptions closes le 30 juin."; Scope = "administration"; Category = "evenement"; AuthorDisplay = "CSE"; PublishDate = "2026-06-09" }
+    @{ Title = "Objectifs T3 : répartition par portefeuille"; Excerpt = "Nouveaux quotas par commercial et primes associées pour le 3e trimestre."; Scope = "commerciaux"; Category = "commercial"; AuthorDisplay = "Direction Commerciale"; PublishDate = "2026-06-27"; Highlighted = $true }
+    @{ Title = "Nouveau catalogue services Cloud & Infogérance 2026"; Excerpt = "Révision des grilles tarifaires et nouvelles offres managées disponibles."; Scope = "commerciaux"; Category = "commercial"; AuthorDisplay = "Marketing"; PublishDate = "2026-06-20" }
+    @{ Title = "Deal win : référence bancaire sur 3 ans"; Excerpt = "Mission d'infogérance sécurisée, démarrage Q4. Bravo à l'équipe Île-de-France."; Scope = "commerciaux"; Category = "projet"; AuthorDisplay = "Direction Commerciale"; PublishDate = "2026-06-11" }
+    @{ Title = "Migration plateforme de supervision : jalon 2 atteint"; Excerpt = "Promotion des sondes en production prévue mardi 22 h, fenêtre de maintenance 2 h."; Scope = "techniciens"; Category = "technique"; AuthorDisplay = "Exploitation"; PublishDate = "2026-06-26"; Highlighted = $true }
+    @{ Title = "Base de connaissance : nouveau modèle d'article"; Excerpt = "Format standardisé pour les runbooks et procédures d'intervention."; Scope = "techniciens"; Category = "technique"; AuthorDisplay = "Référent technique"; PublishDate = "2026-06-17" }
+    @{ Title = "Astreintes week-end : rotation juillet-août"; Excerpt = "Planning publié, merci de confirmer vos disponibilités auprès du manager."; Scope = "techniciens"; Category = "admin"; AuthorDisplay = "Responsable exploitation"; PublishDate = "2026-06-08" }
+)
+
+foreach ($n in $newsItems) { Add-ItemIfMissing -ListName "News" -Values $n }
+
+# ------------------------------------------------------------------
+# Events - source : data/home.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== Events ===" -ForegroundColor Cyan
+
+$events = @(
+    @{ Title = "All Hands Tech — Q2 Review"; MonthLabel = "JUN"; DayLabel = "10"; EventDate = "2026-06-10"; ImageUrl = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=80&q=80"; EventTag = "Stratégie" }
+    @{ Title = "Workshop Architecture Cloud"; MonthLabel = "JUN"; DayLabel = "18"; EventDate = "2026-06-18"; ImageUrl = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=80&q=80"; EventTag = "Tech" }
+    @{ Title = "Demo Day — Projets IA"; MonthLabel = "JUN"; DayLabel = "25"; EventDate = "2026-06-25"; ImageUrl = "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=80&q=80"; EventTag = "Innovation" }
+    @{ Title = "Revue Cybersécurité S1"; MonthLabel = "JUL"; DayLabel = "3"; EventDate = "2026-07-03"; ImageUrl = "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=80&q=80"; EventTag = "SecOps" }
+)
+
+foreach ($e in $events) { Add-ItemIfMissing -ListName "Events" -Values $e }
+
+# ------------------------------------------------------------------
+# QuickLinks - source : data/home.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== QuickLinks ===" -ForegroundColor Cyan
+
+$quickLinks = @(
+    @{ Title = "Calcul bordereau des prix"; IconName = "Users"; LinkUrl = "/Bordereaudesprix"; SortOrder = 10 }
+    @{ Title = "Demande de congés"; IconName = "Globe"; LinkUrl = "/commerciaux"; SortOrder = 20 }
+    @{ Title = "RH & Avantages"; IconName = "Heart"; LinkUrl = "/administration"; SortOrder = 30 }
+    @{ Title = "Support IT"; IconName = "Headphones"; LinkUrl = "/techniciens"; SortOrder = 40 }
+    @{ Title = "Base de Connaissances"; IconName = "Database"; LinkUrl = "/histoire"; SortOrder = 50 }
+    @{ Title = "Outils DevOps"; IconName = "Settings"; LinkUrl = "/techniciens"; SortOrder = 60 }
+)
+
+foreach ($q in $quickLinks) { Add-ItemIfMissing -ListName "QuickLinks" -Values $q }
+
+# ------------------------------------------------------------------
+# Annonces (bandeau) - source : data/home.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== Annonces ===" -ForegroundColor Cyan
+
+$announcements = @(
+    @{ Title = "Mariage de Koffi et Aïcha"; Detail = "Félicitations à nos collègues du pôle Tech"; AnnouncementType = "Mariage"; Emoji = "💍"; AnnouncementDate = "2026-08-15"; DisplayUntil = "2026-08-20" }
+    @{ Title = "Anniversaire de Souleymane"; Detail = "Joyeux anniversaire au responsable QA"; AnnouncementType = "Anniversaire"; Emoji = "🎉"; AnnouncementDate = "2026-07-22"; DisplayUntil = "2026-07-25" }
+    @{ Title = "Bienvenue à Bébé Inès"; Detail = "Félicitations à l'équipe RH pour cette naissance"; AnnouncementType = "Naissance"; Emoji = "👶"; AnnouncementDate = "2026-09-02"; DisplayUntil = "2026-09-10" }
+    @{ Title = "Soirée d'été IKA"; Detail = "Réservez votre place pour le 10 juillet"; AnnouncementType = "Événement"; Emoji = "🌞"; AnnouncementDate = "2026-07-10"; DisplayUntil = "2026-07-12" }
+)
+
+foreach ($a in $announcements) { Add-ItemIfMissing -ListName "Annonces" -Values $a }
+
+# ------------------------------------------------------------------
+# Projets - source : data/home.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== Projets ===" -ForegroundColor Cyan
+
+$projects = @(
+    @{ Title = "Migration Microservices"; ProjectLead = "Cloud Team"; Progress = 78; ProjectStatus = "À l'heure"; DueDate = "2026-06-30"; TasksDone = 14; TasksTotal = 18; ShowOnHome = $true }
+    @{ Title = "Portail Client v3.0"; ProjectLead = "Frontend"; Progress = 45; ProjectStatus = "À risque"; DueDate = "2026-07-15"; TasksDone = 9; TasksTotal = 20; ShowOnHome = $true }
+    @{ Title = "Pipeline Data IA"; ProjectLead = "Data Team"; Progress = 92; ProjectStatus = "À l'heure"; DueDate = "2026-06-28"; TasksDone = 22; TasksTotal = 24; ShowOnHome = $true }
+    @{ Title = "Audit Cybersécurité"; ProjectLead = "SecOps"; Progress = 30; ProjectStatus = "En retard"; DueDate = "2026-08-01"; TasksDone = 6; TasksTotal = 20; ShowOnHome = $true }
+)
+
+foreach ($p in $projects) { Add-ItemIfMissing -ListName "Projets" -Values $p }
+
+# ------------------------------------------------------------------
+# Galerie - source : data/home.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== Galerie ===" -ForegroundColor Cyan
+
+$gallery = @(
+    @{ Title = "All Hands Tech — Q2 2026"; Caption = "All Hands Tech — Q2 2026"; GalleryCategory = "Événements"; PhotoDate = "2026-06-10"; IsFeatured = $true; AltText = "All Hands Tech Q2" }
+    @{ Title = "Workshop Architecture Cloud"; Caption = "Workshop Architecture Cloud"; GalleryCategory = "Formation"; PhotoDate = "2026-06-18"; IsFeatured = $true; AltText = "Workshop Cloud" }
+    @{ Title = "Demo Day — Projets IA"; Caption = "Demo Day — Projets IA"; GalleryCategory = "Événements"; PhotoDate = "2026-06-25"; IsFeatured = $true; AltText = "Demo IA" }
+)
+
+foreach ($g in $gallery) { Add-ItemIfMissing -ListName "Galerie" -Values $g }
+
+# ------------------------------------------------------------------
+# CollaborateurDuMois - source : data/home.ts
+# ------------------------------------------------------------------
+Write-Host "`n=== Collaborateur du mois ===" -ForegroundColor Cyan
+
+$employeeOfMonth = @{
+    Title = "SERGE GEDEON OUE"
+    DisplayRole = "Lead Software Engineer"
+    Quote = "Il s'est distingué par son excellence technique et sa capacité à livrer des solutions cloud scalables dans des délais serrés."
+    NominatedBy = "YAYA Ouattara, Directeur Général"
+    PeriodStart = "2026-06-01"
+    IsCurrent = $true
+}
+
+Add-ItemIfMissing -ListName "CollaborateurDuMois" -Values $employeeOfMonth
+
 Write-Host "`n=== Termine ===" -ForegroundColor Cyan
 Write-Host "Photos, images et documents restent a televerser manuellement." -ForegroundColor Yellow
 Write-Host "Etape suivante : deploiement du package SPFx (.sppkg)." -ForegroundColor Yellow

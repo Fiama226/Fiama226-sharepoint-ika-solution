@@ -569,6 +569,145 @@
       ]
     },
     {
+      "verb": "createSPList",
+      "listName": "News",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Actualités de l'intranet (globales et par pôle)."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Extrait",
+          "internalName": "Excerpt",
+          "id": "n1e2f3a1-4b5c-6d7e-8f90-123456789abc",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{n1e2f3a2-4b5c-6d7e-8f90-123456789abd}\" Type=\"Choice\" Name=\"Scope\" StaticName=\"Scope\" DisplayName=\"Portée\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>global</CHOICE><CHOICE>comptabilite</CHOICE><CHOICE>administration</CHOICE><CHOICE>commerciaux</CHOICE><CHOICE>techniciens</CHOICE></CHOICES><Default>global</Default></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{n1e2f3a3-4b5c-6d7e-8f90-123456789abe}\" Type=\"Choice\" Name=\"Category\" StaticName=\"Category\" DisplayName=\"Catégorie\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>projet</CHOICE><CHOICE>entreprise</CHOICE><CHOICE>evenement</CHOICE><CHOICE>finance</CHOICE><CHOICE>admin</CHOICE><CHOICE>rh</CHOICE><CHOICE>commercial</CHOICE><CHOICE>technique</CHOICE></CHOICES></Field>",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Auteur",
+          "internalName": "AuthorDisplay",
+          "id": "n1e2f3a4-4b5c-6d7e-8f90-123456789abf",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de publication",
+          "internalName": "PublishDate",
+          "id": "n1e2f3a5-4b5c-6d7e-8f90-123456789ac0",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Boolean",
+          "displayName": "Mis en avant",
+          "internalName": "Highlighted",
+          "id": "n1e2f3a6-4b5c-6d7e-8f90-123456789ac1",
+          "isRequired": false,
+          "addToDefaultView": true
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Events",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Événements internes affichés sur l'accueil."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Mois",
+          "internalName": "MonthLabel",
+          "id": "e1f2a3b1-5c6d-7e8f-9012-234567890def",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Jour",
+          "internalName": "DayLabel",
+          "id": "e1f2a3b2-5c6d-7e8f-9012-234567890df0",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "DateTime",
+          "displayName": "Date de l'événement",
+          "internalName": "EventDate",
+          "id": "e1f2a3b3-5c6d-7e8f-9012-234567890df1",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{e1f2a3b4-5c6d-7e8f-9012-234567890df2}\" Type=\"URL\" Name=\"ImageUrl\" StaticName=\"ImageUrl\" DisplayName=\"Image\" Required=\"FALSE\" Format=\"Image\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Tag",
+          "internalName": "EventTag",
+          "id": "e1f2a3b5-5c6d-7e8f-9012-234567890df3",
+          "isRequired": false,
+          "addToDefaultView": true
+        }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "QuickLinks",
+      "templateType": 100,
+      "subactions": [
+        {
+          "verb": "setDescription",
+          "description": "Liens rapides de l'accueil."
+        },
+        {
+          "verb": "addSPField",
+          "fieldType": "Text",
+          "displayName": "Icône",
+          "internalName": "IconName",
+          "id": "q1r2s3t1-6d7e-8f90-1234-567890abcdef",
+          "isRequired": true,
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{q1r2s3t2-6d7e-8f90-1234-567890abcdf0}\" Type=\"URL\" Name=\"LinkUrl\" StaticName=\"LinkUrl\" DisplayName=\"Lien\" Required=\"TRUE\" Format=\"Hyperlink\" />",
+          "addToDefaultView": true
+        },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{q1r2s3t3-6d7e-8f90-1234-567890abcdf1}\" Type=\"Number\" Name=\"SortOrder\" StaticName=\"SortOrder\" DisplayName=\"Ordre\" Required=\"TRUE\" Decimals=\"0\"><Default>100</Default></Field>",
+          "addToDefaultView": true
+        }
+      ]
+    },
+    {
       "verb": "applyTheme",
       "themeName": "IKA Solution"
     }
