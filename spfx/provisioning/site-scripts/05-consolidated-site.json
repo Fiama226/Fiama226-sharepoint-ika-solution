@@ -1,0 +1,106 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
+  "actions": [
+    {
+      "verb": "createSPList",
+      "listName": "Documents_Comptabilite",
+      "templateType": 101,
+      "subactions": [
+        { "verb": "setTitle", "title": "Documents Comptabilité" },
+        { "verb": "setDescription", "description": "Documents du département Comptabilité" },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{a1b2c301-4d5e-4f60-9a71-2b3c4d5e6f11}\" Type=\"Choice\" Name=\"DocCategory\" StaticName=\"DocCategory\" DisplayName=\"Catégorie documentaire\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Procédure</CHOICE><CHOICE>Modèle</CHOICE><CHOICE>Contrat</CHOICE><CHOICE>Rapport</CHOICE><CHOICE>Facture</CHOICE><CHOICE>Politique</CHOICE><CHOICE>Guide</CHOICE><CHOICE>Présentation</CHOICE><CHOICE>Formulaire</CHOICE><CHOICE>Autre</CHOICE></CHOICES><Default>Autre</Default></Field>",
+          "addToDefaultView": true
+        },
+        { "verb": "addSPField", "fieldType": "Boolean", "displayName": "IsPinned", "internalName": "IsPinned", "id": "a1b2c306-4d5e-4f60-9a71-2b3c4d5e6f16", "isRequired": false }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Documents_Administration",
+      "templateType": 101,
+      "subactions": [
+        { "verb": "setTitle", "title": "Documents Administration" },
+        { "verb": "setDescription", "description": "Documents du département Administration" },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{a1b2c301-4d5e-4f60-9a71-2b3c4d5e6f21}\" Type=\"Choice\" Name=\"DocCategory\" StaticName=\"DocCategory\" DisplayName=\"Catégorie documentaire\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Procédure</CHOICE><CHOICE>Modèle</CHOICE><CHOICE>Contrat</CHOICE><CHOICE>Rapport</CHOICE><CHOICE>Facture</CHOICE><CHOICE>Politique</CHOICE><CHOICE>Guide</CHOICE><CHOICE>Présentation</CHOICE><CHOICE>Formulaire</CHOICE><CHOICE>Autre</CHOICE></CHOICES><Default>Autre</Default></Field>",
+          "addToDefaultView": true
+        },
+        { "verb": "addSPField", "fieldType": "Boolean", "displayName": "IsPinned", "internalName": "IsPinned", "id": "a1b2c306-4d5e-4f60-9a71-2b3c4d5e6f26", "isRequired": false }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Documents_Commerciaux",
+      "templateType": 101,
+      "subactions": [
+        { "verb": "setTitle", "title": "Documents Commerciaux" },
+        { "verb": "setDescription", "description": "Documents du département Commerciaux" },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{a1b2c301-4d5e-4f60-9a71-2b3c4d5e6f31}\" Type=\"Choice\" Name=\"DocCategory\" StaticName=\"DocCategory\" DisplayName=\"Catégorie documentaire\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Procédure</CHOICE><CHOICE>Modèle</CHOICE><CHOICE>Contrat</CHOICE><CHOICE>Rapport</CHOICE><CHOICE>Facture</CHOICE><CHOICE>Politique</CHOICE><CHOICE>Guide</CHOICE><CHOICE>Présentation</CHOICE><CHOICE>Formulaire</CHOICE><CHOICE>Autre</CHOICE></CHOICES><Default>Autre</Default></Field>",
+          "addToDefaultView": true
+        },
+        { "verb": "addSPField", "fieldType": "Boolean", "displayName": "IsPinned", "internalName": "IsPinned", "id": "a1b2c306-4d5e-4f60-9a71-2b3c4d5e6f36", "isRequired": false }
+      ]
+    },
+    {
+      "verb": "createSPList",
+      "listName": "Documents_Techniciens",
+      "templateType": 101,
+      "subactions": [
+        { "verb": "setTitle", "title": "Documents Techniciens" },
+        { "verb": "setDescription", "description": "Documents du département Techniciens" },
+        {
+          "verb": "addSPFieldXml",
+          "schemaXml": "<Field ID=\"{a1b2c301-4d5e-4f60-9a71-2b3c4d5e6f41}\" Type=\"Choice\" Name=\"DocCategory\" StaticName=\"DocCategory\" DisplayName=\"Catégorie documentaire\" Required=\"TRUE\" Format=\"Dropdown\"><CHOICES><CHOICE>Procédure</CHOICE><CHOICE>Modèle</CHOICE><CHOICE>Contrat</CHOICE><CHOICE>Rapport</CHOICE><CHOICE>Facture</CHOICE><CHOICE>Politique</CHOICE><CHOICE>Guide</CHOICE><CHOICE>Présentation</CHOICE><CHOICE>Formulaire</CHOICE><CHOICE>Autre</CHOICE></CHOICES><Default>Autre</Default></Field>",
+          "addToDefaultView": true
+        },
+        { "verb": "addSPField", "fieldType": "Boolean", "displayName": "IsPinned", "internalName": "IsPinned", "id": "a1b2c306-4d5e-4f60-9a71-2b3c4d5e6f46", "isRequired": false }
+      ]
+    },
+    {
+      "verb": "addNavLink",
+      "url": "/SitePages/Comptabilite.aspx",
+      "displayName": "Comptabilité",
+      "isWebRelative": true
+    },
+    {
+      "verb": "addNavLink",
+      "url": "/SitePages/Administration.aspx",
+      "displayName": "Administration",
+      "isWebRelative": true
+    },
+    {
+      "verb": "addNavLink",
+      "url": "/SitePages/Commerciaux.aspx",
+      "displayName": "Commerciaux",
+      "isWebRelative": true
+    },
+    {
+      "verb": "addNavLink",
+      "url": "/SitePages/Techniciens.aspx",
+      "displayName": "Techniciens",
+      "isWebRelative": true
+    },
+    {
+      "verb": "addNavLink",
+      "url": "/SitePages/Organigramme.aspx",
+      "displayName": "Organigramme",
+      "isWebRelative": true
+    },
+    {
+      "verb": "addNavLink",
+      "url": "/SitePages/Histoire.aspx",
+      "displayName": "Notre Histoire",
+      "isWebRelative": true
+    },
+    {
+      "verb": "applyTheme",
+      "themeName": "IKA Solution"
+    }
+  ],
+  "version": 1
+}

@@ -16,6 +16,7 @@ import { IDocumentItem } from "../../models/IIkaModels";
 
 export interface IDocumentsListWebPartProps {
   title: string;
+  listName: string;
   maxItems: number;
   pinnedFirst: boolean;
   showConfidentiality: boolean;
@@ -35,7 +36,7 @@ export default class DocumentsListWebPart extends BaseClientSideWebPart<IDocumen
   }
 
   public render(): void {
-    const signature = String(this.properties.maxItems);
+    const signature = `${this.properties.listName || "Documents"}|${this.properties.maxItems}`;
 
     if (this._loadedFor !== signature) {
       this._loadedFor = signature;
@@ -74,13 +75,14 @@ export default class DocumentsListWebPart extends BaseClientSideWebPart<IDocumen
   private async _load(): Promise<void> {
     try {
       this._documents = await this._service.getDocuments(
-        this.properties.maxItems || 6
+        this.properties.maxItems || 6,
+        this.properties.listName || "Documents"
       );
       this._error = undefined;
     } catch {
       this._documents = [];
       this._error =
-        "Impossible de charger les documents. Vérifiez que la bibliothèque « Documents » existe sur ce site.";
+        `Impossible de charger les documents. Vérifiez que la bibliothèque « ${this.properties.listName || "Documents"} » existe sur ce site.`;
     } finally {
       this._loading = false;
       this.render();
@@ -106,6 +108,10 @@ export default class DocumentsListWebPart extends BaseClientSideWebPart<IDocumen
               groupFields: [
                 PropertyPaneTextField("title", {
                   label: "Titre de la section",
+                }),
+                PropertyPaneTextField("listName", {
+                  label: "Nom de la bibliothèque",
+                  description: "Ex: Documents_Comptabilite",
                 }),
                 PropertyPaneSlider("maxItems", {
                   label: "Nombre de documents",
