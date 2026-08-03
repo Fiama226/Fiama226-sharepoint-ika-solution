@@ -17,6 +17,7 @@ import { INewsItem } from "../../models/IIkaModels";
 
 export interface INewsListWebPartProps {
   title: string;
+  scope: string;
   maxItems: number;
   showImages: boolean;
   layout: "list" | "cards";
@@ -36,7 +37,7 @@ export default class NewsListWebPart extends BaseClientSideWebPart<INewsListWebP
   }
 
   public render(): void {
-    const signature = `${this.properties.maxItems}`;
+    const signature = `${this.properties.scope || "global"}|${this.properties.maxItems}`;
 
     if (this._loadedFor !== signature) {
       this._loadedFor = signature;
@@ -63,7 +64,10 @@ export default class NewsListWebPart extends BaseClientSideWebPart<INewsListWebP
 
   private async _load(): Promise<void> {
     try {
-      this._items = await this._service.getNews(this.properties.maxItems || 4);
+      this._items = await this._service.getNews(
+        this.properties.maxItems || 4,
+        this.properties.scope || "global"
+      );
       this._error = undefined;
     } catch (error) {
       this._items = [];
@@ -100,6 +104,16 @@ export default class NewsListWebPart extends BaseClientSideWebPart<INewsListWebP
                   options: [
                     { key: "cards", text: "Cartes" },
                     { key: "list", text: "Liste" },
+                  ],
+                }),
+                PropertyPaneDropdown("scope", {
+                  label: "Portée (Scope)",
+                  options: [
+                    { key: "global", text: "Global (Accueil)" },
+                    { key: "comptabilite", text: "Comptabilité" },
+                    { key: "administration", text: "Administration" },
+                    { key: "commerciaux", text: "Commerciaux" },
+                    { key: "techniciens", text: "Techniciens" },
                   ],
                 }),
                 PropertyPaneSlider("maxItems", {

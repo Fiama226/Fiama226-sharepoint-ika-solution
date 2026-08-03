@@ -22,6 +22,8 @@ import {
   ISiteSetting,
 } from "../models/IIkaModels";
 
+import * as Mocks from "./MockData";
+
 const CACHE_PREFIX = "ika.cache.";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
 
@@ -33,7 +35,8 @@ interface ICacheEntry<T> {
 export interface ISPRequestContext {
   spHttpClient: SPHttpClient;
   pageContext: {
-    web: { absoluteUrl: string };
+    web: { absoluteUrl: string; serverRelativeUrl: string };
+    user: { displayName: string; email: string };
     legacyPageContext?: unknown;
   };
 }
@@ -42,11 +45,14 @@ export class DataService {
   private readonly _context: ISPRequestContext;
   private readonly _webUrl: string;
   private readonly _hubUrl: string;
+  private readonly _isLocal: boolean;
 
   public constructor(context: ISPRequestContext, hubUrl?: string) {
     this._context = context;
     this._webUrl = context.pageContext.web.absoluteUrl;
     this._hubUrl = hubUrl || this._resolveHubUrl();
+    this._isLocal = typeof window !== 'undefined' && 
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   }
 
   private _resolveHubUrl(): string {
@@ -63,6 +69,7 @@ export class DataService {
   }
 
   private _readCache<T>(key: string): T | undefined {
+    if (this._isLocal) return undefined;
     try {
       const raw = window.sessionStorage.getItem(CACHE_PREFIX + key);
       if (!raw) return undefined;
@@ -78,6 +85,7 @@ export class DataService {
   }
 
   private _writeCache<T>(key: string, payload: T, ttl: number): void {
+    if (this._isLocal) return;
     try {
       const entry: ICacheEntry<T> = { expires: Date.now() + ttl, payload };
       window.sessionStorage.setItem(CACHE_PREFIX + key, JSON.stringify(entry));
@@ -116,7 +124,9 @@ export class DataService {
     return value;
   }
 
-  public async getNews(top: number = 4): Promise<INewsItem[]> {
+  public async getNews(top: number = 4, scope: string = "global"): Promise<INewsItem[]> {
+    if (this._isLocal) return Mocks.MOCK_NEWS.slice(0, top);
+
     const select = [
       "Id",
       "Title",
@@ -131,15 +141,19 @@ export class DataService {
       "NewsAuthor/EMail",
     ].join(",");
 
+    const scopeFilter = scope ? `Scope eq '${scope}'` : "Scope eq 'global'";
     const endpoint =
       `lists/getByTitle('Actualites')/items` +
       `?$select=${select}&$expand=NewsAuthor` +
+      `&$filter=${scopeFilter}` +
       `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
 
-    return this._get<INewsItem>(this._webUrl, endpoint, `news.${top}`);
+    return this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
   }
 
-  public async getDocuments(top: number = 10): Promise<IDocumentItem[]> {
+  public async getDocuments(top: number = 10, listTitle: string = "Documents"): Promise<IDocumentItem[]> {
+    if (this._isLocal) return Mocks.MOCK_DOCUMENTS.slice(0, top);
+
     const select = [
       "Id",
       "Title",
@@ -154,14 +168,16 @@ export class DataService {
     ].join(",");
 
     const endpoint =
-      `lists/getByTitle('Documents')/items` +
+      `lists/getByTitle('${listTitle}')/items` +
       `?$select=${select}&$expand=Editor` +
       `&$filter=FSObjType eq 0&$orderby=Modified desc&$top=${top}`;
 
-    return this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${top}`);
+    return this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${listTitle}.${top}`);
   }
 
-  public async getEvents(top: number = 5): Promise<IEventItem[]> {
+  public async getEvents(top: number = 5, scope: string = "global"): Promise<IEventItem[]> {
+    if (this._isLocal) return []; 
+
     const today = new Date().toISOString();
     const select = [
       "Id",
@@ -184,7 +200,9 @@ export class DataService {
     return this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
   }
 
-  public async getQuickLinks(): Promise<IQuickLink[]> {
+  public async getQuickLinks(scope: string = "global"): Promise<IQuickLink[]> {
+    if (this._isLocal) return [];
+
     const endpoint =
       `lists/getByTitle('LiensRapides')/items` +
       `?$select=Id,Title,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive,Created,Modified` +
@@ -194,6 +212,8 @@ export class DataService {
   }
 
   public async getDepartements(): Promise<IDepartement[]> {
+    if (this._isLocal) return Mocks.MOCK_DEPARTEMENTS;
+
     const endpoint =
       `lists/getByTitle('Departements')/items` +
       `?$select=Id,Title,Slug,Tagline,DeptDescription,HeroTitle,HeroSubtitle,Accent,IconName,SiteUrl,AccentClasses,BadgeClasses,MemberCount,SortOrder,Created,Modified` +
@@ -417,6 +437,8 @@ export class DataService {
   }
 
   public async getCompanyInfo(): Promise<ICompanyInfo> {
+    if (this._isLocal) return Mocks.MOCK_COMPANY;
+
     const endpoint =
       `lists/getByTitle('ParametresSite')/items` +
       `?$select=Id,Title,SettingValue,SettingCategory,Created,Modified&$top=100`;
