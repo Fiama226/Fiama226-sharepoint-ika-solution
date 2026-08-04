@@ -39,3 +39,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# SPFx / Heft artifacts (build, dev certs, generated bundle)
+/spfx/node_modules
+/spfx/lib
+/spfx/dist
+/spfx/temp
+/spfx/out
+/spfx/.heft
+/spfx/sharepoint/solution
+/spfx/.cert
+/spfx/src/styles/tailwind.compiled.css
+/spfx/coverage
+
+# Workbench dev outputs
+/spfx/lib
+/spfx/temp
+*.sppkg
+*.sppkg.js
+.sp-pnp
+
+# Docker build artifacts (when using docker compose out volume)
+/out
+/docker-out

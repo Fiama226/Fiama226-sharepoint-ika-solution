@@ -181,14 +181,24 @@ Un aperçu statique du design de l'organigramme est disponible dans
 | PnP PowerShell | 3.x | `Get-Module PnP.PowerShell` |
 
 ```bash
-npm install @microsoft/spfx-cli --global
-spfx create --template webpart-react --library-name ika-intranet
-npm install react@17.0.1 react-dom@17.0.1 --save-exact
+npm install @rushstack/heft --global   # optionnel mais pratique
+npm install
+npm run trust-cert   # une fois : certificat dev
+npm run start        # → https://localhost:4321
 ```
 
 > **Attention** : Gulp est supprimé depuis SPFx 1.22 au profit de **Heft**.
 > Les commandes `gulp serve` / `gulp bundle` n'existent plus :
-> `heft start`, `heft bundle --ship`, `heft package-solution --ship`.
+> `heft start`, `heft bundle --production`, `heft package-solution --production`.
+
+### Alternative 100% conteneurisée (Docker)
+
+```bash
+docker compose up -d spfx-workbench
+# Workbench : https://localhost:4321/_layouts/15/workbench.aspx
+```
+
+Voir [`BUILD-INSTRUCTIONS.md`](./BUILD-INSTRUCTIONS.md) pour le détail.
 
 ---
 
