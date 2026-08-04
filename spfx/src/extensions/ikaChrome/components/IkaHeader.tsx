@@ -1,3 +1,5 @@
+import "../../../styles/tailwind.css";
+
 import * as React from "react";
 
 import { IIkaHeaderProps, INavNode } from "../../../models/IChromeModels";

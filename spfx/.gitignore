@@ -1,0 +1,54 @@
+# Dépendances
+node_modules/
+
+# Artefacts de build Heft
+lib/
+lib-commonjs/
+lib-esm/
+dist/
+temp/
+release/
+*.tsbuildinfo
+
+# Certificats dev Heft
+.cert/
+*.pem
+*.crt
+*.key
+*.pfx
+
+# Bundles & manifests générés
+temp/build/manifests.js
+temp/build/assets/
+*.sppkg
+
+# Outputs SPFx
+sharepoint/solution/ika-intranet.sppkg
+sharepoint/solution/debug/
+
+# Tailwind compilé (régénéré par build:tailwind)
+lib/styles/tailwind.css
+src/styles/tailwind.compiled.css
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Out docker
+out/
+
+# Jest outputs
+jest-output/
+coverage/
+
+# Workbench generated files
+workbench/
