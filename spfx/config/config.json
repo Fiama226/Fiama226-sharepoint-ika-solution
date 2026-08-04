@@ -41,6 +41,10 @@
           "manifest": "./src/webparts/heroSlider/HeroSliderWebPart.manifest.json"
         },
         {
+          "entrypoint": "./lib/webparts/homePage/HomePageWebPart.js",
+          "manifest": "./src/webparts/homePage/HomePageWebPart.manifest.json"
+        },
+        {
           "entrypoint": "./lib/webparts/intranetSections/IntranetSectionsWebPart.js",
           "manifest": "./src/webparts/intranetSections/IntranetSectionsWebPart.manifest.json"
         },
