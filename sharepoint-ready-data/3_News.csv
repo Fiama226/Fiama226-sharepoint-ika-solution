@@ -1,0 +1,17 @@
+id,scope,title,excerpt,category,author,date,highlighted
+news-g-1,global,IKA Solution retient un nouveau contrat avec la Mairie de Lyon,"Un projet de modernisation du SI métropolitain sur 18 mois, démarrage en septembre.",projet,Direction Commerciale,2026-06-28,TRUE
+news-g-2,global,Rentrée 2026 : nouvel open-space pôle ingénierie,Le plateau technique déménage au 4e étage. Visite guidée prévue le 5 septembre.,entreprise,Direction des opérations,2026-06-21,
+news-g-3,global,Webinaire : cybersécurité et bonnes pratiques,"Session obligatoire pour tous les collaborateurs, inscriptions ouvertes sur l'intranet.",evenement,RSSI,2026-06-15,
+news-g-4,global,Résultats semestriels en hausse de +12 %,Le CA progresse grâce au pôle Cloud et aux missions d'infogérance.,finance,Direction Générale,2026-06-10,
+news-comp-1,comptabilite,Clôture annuelle 2025 : échéances et jalons,"Préparation de la liasse fiscale, dates limites et points de blocage à traiter.",finance,Awa Kaboré,2026-06-30,TRUE
+news-comp-2,comptabilite,Nouveau workflow de validation des notes de frais,"Saisie 100 % en ligne, validation manager sous 48 h, remboursement J+3.",admin,Contrôle de gestion,2026-06-22,
+news-comp-3,comptabilite,Reporting mensuel : nouveau modèle Power BI,Tableaux de bord financier partagés en accès libre à la direction.,finance,Contrôle de gestion,2026-06-12,
+news-admin-1,administration,Campagne d'entretiens annuels 2026 ouverte,Réservez votre créneau avec votre manager entre le 1er et le 30 septembre.,rh,RH,2026-06-29,TRUE
+news-admin-2,administration,Mise à jour du règlement intérieur,"Télétravail, plages horaires et astreintes : consultez la nouvelle version.",rh,RH,2026-06-18,
+news-admin-3,administration,CSE : inscriptions sortie d'été,"Journée de cohésion le 12 juillet, inscriptions closes le 30 juin.",evenement,CSE,2026-06-09,
+news-com-1,commerciaux,Objectifs T3 : répartition par portefeuille,Nouveaux quotas par commercial et primes associées pour le 3e trimestre.,commercial,Direction Commerciale,2026-06-27,TRUE
+news-com-2,commerciaux,Nouveau catalogue services Cloud & Infogérance 2026,Révision des grilles tarifaires et nouvelles offres managées disponibles.,commercial,Marketing,2026-06-20,
+news-com-3,commerciaux,Deal win : référence bancaire sur 3 ans,"Mission d'infogérance sécurisée, démarrage Q4. Bravo à l'équipe Île-de-France.",projet,Direction Commerciale,2026-06-11,
+news-tech-1,techniciens,Migration plateforme de supervision : jalon 2 atteint,"Promotion des sondes en production prévue mardi 22 h, fenêtre de maintenance 2 h.",technique,Exploitation,2026-06-26,TRUE
+news-tech-2,techniciens,Base de connaissance : nouveau modèle d'article,Format standardisé pour les runbooks et procédures d'intervention.,technique,Référent technique,2026-06-17,
+news-tech-3,techniciens,Astreintes week-end : rotation juillet-août,"Planning publié, merci de confirmer vos disponibilités auprès du manager.",admin,Responsable exploitation,2026-06-08,

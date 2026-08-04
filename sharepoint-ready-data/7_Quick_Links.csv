@@ -1,0 +1,31 @@
+id,scope,label,href,description,icon
+ql-global-1,global,Demande de congés,#,Formulaires RH centralisés,calendar
+ql-global-2,global,Annuaire interne,#,Rechercher un collaborateur,people
+ql-global-3,global,Demande de matériel,#,Bons de commande IT,package
+ql-global-4,global,Base de connaissance,#,Wiki & procédures,book
+ql-global-5,global,Tickets support IT,#,Demander de l'aide,lifebuoy
+ql-global-6,global,Organigramme,#,Structure des équipes,tree
+ql-comp-1,comptabilite,Factures fournisseurs,#,Validation & suivi,invoice
+ql-comp-2,comptabilite,Factures clients,#,Émission & relances,invoice
+ql-comp-3,comptabilite,Déclarations fiscales,#,"TVA, IS, liasse fiscale",doc
+ql-comp-4,comptabilite,Budget & reporting,#,Tableaux de bord,chart
+ql-comp-5,comptabilite,Notes de frais,#,Saisie & validation,wallet
+ql-comp-6,comptabilite,Paie,#,Bulletins & variables,people
+ql-admin-1,administration,Demande de congés,#,Solde & validation,calendar
+ql-admin-2,administration,Contrats & avenants,#,Modèles RH,doc
+ql-admin-3,administration,Notes de service,#,Communications internes,megaphone
+ql-admin-4,administration,Organigramme,#,Structure & rattachements,tree
+ql-admin-5,administration,Bibliothèque RH,#,Politiques & procédures,book
+ql-admin-6,administration,Vie sociale (CSE),#,Événements & avantages,gift
+ql-com-1,commerciaux,Pipeline CRM,#,Opportunités en cours,chart
+ql-com-2,commerciaux,Devis,#,Création & suivi,invoice
+ql-com-3,commerciaux,Fiches clients,#,Base clients,people
+ql-com-4,commerciaux,Propositions commerciales,#,Modèles & gabarits,doc
+ql-com-5,commerciaux,Objectifs & commissions,#,Suivi par commercial,target
+ql-com-6,commerciaux,Catalogue & tarifs,#,Grille de prix 2026,tag
+ql-tech-1,techniciens,Tickets d'intervention,#,File & planning,lifebuoy
+ql-tech-2,techniciens,Base de connaissance,#,KB technique,book
+ql-tech-3,techniciens,Planning interventions,#,Agenda technique,calendar
+ql-tech-4,techniciens,Inventaire matériel,#,Parc & prêts,package
+ql-tech-5,techniciens,Procédures & runbooks,#,Mode opératoire,doc
+ql-tech-6,techniciens,Suivi projets clients,#,Jalons & livrables,tree

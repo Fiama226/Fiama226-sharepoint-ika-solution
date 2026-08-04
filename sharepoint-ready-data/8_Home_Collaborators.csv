@@ -1,0 +1,9 @@
+id,name,occupation,department,birthdate,location,email,phone,avatar
+1,YAYA Ouattara,Directeur Général,Direction,1989-06-14,"Ouagadougou, Burkina Faso",y.ouattara@ikasolution.com,+226 70 70 70 70,/assets/team/DG.jpg
+2,SERGE GEDEON OUE,Développeur Full Stack,Engineering,1982-03-22,"Ouagadougou, Burkina Faso",s.gedeon@ikasolution.com,+226 70 70 70 70,/assets/team/serge.jpg
+3,Daouda DAO,Développeur Front End,Engineering,1994-11-05,"Ouagadougou, Burkina Faso",d.dao@ikasolution.com,+226 70 70 70 70,/assets/team/daouda.jpg
+4,Sandrine Tiahoun KINI,Assistante de Direction,Direction,1991-08-30,"Ouagadougou, Burkina Faso",s.kini@ikasolution.com,+226 70 70 70 70,/assets/team/sandrine.jpg
+5,Tegawende Martin YAMEOGO,Développeur Junior,Engineering,1996-02-18,"Ouagadougou, Burkina Faso",m.yameogo@ikasolution.com,+226 70 70 70 70,/assets/team/Martin.jpg
+6,Roukiatou OUEDRAOGO,Commerciale,Ventes & Marketing,1988-09-12,"Ouagadougou, Burkina Faso",r.ouedraogo@ikasolution.com,+226 70 70 70 70,/assets/team/roukie.jpg
+7,Victorine BAZEMO,Assistante Commerciale,Ventes & Marketing,1993-04-27,"Ouagadougou, Burkina Faso",v.bazemo@ikasolution.com,+226 70 70 70 70,/assets/team/victorine.jpg
+8,Aminata HEMA,Compliance Officer,Comptabilité,1979-12-03,"Ouagadougou, Burkina Faso",a.hema@ikasolution.com,+226 70 70 70 70,/assets/team/aminata.jpg
