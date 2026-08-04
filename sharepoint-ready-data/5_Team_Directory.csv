@@ -1,0 +1,22 @@
+id,scope,name,role,email,phone,location
+team-g-1,global,Awa Kaboré,Responsable communication interne,awa.kabore@ika-solution.fr,+33 1 23 45 67 80,Paris (siège)
+team-g-2,global,Mehdi Benali,Directeur Général,mehdi.benali@ika-solution.fr,+33 1 23 45 67 81,Paris (siège)
+team-g-3,global,Sofia Lemaire,Directrice des Ressources Humaines,sofia.lemaire@ika-solution.fr,+33 1 23 45 67 82,Paris (siège)
+team-comp-1,comptabilite,Nadia Cherif,Responsable comptable,nadia.cherif@ika-solution.fr,+33 1 23 45 67 90,Paris (siège)
+team-comp-2,comptabilite,Karim Saadi,Comptable fournisseurs,karim.saadi@ika-solution.fr,+33 1 23 45 67 91,
+team-comp-3,comptabilite,Léa Fontaine,Gestionnaire paie,lea.fontaine@ika-solution.fr,+33 1 23 45 67 92,
+team-comp-4,comptabilite,Thomas Roche,Contrôleur de gestion,thomas.roche@ika-solution.fr,+33 1 23 45 67 93,
+team-admin-1,administration,Sofia Lemaire,Directrice des Ressources Humaines,sofia.lemaire@ika-solution.fr,+33 1 23 45 67 82,
+team-admin-2,administration,Yann Poliec,Chargé de recrutement,yann.poliec@ika-solution.fr,+33 1 23 45 67 83,
+team-admin-3,administration,Inès Bakir,Gestionnaire RH & contrats,ines.bakir@ika-solution.fr,+33 1 23 45 67 84,
+team-admin-4,administration,Paul Mercier,Juriste d'entreprise,paul.mercier@ika-solution.fr,+33 1 23 45 67 85,
+team-com-1,commerciaux,Élodie Roy,Directrice commerciale,elodie.roy@ika-solution.fr,+33 1 23 45 67 70,Paris (siège)
+team-com-2,commerciaux,Marc Duval,Commercial Île-de-France,marc.duval@ika-solution.fr,+33 1 23 45 67 71,
+team-com-3,commerciaux,Sarah Lemoine,Commercial Rhône-Alpes,sarah.lemoine@ika-solution.fr,+33 1 23 45 67 72,Lyon
+team-com-4,commerciaux,Rachid Mansour,Avant-vente Cloud,rachid.mansour@ika-solution.fr,+33 1 23 45 67 73,
+team-com-5,commerciaux,Camille Petit,Responsable grands comptes,camille.petit@ika-solution.fr,+33 1 23 45 67 74,
+team-tech-1,techniciens,Julien Aubry,Responsable exploitation,julien.aubry@ika-solution.fr,+33 1 23 45 67 60,Paris (siège)
+team-tech-2,techniciens,Hugo Lefort,Technicien support N2,hugo.lefort@ika-solution.fr,+33 1 23 45 67 61,
+team-tech-3,techniciens,Fatou Diallo,Technicienne infrastructure,fatou.diallo@ika-solution.fr,+33 1 23 45 67 62,
+team-tech-4,techniciens,Antoine Garnier,Technicien intervention clients,antoine.garnier@ika-solution.fr,+33 1 23 45 67 63,Lyon
+team-tech-5,techniciens,Mei Chen,Référente base de connaissance,mei.chen@ika-solution.fr,+33 1 23 45 67 64,

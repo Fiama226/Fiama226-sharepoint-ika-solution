@@ -1,0 +1,17 @@
+id,scope,title,date,time,location,category
+evt-g-1,global,Rentrée IKA Solution 2026,2026-09-01,09:30,Salle principale — Paris,Entreprise
+evt-g-2,global,Webinaire cybersécurité,2026-07-12,14:00,En ligne (Teams),Formation
+evt-g-3,global,Revue trimestrielle Q3,2026-07-05,10:00,Salle de conférence A,Réunion
+evt-g-4,global,Cohésion d'été (CSE),2026-07-12,12:00,Base de loisirs — Base de loisirs,Événement
+evt-comp-1,comptabilite,Clôture mensuelle juin 2026,2026-07-03,17:00,Service comptabilité,Échéance
+evt-comp-2,comptabilite,Déclaration TVA T2,2026-07-15,23:59,En ligne (portail impôts),Échéance
+evt-comp-3,comptabilite,Revue budgétaire avec la direction,2026-07-08,11:00,Salle de conférence B,Réunion
+evt-admin-1,administration,Campagne entretiens annuels,2026-09-01,09:00,Sur rendez-vous individuel,RH
+evt-admin-2,administration,Réunion représentants du personnel,2026-07-10,15:00,Salle du CSE,Réunion
+evt-admin-3,administration,Sortie d'été (CSE),2026-07-12,12:00,Base de loisirs,Événement
+evt-com-1,commerciaux,Kick-off commercial T3,2026-07-02,10:00,Salle principale — Paris,Réunion
+evt-com-2,commerciaux,Salon Cloud & Cybersécurité,2026-07-18,09:00,Paris Expo — Porte de Versailles,Événement
+evt-com-3,commerciaux,Revue pipeline commerciale hebdo,2026-07-04,11:00,En ligne (Teams),Réunion
+evt-tech-1,techniciens,Maintenance supervision (jalon 2),2026-07-22,22:00,Salle serveurs — Paris,Maintenance
+evt-tech-2,techniciens,Rotation des astreintes été,2026-07-01,08:00,Général — intranet,Astreinte
+evt-tech-3,techniciens,Stand-up hebdo exploitation,2026-07-07,09:15,Salle technique,Réunion
