@@ -58,7 +58,8 @@ spfx/
 │   ├── 06-provisioning.md          Procédure de déploiement pas à pas
 │   ├── 07-securite-gouvernance.md  Permissions, groupes, cycle de vie
 │   ├── 08-plan-migration.md        Phasage, charges, risques
-│   └── 09-lot1-demarrage.md        ★ Démarrage et tests de validation
+│   ├── 09-lot1-demarrage.md        ★ Démarrage et tests de validation
+│   └── 10-listes-a-creer.md        ★ Listes à créer + types de colonnes
 ├── provisioning/
 │   ├── site-scripts/               JSON de création des listes
 │   ├── site-designs/               Association scripts → designs
@@ -161,8 +162,19 @@ Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 | IKA — Tableau de bord financier | `DonneesFinancieres` |
 | IKA — Bordereau des prix | — (saisie en page) |
 
-**20 Web Parts + 1 extension — portage terminé.**
-**79 fichiers TypeScript compilés en `strict` : 0 erreur, 0 dépendance externe.**
+**21 Web Parts + 1 extension — portage terminé.**
+**83 fichiers TypeScript compilés en `strict` : 0 erreur, 0 dépendance externe.**
+
+### Livré — Lot 7 (assembleur de page)
+
+| Web Part | Listes lues |
+|---|---|
+| IKA — Page d'accueil complète | `HeroSlides`, `Missions`, `Indicateurs`, `Annonces`, `Actualites`, `Documents`, `LiensRapides`, `Evenements`, `Galerie`, `Collaborateurs`, `CollaborateurDuMois`, `Projets` |
+
+Cette Web Part **assembleuse** regroupe en un seul composant toutes les sections
+de la page d'accueil (à l'image du site statique `app/page.tsx`). Ajoutée une
+fois sur une page, elle reconstitue la page d'accueil complète ; le volet de
+propriétés permet de cliquer pour regrouper / masquer chaque section.
 
 Un aperçu statique du design de l'organigramme est disponible dans
 `docs/orgchart-preview.html` (à ouvrir dans un navigateur).
