@@ -1,0 +1,19 @@
+/**
+ * Point d'entrée Tailwind SPFx pour IKA Solution.
+ *
+ * Ce fichier est compilé par :
+ *   - `config/build-tailwind.js`  (mode workbench / dev)
+ *   - `config/webpack-patch.js`   (mode build via Heft)
+ *
+ * La sortie atterrit dans `lib/styles/tailwind.css` et est importée par
+ * chaque web part via `import "../styles/tailwind.css";`.
+ *
+ * Préfixe `ika-` et isolation via `tailwindcss-scoped-preflight` :
+ *   - Toutes les classes Tailwind sont préfixées `ika-` (voir
+ *     config/tailwind.config.js).
+ *   - Le préflight (reset) est scopé au sélecteur `.ika-root` pour ne
+ *     pas casser le DOM SharePoint.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

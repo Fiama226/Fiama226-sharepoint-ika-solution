@@ -1,6 +1,24 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/core-build/serve.schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
   "port": 4321,
   "https": true,
-  "initialPage": "https://ikasolution.sharepoint.com/sites/ika-intranet/_layouts/15/workbench.aspx"
+  "ipAddress": "0.0.0.0",
+  "initialPage": "https://ikasolution.sharepoint.com/sites/ika-intranet/_layouts/15/workbench.aspx",
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://ikasolution.sharepoint.com/sites/ika-intranet/_layouts/15/workbench.aspx",
+      "customActions": {
+        "1e7a6b9d-5c8f-4d2a-e46b-3b9c7d1e2f46": {
+          "location": "ClientSideExtension.ApplicationCustomizer",
+          "properties": {
+            "navigationSource": "hub",
+            "showFooter": true,
+            "showSearch": true,
+            "showDocumentsMenu": true,
+            "footerDescription": ""
+          }
+        }
+      }
+    }
+  }
 }

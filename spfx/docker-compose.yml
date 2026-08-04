@@ -1,0 +1,125 @@
+name: ika-spfx
+
+# =============================================================================
+# IKA Intranet SPFx — docker-compose
+# -----------------------------------------------------------------------------
+# Trois services principaux :
+#   spfx-workbench  : dev avec hot-reload (heft start) sur https://localhost:4321
+#   spfx-build      : build de production jetable (extrait le .sppkg dans ./out)
+#   spfx-shell      : image dev interactive (pour debug / eject-webpack)
+#
+# Démarrage rapide :
+#     docker compose up -d spfx-workbench
+#     docker compose logs -f spfx-workbench
+#     # Workbench : https://localhost:4321/_layouts/15/workbench.aspx
+#     # (configurer le tenant SharePoint cible via TENANT_URL)
+#
+# Build prod :
+#     docker compose run --rm spfx-build
+#     # → ./out/ika-intranet.sppkg
+# =============================================================================
+
+x-node-version: &node_version
+  NODE_VERSION: "22.11.0"
+
+services:
+  # ---------------------------------------------------------------------------
+  # Workbench SPFx (dev avec hot-reload)
+  # ---------------------------------------------------------------------------
+  spfx-workbench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        <<: *node_version
+    image: ika-spfx:dev
+    container_name: ika-spfx-workbench
+    restart: unless-stopped
+    ports:
+      # Workbench Heft (https). Le host est bindé en 0.0.0.0 pour permettre
+      # l'accès depuis n'importe quelle interface (live preview, LAN, etc.).
+      - "4321:4321"   # https workbench
+      - "4322:4322"   # proxy / livereload (si utilisé)
+    environment:
+      # Cible SharePoint Online. Adapter pour votre tenant.
+      TENANT_URL: "https://ikasolution.sharepoint.com"
+      HUB_URL: "https://ikasolution.sharepoint.com/sites/ika-intranet"
+      # Désactive la télémétrie Heft (bruyante en CI / conteneurs)
+      HEFT_TELEMETRY_OPT_OUT: "true"
+      # Permet à Heft de se reconnecter à un dev-cert existant
+      NODE_EXTRA_CA_CERTS: /app/.cert/ca.crt
+    volumes:
+      # Sources en mode "bind" : toute modification de src/ est
+      # immédiatement visible dans le conteneur.
+      - ./src:/app/src:ro
+      - ./config:/app/config:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      # Sortie du bundle JS dans le conteneur (et donc sur l'hôte)
+      - spfx-lib:/app/lib
+      - spfx-temp:/app/temp
+      # Certificat de dev généré par `heft trust-dev-cert`
+      - spfx-cert:/app/.cert
+      # Mode watch pour Tailwind (fichier CSS re-généré si modifié)
+      - tailwind-watcher:/tmp/tailwind
+    networks:
+      - ika-spfx-net
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -kfsS https://localhost:4321/ -o /dev/null 2>&1 || curl -kfsS http://localhost:4321/ -o /dev/null 2>&1 || exit 0"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # Build production jetable (génère le .sppkg)
+  # ---------------------------------------------------------------------------
+  spfx-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      args:
+        <<: *node_version
+    image: ika-spfx:builder
+    container_name: ika-spfx-build
+    profiles: ["build"]   # ne démarre pas avec `up` simple
+    volumes:
+      - ./out:/out
+    command: ["sh", "-c", "cp -v /app/sharepoint/solution/*.sppkg /out/ 2>/dev/null || (echo 'No .sppkg in sharepoint/solution'; ls -la /app/sharepoint/solution /app/solution 2>/dev/null)"]
+
+  # ---------------------------------------------------------------------------
+  # Shell interactif dans l'image dev (debug, eject-webpack, etc.)
+  # ---------------------------------------------------------------------------
+  spfx-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        <<: *node_version
+    image: ika-spfx:dev
+    container_name: ika-spfx-shell
+    profiles: ["shell"]   # ne démarre pas avec `up` simple
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./tsconfig.json:/app/tsconfig.json
+      - spfx-lib:/app/lib
+      - spfx-temp:/app/temp
+    networks:
+      - ika-spfx-net
+
+networks:
+  ika-spfx-net:
+    driver: bridge
+
+volumes:
+  spfx-lib:
+  spfx-temp:
+  spfx-cert:
+  tailwind-watcher:

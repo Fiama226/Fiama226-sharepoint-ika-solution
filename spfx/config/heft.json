@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/heft/v0/heft.schema.json",
+  "extends": "@microsoft/spfx-web-build-rig/profiles/default/config/heft.json",
+  "phasesByName": {
+    "package-solution": {
+      "tasksByName": {
+        "copy-sharepoint-assets-extras": {
+          "taskPlugin": {
+            "pluginPackage": "@rushstack/heft",
+            "pluginName": "copy-files-plugin",
+            "options": {
+              "copyOperations": [
+                {
+                  "sourcePath": "./sharepoint/assets",
+                  "destinationFolders": ["./sharepoint/solution"],
+                  "includeGlobs": ["LICENSE.md"]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
