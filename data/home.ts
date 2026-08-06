@@ -6,6 +6,7 @@
 // jamais d'import direct depuis les composants. Types dans types/intranet.ts.
 
 import type {
+  HomeAnnouncement,
   HomeCollaborator,
   HomeDepartmentCard,
   HomeEmployeeOfMonth,

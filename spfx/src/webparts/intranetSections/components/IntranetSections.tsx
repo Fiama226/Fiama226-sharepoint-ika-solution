@@ -143,7 +143,7 @@ const ProjectDashboard: React.FC<{
   const totalDone = projects.reduce((sum, p) => sum + (p.TasksDone || 0), 0);
   const totalTasks = projects.reduce((sum, p) => sum + (p.TasksTotal || 0), 0);
   const onTrack = projects.filter(
-    (p) => p.ProjectStatus === "À l'heure"
+    (p) => p.ProjectStatus === "À l'heure",
   ).length;
 
   const pills = [
@@ -197,7 +197,7 @@ const ProjectDashboard: React.FC<{
               key={pill.label}
               className={cn(
                 "ika-flex ika-items-center ika-gap-3 ika-rounded-xl ika-px-5 ika-py-3",
-                pill.cls
+                pill.cls,
               )}
             >
               <Icon name={pill.icon} className="ika-h-4 ika-w-4" />
@@ -239,7 +239,7 @@ const ProjectDashboard: React.FC<{
                     className={cn(
                       "ika-flex ika-shrink-0 ika-items-center ika-gap-1 ika-rounded-full ika-px-2.5 ika-py-1 ika-text-[11px] ika-font-bold",
                       cfg.bgColor,
-                      cfg.textColor
+                      cfg.textColor,
                     )}
                   >
                     <Icon name={cfg.icon} className="ika-h-3 ika-w-3" />
@@ -265,7 +265,7 @@ const ProjectDashboard: React.FC<{
                     <div
                       className={cn(
                         "ika-h-full ika-rounded-full ika-transition-all ika-duration-700",
-                        cfg.barColor
+                        cfg.barColor,
                       )}
                       style={{ width: `${progress}%` }}
                     />

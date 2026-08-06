@@ -162,7 +162,7 @@ export default function SiteHeader() {
               </kbd>
             </div>
 
-            {/* Dropdown Documents Simplifié */}
+            {/* Dropdown Documents - Repository Folders */}
             <div className="relative" ref={docsMenuRef}>
               <button
                 onClick={() => setIsDocsMenuOpen(!isDocsMenuOpen)}
@@ -174,41 +174,63 @@ export default function SiteHeader() {
               >
                 <FolderOpen className="w-4 h-4" />
                 <span className="hidden xl:inline">Documents</span>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-semibold">
-                  {DOCS_STATS.total}
-                </span>
               </button>
 
               {isDocsMenuOpen && (
                 <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                   <div className="px-4 py-2 border-b border-gray-100 mb-1">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Bibliothèque
+                      Repository
                     </p>
+                    <Link
+                      href="/documents"
+                      onClick={() => setIsDocsMenuOpen(false)}
+                      className="mt-2 inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <FolderOpen className="w-4 h-4" />
+                      Tous les documents
+                    </Link>
                   </div>
-                  {Object.entries(DEPARTMENT_DOCS).map(([key, dept]) => {
-                    const Icon = dept.icon;
-                    return (
-                      <Link
-                        key={key}
-                        href={`/${key}/documents`}
-                        onClick={() => setIsDocsMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`p-1.5 rounded-lg bg-${dept.color}-50 text-${dept.color}-600 group-hover:bg-white transition-colors`}
-                          >
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <span className="font-medium">{dept.name}</span>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">
-                          {dept.totalDocs}
-                        </span>
-                      </Link>
-                    );
-                  })}
+                  <Link
+                    href="/documents/Comptabilite"
+                    onClick={() => setIsDocsMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors group"
+                  >
+                    <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-white transition-colors">
+                      <Calculator className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">Comptabilité</span>
+                  </Link>
+                  <Link
+                    href="/documents/Administartion"
+                    onClick={() => setIsDocsMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors group"
+                  >
+                    <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600 group-hover:bg-white transition-colors">
+                      <Shield className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">Administration</span>
+                  </Link>
+                  <Link
+                    href="/documents/Commerciaux"
+                    onClick={() => setIsDocsMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors group"
+                  >
+                    <div className="p-1.5 rounded-lg bg-green-50 text-green-600 group-hover:bg-white transition-colors">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">Commerciaux</span>
+                  </Link>
+                  <Link
+                    href="/documents/Techniciens"
+                    onClick={() => setIsDocsMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors group"
+                  >
+                    <div className="p-1.5 rounded-lg bg-orange-50 text-orange-600 group-hover:bg-white transition-colors">
+                      <Wrench className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">Techniciens</span>
+                  </Link>
                   <div className="mt-2 border-t border-gray-100 pt-2">
                     <Link
                       href="/documents"
@@ -216,7 +238,7 @@ export default function SiteHeader() {
                       className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg mx-2 transition-colors"
                     >
                       <FolderOpen className="w-4 h-4" />
-                      Voir toute la bibliothèque
+                      All Documents
                     </Link>
                   </div>
                 </div>

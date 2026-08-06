@@ -190,12 +190,12 @@ function ProjectDashboardA({ projects }: { projects: HomeProject[] }) {
 
 function EmployeeCardA({ employee }: { employee: HomeEmployeeOfMonth }) {
   return (
-    <section className="w-full bg-brand-navy px-4 py-12 sm:px-6 lg:px-8 font-sans">
-      <div className="mx-auto max-w-7xl">
+    <section className="w-full  px-4 py-12 sm:px-6 lg:px-8 font-sans">
+      <div className="mx-auto max-w-7xl ">
         {/* Header */}
         <div className="mb-8 flex flex-wrap items-center gap-3">
           <Award size={26} className="text-amber-400" />
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="text-3xl font-extrabold tracking-tight text-#0a0a0a">
             Collaborateur du mois
           </h2>
           <span className="ml-auto rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1 text-xs font-bold text-amber-300">
@@ -204,7 +204,7 @@ function EmployeeCardA({ employee }: { employee: HomeEmployeeOfMonth }) {
         </div>
 
         {/* Card */}
-        <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-sm md:flex-row">
+        <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10  shadow-sm md:flex-row bg-brand-navy">
           {/* Photo */}
           <div className="relative h-72 shrink-0 md:h-auto md:w-72">
             <Image
