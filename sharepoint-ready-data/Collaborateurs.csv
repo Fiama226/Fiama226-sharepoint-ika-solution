@@ -1,0 +1,9 @@
+Title,JobTitle,Email,Phone,OfficeLocation,Birthdate,HierarchyLevel,Division,IsActive,SortOrder
+YAYA Ouattara,Directeur Général,y.ouattara@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1989-06-14,1,Direction Générale,TRUE,1
+SERGE GEDEON OUE,Développeur Full Stack,s.gedeon@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1982-03-22,2,Engineering,TRUE,2
+Daouda DAO,Développeur Front End,d.dao@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1994-11-05,2,Engineering,TRUE,3
+Sandrine Tiahoun KINI,Assistante de Direction,s.kini@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1991-08-30,2,Direction Générale,TRUE,4
+Tegawende Martin YAMEOGO,Développeur Junior,m.yameogo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1996-02-18,3,Engineering,TRUE,5
+Roukiatou OUEDRAOGO,Commerciale,r.ouedraogo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1988-09-12,2,Ventes & Marketing,TRUE,6
+Victorine BAZEMO,Assistante Commerciale,v.bazemo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1993-04-27,3,Ventes & Marketing,TRUE,7
+Aminata HEMA,Compliance Officer,a.hema@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1979-12-03,2,Comptabilité,TRUE,8

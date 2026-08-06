@@ -1,0 +1,5 @@
+Title,EventDate,EndDate,Location,EventCategory,EventDescription,IsMandatory
+All Hands Tech — Q2 Review,2026-08-10T10:00:00Z,2026-08-10T12:00:00Z,Salle de conférence A,Réunion,Réunion trimestrielle pour passer en revue nos accomplissements techniques.,TRUE
+Workshop Architecture Cloud,2026-08-18T14:00:00Z,2026-08-18T16:00:00Z,En ligne (Teams),Formation,Formation avancée sur les architectures cloud serverless et conteneurs.,FALSE
+Demo Day — Projets IA,2026-08-25T09:00:00Z,2026-08-25T11:30:00Z,Espace Innovation,Séminaire,Présentation et démonstration de nos prototypes d'IA générative.,FALSE
+Revue Cybersécurité S1,2026-09-03T11:00:00Z,2026-09-03T12:30:00Z,Salle de conférence B,Réunion,Bilan de notre audit de sécurité et rappels de sensibilisation.,TRUE

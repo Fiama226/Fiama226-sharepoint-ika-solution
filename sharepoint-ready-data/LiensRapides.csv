@@ -1,0 +1,7 @@
+Title,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive
+Demande de congés,https://ikasolution.sharepoint.com/sites/ika-intranet,Formulaires RH centralisés,Calendar,1,TRUE,RH,TRUE
+Annuaire interne,https://ikasolution.sharepoint.com/sites/ika-intranet,Rechercher un collaborateur,Users,2,FALSE,Général,TRUE
+Demande de matériel,https://ikasolution.sharepoint.com/sites/ika-intranet,Bons de commande IT,Package,3,FALSE,IT,TRUE
+Base de connaissances,https://ikasolution.sharepoint.com/sites/ika-intranet,Wiki & procédures,Book,4,FALSE,Général,TRUE
+Support IT,https://ikasolution.sharepoint.com/sites/ika-intranet,Demander de l'aide,LifeBuoy,5,TRUE,IT,TRUE
+Organigramme,https://ikasolution.sharepoint.com/sites/ika-intranet,Structure des équipes,GitFork,6,FALSE,Général,TRUE

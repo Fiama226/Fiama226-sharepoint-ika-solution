@@ -2,7 +2,8 @@ export type DepartementSlug =
   | "comptabilite"
   | "administration"
   | "commerciaux"
-  | "techniciens";
+  | "techniciens"
+  | "direction";
 
 export type Scope = "global" | DepartementSlug;
 

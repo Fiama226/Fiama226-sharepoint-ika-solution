@@ -1,0 +1,4 @@
+Title,StatValue,IconName,Placement,SortOrder,IsActive
+Projets actifs,24,FolderOpen,Hero accueil,1,TRUE
+Collaborateurs,138,Users,Hero accueil,2,TRUE
+Tickets ouverts,12,Target,Hero accueil,3,TRUE
