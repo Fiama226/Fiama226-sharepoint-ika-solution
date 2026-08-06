@@ -45,6 +45,10 @@
           "manifest": "./src/webparts/homePage/HomePageWebPart.manifest.json"
         },
         {
+          "entrypoint": "./lib/webparts/intranetMain/IntranetMainWebPart.js",
+          "manifest": "./src/webparts/intranetMain/IntranetMainWebPart.manifest.json"
+        },
+        {
           "entrypoint": "./lib/webparts/intranetSections/IntranetSectionsWebPart.js",
           "manifest": "./src/webparts/intranetSections/IntranetSectionsWebPart.manifest.json"
         },
