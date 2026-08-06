@@ -1,6 +1,7 @@
 import {
   IAnnouncement,
   ICollaborateur,
+  IDepartement,
   IDocumentItem,
   IEmployeeOfMonth,
   IEventItem,
@@ -40,6 +41,15 @@ export interface IIntranetMainProps {
   employee: IEmployeeOfMonth | undefined;
   employeePhotoUrl: string;
   projects: IProject[];
+  departments: IDepartement[];
+
+  // —— Chrome (header / footer) intégrés —————————————————
+  /** Affiche le header IKA en haut de la WP (évite une extension séparée). */
+  showHeader: boolean;
+  /** Affiche le footer IKA en bas de la WP (évite une extension séparée). */
+  showFooter: boolean;
+  /** URL du logo affiché dans le header / footer. */
+  logoUrl?: string;
 
   // —— Contexte utilisateur ————————————————————————————————
   currentUser: string;

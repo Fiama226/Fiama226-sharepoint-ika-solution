@@ -24,7 +24,7 @@ if (!fs.existsSync(outputDir)) {
 }
 
 // Helper to write CSV and add to workbook
-function exportDataSet(sheetName: string, fileName: string, data: any[]) {
+function exportDataSet(sheetName: string, fileName: string, data: unknown[]) {
   if (!data || data.length === 0) return;
 
   // Create worksheet

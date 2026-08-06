@@ -41,10 +41,6 @@
           "manifest": "./src/webparts/heroSlider/HeroSliderWebPart.manifest.json"
         },
         {
-          "entrypoint": "./lib/webparts/homePage/HomePageWebPart.js",
-          "manifest": "./src/webparts/homePage/HomePageWebPart.manifest.json"
-        },
-        {
           "entrypoint": "./lib/webparts/intranetMain/IntranetMainWebPart.js",
           "manifest": "./src/webparts/intranetMain/IntranetMainWebPart.manifest.json"
         },
@@ -93,14 +89,7 @@
           "manifest": "./src/webparts/timeline/TimelineWebPart.manifest.json"
         }
       ]
-    },
-    "ika-intranet-chrome-extension": {
-      "components": [
-        {
-          "entrypoint": "./lib/extensions/ikaChrome/IkaChromeApplicationCustomizer.js",
-          "manifest": "./src/extensions/ikaChrome/IkaChromeApplicationCustomizer.manifest.json"
-        }
-      ]
     }
   }
 }
+

@@ -15,10 +15,10 @@ Il ne modifie **aucun** fichier de la maquette Next.js existante.
 |---|---|---|
 | Plateforme cible | SharePoint Online (Microsoft 365) | `docs/01-architecture.md` |
 | Architecture de sites | Hub Site + 1 site de communication par département | `docs/01-architecture.md` |
-| Provisioning | Site Scripts + Site Designs (JSON natif) | `provisioning/` |
+| Provisioning | Création manuelle via l'interface web | `docs/10-listes-a-creer.md` |
 | Styling | Tailwind CSS compilé dans le bundle SPFx | `docs/04-styling-tailwind.md` |
-| Header / Footer | SPFx Application Customizer (Top + Bottom) | `docs/05-extensions.md` |
-| Périmètre | Doc + scripts + code SPFx + portage UI | ce dossier |
+| Header / Footer | Composants React directement intégrés à `IntranetMain` (1 seule WP à poser) | `src/webparts/intranetMain/` |
+| Périmètre | Code SPFx + portage UI + documentation | ce dossier |
 
 ---
 
@@ -51,29 +51,28 @@ spfx/
 ├── README.md                       ← vous êtes ici
 ├── docs/
 │   ├── 01-architecture.md          Architecture hub + sites + sécurité
-│   ├── 02-listes-sharepoint.md     ★ Schémas détaillés des 16 listes
+│   ├── 02-listes-sharepoint.md     ★ Schémas détaillés des listes
 │   ├── 03-migration-composants.md  Mapping 1:1 Next.js → Web Parts
 │   ├── 04-styling-tailwind.md      Intégration Tailwind dans SPFx
-│   ├── 05-extensions.md            Application Customizer header/footer
-│   ├── 06-provisioning.md          Procédure de déploiement pas à pas
+│   ├── 05-extensions.md            Composants Header/Footer réutilisés
 │   ├── 07-securite-gouvernance.md  Permissions, groupes, cycle de vie
 │   ├── 08-plan-migration.md        Phasage, charges, risques
 │   ├── 09-lot1-demarrage.md        ★ Démarrage et tests de validation
 │   └── 10-listes-a-creer.md        ★ Listes à créer + types de colonnes
-├── provisioning/
-│   ├── site-scripts/               JSON de création des listes
-│   ├── site-designs/               Association scripts → designs
-│   ├── scripts/                    PowerShell de déploiement
-│   └── theme/                      Thème SharePoint IKA
 ├── src/
 │   ├── webparts/                   Web Parts (1 dossier par composant)
-│   ├── extensions/                 Application Customizer
+│   ├── extensions/                 Composants Header/Footer (intégrés à IntranetMain)
 │   ├── models/                     Interfaces TypeScript
 │   ├── services/                   Accès données SharePoint
 │   └── common/                     Hooks et utilitaires
 ├── config/                         Configuration solution SPFx
-└── assets/                         Logo, images de référence
+└── sharepoint/assets/              Éléments de packaging
 ```
+
+> **Création des listes 100% manuelle.** Les scripts PowerShell et Site
+> Scripts ont été retirés du repo. Suivez `docs/10-listes-a-creer.md` et
+> `../DEPLOYMENT-GUIDE.md` pour créer les listes à la main dans l'interface
+> SharePoint.
 
 ---
 
@@ -82,21 +81,20 @@ spfx/
 1. **Lire** `docs/01-architecture.md` — comprendre la cible
 2. **Valider** `docs/02-listes-sharepoint.md` — c'est le document à faire
    approuver par le métier avant tout développement
-3. **Exécuter** `provisioning/scripts/` — créer les sites et les listes
-4. **Développer** en suivant `docs/03-migration-composants.md`
+3. **Créer les listes à la main** dans SharePoint en suivant
+   `docs/10-listes-a-creer.md` et `../DEPLOYMENT-GUIDE.md`
+4. **Builder** le `.sppkg` (voir §5) puis l'envoyer à l'admin du tenant
+5. **Ajouter** la WP `IKA — Intranet (composant principal)` sur une page
+   en section pleine largeur
 
 ### Outils fournis
 
 ```bash
 # Valider tous les artefacts avant deploiement
-node spfx/config/validate.js
-
-# Prefixer les classes Tailwind d'un composant porte
-node spfx/config/prefix-classes.js <fichier.tsx>          # simulation
-node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
+node config/validate.js
 ```
 
-État actuel de la validation : **20 listes, 155 champs, 0 erreur**.
+État actuel de la validation : **20 listes, 155 champs**.
 
 ---
 
@@ -106,10 +104,10 @@ node spfx/config/prefix-classes.js <fichier.tsx> --write  # application
 
 | Élément | Rôle |
 |---|---|
-| `IkaChrome` | Application Customizer — header + footer sur tous les sites |
+| `IkaHeader` / `IkaFooter` | Composants React de header/footer (directement intégrés à `IntranetMain` — plus besoin d'Application Customizer séparée) |
 | `DataService` | Accès REST aux listes + cache session |
 | `NavigationService` | Navigation du hub + repli statique |
-| `Icon` | 43 icônes SVG inline, zéro dépendance |
+| `Icon` | 47 icônes SVG inline, zéro dépendance |
 | `spUtils` | Dates, images, devises, `cn()` |
 | `useClickOutside` / `useLiveClock` | Hooks partagés |
 
@@ -162,8 +160,8 @@ Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 | IKA — Tableau de bord financier | `DonneesFinancieres` |
 | IKA — Bordereau des prix | — (saisie en page) |
 
-**21 Web Parts + 1 extension — portage terminé.**
-**83 fichiers TypeScript compilés en `strict` : 0 erreur, 0 dépendance externe.**
+**20 Web Parts — portage terminé.**
+Header/Footer intégrés à la Web Part principale pour un déploiement en un seul coup.
 
 ### Livré — Lot 7 (assembleur de page)
 
@@ -219,6 +217,15 @@ Voir [`BUILD-INSTRUCTIONS.md`](./BUILD-INSTRUCTIONS.md) pour le détail.
 Les données de la maquette (`data/*.ts`) sont la **spécification fonctionnelle**
 des listes SharePoint. Toute liste du document `02-listes-sharepoint.md`
 correspond à une interface de `types/intranet.ts`.
+
+> 🚀 **Déploiement « en un coup »** : la Web Part
+> **`IKA — Intranet (composant principal)`** (`IntranetMainWebPart`) est
+> autosuffisante. Posée une fois sur une section pleine largeur, elle rend
+> le header IKA, toute la page d'accueil (Hero, annonces, actualités, accès
+> rapide, galerie, équipe, collaborateur du mois, projets, **portails
+> départementaux**) et le footer IKA. Les cartes départementales pointent
+> vers la bibliothèque « Documents partagés » de chaque site (colonne
+> `SiteUrl` de la liste `Departements`).
 
 | Maquette Next.js | Liste SharePoint |
 |---|---|

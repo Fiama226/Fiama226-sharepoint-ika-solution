@@ -8,9 +8,10 @@
 ## 1. Contexte & décisions
 
 - **Structure** : 1 accueil + 4 sous-sites par département :
-  - `/comptabilite` → `Finance.jpg` · `/administration` → `Administartion.jpg`
-  - `/commerciaux` → `Sales-Department-Homepage-SharePoint-Maven-scaled.jpg`
+  - `/comptabilite` → `design-references/Finance.jpg` · `/administration` → `design-references/Administartion.jpg`
+  - `/commerciaux` → `design-references/Sales-Department-Homepage-SharePoint-Maven-scaled.jpg`
   - `/techniciens` → style Administration (pas d'image fournie)
+  - ⚠️ Les pages `/comptabilite`, `/administration`, `/commerciaux`, `/techniciens` ne sont pas encore créées dans `app/` — les liens du menu pointent pour l'instant vers des routes 404 (choix volontaire, à implémenter).
 - **Palette** (logo IKA) : bleu marine `#0A2540` + cyan `#06B6D4`.
 - **Langue UI + dummy data** : français. Code/identifiants : anglais.
 - **Auth**: aucune — le header affiche un utilisateur fictif fixe (`Awa Kaboré`).

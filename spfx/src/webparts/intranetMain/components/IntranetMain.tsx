@@ -13,6 +13,21 @@ import { Gallery } from "../../gallery/components/Gallery";
 import { TeamHome } from "../../teamHome/components/TeamHome";
 import { IntranetSections } from "../../intranetSections/components/IntranetSections";
 
+// Header/Footer intégrés (plus besoin d'activer l'Application Customizer
+// séparément — tout est rendu par la seule Web Part IntranetMain).
+import { IkaHeader } from "../../../extensions/ikaChrome/components/IkaHeader";
+import { IkaFooter } from "../../../extensions/ikaChrome/components/IkaFooter";
+import { IChromeContext, INavNode } from "../../../models/IChromeModels";
+import {
+  STATIC_PRIMARY_NAV,
+  STATIC_SECONDARY_NAV,
+} from "../../../services/NavigationService";
+import { DepartmentGrid } from "./DepartmentGrid";
+
+// NOTE : les icônes utilisées dans le header (Home, Calendar, Book, …) sont
+// fournies par Icon.tsx (registry partagé). Elles ont été ajoutées au registre
+// pour que le header fonctionne sans dépendance externe.
+
 // ---------------------------------------------------------------------------
 // Hook : fade-in au scroll (IntersectionObserver)
 // ---------------------------------------------------------------------------
@@ -189,11 +204,73 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
 
   const animate = props.animationsEnabled;
 
+  // —— Contexte chrome (header / footer) ———————————————
+  // Construit à partir des props passées par la Web Part. Évite de dépendre
+  // de l'Application Customizer pour que la WP seule soit autosuffisante.
+  const chromeContext = React.useMemo<IChromeContext>(() => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const hubUrl = `${origin}/sites/ika-intranet`;
+    const siteUrl = `${origin}${window.location.pathname.split("/").slice(0, 3).join("/")}`;
+    return {
+      currentUser: {
+        displayName: props.currentUser,
+        email: "",
+        loginName: "",
+        photoUrl: "",
+        isSiteAdmin: false,
+      },
+      currentPath: window.location.pathname,
+      hubUrl,
+      siteUrl,
+      logoUrl: props.logoUrl || `${hubUrl}/SiteAssets/logo.png`,
+    };
+  }, [props.currentUser, props.logoUrl]);
+
+  // Construit la navigation « Documents par département » à partir de la
+  // liste Departements. Chaque carte / lien ouvre la bibliothèque
+  // « Documents partagés » (Shared Documents) du site départemental
+  // correspondant — c'est la bibliothèque de documents SharePoint par défaut.
+  const documentsNav: INavNode[] = React.useMemo(() => {
+    return props.departments.map((dept, idx) => {
+      const siteRel = dept.SiteUrl && dept.SiteUrl.Url
+        ? dept.SiteUrl.Url.replace(/^https?:\/\/[^/]+/, "")
+        : `${chromeContext.hubUrl}`;
+      // SharePoint renomme la bibliothèque par défaut selon la langue du site :
+      // FR → "Documents%20partages", EN → "Shared%20Documents". On utilise la
+      // version FR qui correspond au site IKA.
+      const target =
+        dept.Slug && dept.Slug !== "direction"
+          ? `${siteRel}/Documents%20partages`
+          : `${chromeContext.hubUrl}/Documents%20partages`;
+      const iconFallback = ["Calculator", "ShieldCheck", "Users", "Settings", "Building2"][idx] || "FolderOpen";
+      return {
+        key: `doc-${dept.Id || idx}`,
+        label: dept.Title,
+        url: target,
+        iconName: dept.IconName || iconFallback,
+      };
+    });
+  }, [props.departments, chromeContext.hubUrl]);
+
   return (
     <div
       className="ika-root ika-bg-white ika-text-slate-900"
       data-accent={props.accent}
     >
+      {/* ────────────────────────────────────────────────────────────
+          0. HEADER IKA (intégré — pas d'extension séparée à activer)
+          ──────────────────────────────────────────────────────────── */}
+      {props.showHeader ? (
+        <IkaHeader
+          context={chromeContext}
+          primaryNav={STATIC_PRIMARY_NAV}
+          secondaryNav={STATIC_SECONDARY_NAV}
+          showSearch={true}
+          showDocumentsMenu={documentsNav.length > 0}
+          documentsNav={documentsNav}
+        />
+      ) : null}
+
       {/* ────────────────────────────────────────────────────────────
           1. HERO SLIDER (pleine largeur, hors conteneur comme Next.js)
           ──────────────────────────────────────────────────────────── */}
@@ -310,10 +387,34 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
             />
           </RevealSection>
         ) : null}
+
+        {/* ──────────────────────────────────────────────────────────
+            7. PORTAILS DÉPARTEMENTAUX
+               Cartes qui ouvrent directement la bibliothèque
+               « Documents partagés » de chaque département — équivaut
+               aux cartes de la maquette Next.js mais pointe sur la
+               bibliothèque SharePoint plutôt que sur une route Next.
+            ────────────────────────────────────────────────────────── */}
+        {props.departments.length > 0 ? (
+          <RevealSection enabled={animate}>
+            <DepartmentGrid departments={props.departments} />
+          </RevealSection>
+        ) : null}
       </div>
 
+      {/* ──────────────────────────────────────────────────────────
+          FOOTER IKA (intégré)
+          ────────────────────────────────────────────────────────── */}
+      {props.showFooter ? (
+        <IkaFooter
+          company={undefined}
+          description="L'intranet IKA Solution est votre passerelle vers un univers de connaissances, de collaboration et d'innovation. Explorez nos ressources, échangez avec vos collègues et restez informé des dernières actualités."
+          logoUrl={chromeContext.logoUrl}
+        />
+      ) : null}
+
       {/* ── Espacement final pour la respiration de page ── */}
-      <div className="ika-h-16" aria-hidden="true" />
+      {!props.showFooter ? <div className="ika-h-16" aria-hidden="true" /> : null}
     </div>
   );
 };
