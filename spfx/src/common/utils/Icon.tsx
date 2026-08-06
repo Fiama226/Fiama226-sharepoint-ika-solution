@@ -108,6 +108,13 @@ const REGISTRY: Record<string, PathSet[]> = {
   Phone: [S("M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z")],
   MapPin: [S("M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"), C(12, 10, 2.6)],
   Zap: [S("M13 2 4 14h7l-1 8 9-12h-7l1-8Z")],
+  Home: [S("M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9.5Z")],
+  "arrow-right": [S("M5 12h14M13 5l7 7-7 7")],
+  Award: [
+    C(12, 9, 5),
+    S("M8.2 13.6 6 22l6-3 6 3-2.2-8.4"),
+    S("M9 2h6l2 4H7l2-4Z"),
+  ],
 };
 
 export const Icon: React.FC<IIconProps> = (props) => {

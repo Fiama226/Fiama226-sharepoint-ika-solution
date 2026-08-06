@@ -16,10 +16,10 @@ npm run build
 
 | Route | Département / rôle | Design de référence |
 |---|---|---|
-| `/` | Accueil central | `Homepage.jpg` |
-| `/comptabilite` | Comptabilité | `Finance.jpg` |
-| `/administration` | Administration | `Administartion.jpg` |
-| `/commerciaux` | Commerciaux | `Sales-Department-Homepage-SharePoint-Maven-scaled.jpg` |
+| `/` | Accueil central | `design-references/Homepage.jpg` |
+| `/comptabilite` | Comptabilité | `design-references/Finance.jpg` |
+| `/administration` | Administration | `design-references/Administartion.jpg` |
+| `/commerciaux` | Commerciaux | `design-references/Sales-Department-Homepage-SharePoint-Maven-scaled.jpg` |
 | `/techniciens` | Techniciens | style Administration (pas d'image fournie) |
 
 ## Stack

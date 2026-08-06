@@ -37,6 +37,7 @@ import { DataService } from "../../services/DataService";
 import {
   IAnnouncement,
   ICollaborateur,
+  IDepartement,
   IDocumentItem,
   IEmployeeOfMonth,
   IEventItem,
@@ -95,6 +96,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
   private _employee: IEmployeeOfMonth | undefined = undefined;
   private _employeePhoto: string = "";
   private _projects: IProject[] = [];
+  private _departments: IDepartement[] = [];
 
   private _loading: boolean = true;
   private _error: string | undefined = undefined;
@@ -133,6 +135,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         employee: this._employee,
         employeePhotoUrl: this._employeePhoto,
         projects: this._projects,
+        departments: this._departments,
 
         loading: this._loading,
         error: this._error,
@@ -148,6 +151,10 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         showTeam: this.properties.showTeam !== false,
         showEmployee: this.properties.showEmployee !== false,
         showProjects: this.properties.showProjects !== false,
+        // Chrome intégré : activé par défaut pour un déploiement
+        // en un seul coup (pas besoin d'activer l'Application Customizer).
+        showHeader: true,
+        showFooter: true,
       }
     );
 
@@ -173,6 +180,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
       collaboratorsRes,
       employeeRes,
       projectsRes,
+      departmentsRes,
     ] = await Promise.all([
       this._service.getHeroSlides().catch(() => undefined),
       this._service.getMissions().catch(() => undefined),
@@ -186,6 +194,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
       this._service.getCollaborateurs().catch(() => undefined),
       this._service.getEmployeeOfMonth().catch(() => undefined),
       this._service.getProjects(true).catch(() => undefined),
+      this._service.getDepartements().catch(() => undefined),
     ]);
 
     this._slides = slidesRes || [];
@@ -208,6 +217,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
     this._gallery = galleryRes || [];
     this._collaborators = collaboratorsRes || [];
     this._projects = projectsRes || [];
+    this._departments = departmentsRes || [];
 
     this._employee = employeeRes;
     if (this._employee) {

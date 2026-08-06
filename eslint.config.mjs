@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // SPFx is a *separate* project with its own toolchain, React version and
+    // ESLint config. Do NOT lint it with Next/React 19 rules.
+    "spfx/**",
+    // Build output / generated
+    "node_modules/**",
+    "design-references/**",
+    "sharepoint-ready-data/**",
   ]),
 ]);
 
