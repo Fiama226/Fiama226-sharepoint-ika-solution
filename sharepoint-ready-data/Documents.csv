@@ -1,0 +1,7 @@
+FileLeafRef,Title,DocCategory,DocDescription,Confidentiality,IsPinned,BusinessVersion
+charte-dev.pdf,Charte Développement,Procédure,"Spécifications et bonnes pratiques de codage internes IKA Solution.",Interne,TRUE,v2.4
+patterns-archi.pdf,Architecture Patterns,Guide,Modèles d'architecture cloud et microservices d'entreprise.,Interne,TRUE,v1.1
+templates-proj.zip,Templates de Projets,Modèle,Structures prêtes à l'emploi pour démarrer de nouveaux projets.,Public,TRUE,v3.0
+process-cicd.pdf,Processus CI/CD,Procédure,Guide de mise en œuvre de l'intégration et du déploiement continus.,Interne,TRUE,v1.2
+reglement-depenses.pdf,Politique de Dépenses,Politique,Règles et limites de remboursement des frais de mission.,Interne,TRUE,v4.0
+guide-cybersec.pdf,Guide Cybersécurité,Politique,Règles fondamentales de sécurité des postes et mots de passe.,Confidentiel,TRUE,v2.0
