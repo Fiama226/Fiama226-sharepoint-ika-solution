@@ -1,5 +1,0 @@
-slug,name,tagline,description,heroTitle,heroSubtitle,accent,icon
-comptabilite,Comptabilité,Pilotage financier & reporting,"Suivi budgétaire, factures fournisseurs/clients, paie, déclarations fiscales et reporting de gestion.",Espace Comptabilité,"Vos documents financiers, rapports et échéances fiscales au même endroit.",navy,finance
-administration,Administration,"RH, juridique & vie de l'entreprise","Congés, contrats, vie sociale, processus administratifs et ressources internes.",Espace Administration,"Gestion administrative, RH, contrats et démarches internes.",cyan,admin
-commerciaux,Commerciaux,"Pipeline, devis & clients","Suivi commercial, opportunités, devis, clients et objectifs par équipe.",Espace Commerciaux,"Votre pipeline, vos opportunités et vos outils de suivi commercial.",navy,sales
-techniciens,Techniciens,"Support, interventions & projets","Tickets d'intervention, base de connaissance, planning technique et projets clients.",Espace Techniciens,"Suivi des interventions, ressources techniques et base de connaissance.",cyan,tech

@@ -40,7 +40,7 @@
 | **DataService avec tolérance d'erreur** | Le fetch parallèle tolère jusqu'à 7 échecs de liste avant d'afficher une erreur. Très bonne UX pour SharePoint. |
 | **Volet de propriétés riche sur la Web Part principale** | 12 toggles + options d'apparence (hauteur hero, accent). Permet de masquer/montrer des sections sans supprimer la WP. |
 | **Site Scripts + PnP PowerShell fournis** | `spfx/provisioning/` contient les JSON et scripts pour automatiser. |
-| **Données d'import CSV/Excel générées** | `sharepoint-ready-data/` contient 13 feuilles CSV/XLSX prêtes à importer dans SharePoint. |
+| **Données d'import CSV générées** | `sharepoint-ready-data/` contient **14 CSV** (une série unique, alignée sur les colonnes SharePoint) prêts à importer via Quick Edit. |
 | **Résolution automatique photo M365** | Si un collaborateur n'a pas de photo uploadée dans la liste, la Web Part repli sur la photo de profil Microsoft 365. |
 | **Respect de `prefers-reduced-motion`** | Les animations se désactivent automatiquement selon le setting système. |
 
@@ -385,11 +385,12 @@ Voir `spfx/docs/10-listes-a-creer.md` §B12-B13 pour le schéma détaillé.
 </details>
 
 <details>
-<summary><code>Actualites</code> — Liste locale (par site départemental)</summary>
+<summary><code>Actualites</code> — Liste locale (par site départemental) / globale sur le hub</summary>
 
 | Nom affiché | Interne | Type | Valeurs |
 |---|---|---|---|
 | Titre | `Title` | Texte | |
+| **Scope** | `Scope` | Choix | `global`, `comptabilite`, `administration`, `commercial`, `techniques` — **obligatoire** (requis par `DataService.getNews()`, valeur par défaut `global`) |
 | Excerpt | `Excerpt` | Note | |
 | Body | `Body` | Note | |
 | Category | `Category` | Choix | `Entreprise`, `RH`, `Projet`, `Finance`, `Administration`, `Commercial`, `Technique`, `Événement`, `DevOps`, `Formation`, `Cybersécurité`, `Innovation` |
@@ -583,9 +584,16 @@ Une fois la page en place, où déposer quoi ?
 | Départements | Liste **`Departements`** | `Slug` et `SortOrder` obligatoires. Remplir `SiteUrl` avec l'URL absolue du site départemental (ex. `https://<tenant>.sharepoint.com/sites/ika-comptabilite`) pour que les cartes ouvrent la bonne bibliothèque ; sinon la WP utilise une convention `ika-<slug>` puis retombe sur le hub. |
 
 > 📊 **Import en masse** : les fichiers dans `sharepoint-ready-data/*.csv` sont
-> pré-remplis avec les données dummy du site Next.js. Tu peux les importer dans
-> SharePoint via "Quick Edit" (vue grille) → copier/coller depuis Excel, ou via
-> le script `04-Import-SampleData.ps1`.
+> pré-remplis avec les données dummy du site Next.js, alignés sur les colonnes
+> internes attendues par `DataService`. Import unique : créez la liste (colonnes
+> ci-dessus), puis remplissez-la via "Quick Edit" (vue grille) → copier/coller
+> depuis Excel, en respectant l'ordre ci-dessous (dépendances lookup).
+>
+> ⚠️ **La liste `Actualites` doit impérativement avoir une colonne `Scope`**
+> (Choix : `global`, `comptabilite`, `administration`, `commercial`, `techniques`)
+> car `DataService.getNews()` filtre `$filter=Scope eq 'global'`. Le CSV
+> `Actualites.csv` inclut déjà cette colonne (valeur `global`) — cochez-la lors
+> de la création de la liste.
 
 ---
 
