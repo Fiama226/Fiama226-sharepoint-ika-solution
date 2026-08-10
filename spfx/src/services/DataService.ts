@@ -144,7 +144,7 @@ export class DataService {
   }
 
   public async getNews(top: number = 4, scope: string = "global"): Promise<INewsItem[]> {
-    if (this._useMocks) return Mocks.MOCK_NEWS.slice(0, top);
+    if (this._useMocks) return [];
 
     try {
       const select = [
@@ -169,15 +169,15 @@ export class DataService {
         `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
 
       const items = await this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_NEWS.slice(0, top);
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour actualités:", e);
-      return Mocks.MOCK_NEWS.slice(0, top);
+      return [];
     }
   }
 
   public async getDocuments(top: number = 10, listTitle: string = "Documents"): Promise<IDocumentItem[]> {
-    if (this._useMocks) return Mocks.MOCK_DOCUMENTS.slice(0, top);
+    if (this._useMocks) return [];
 
     try {
       const select = [
@@ -199,15 +199,15 @@ export class DataService {
         `&$filter=FSObjType eq 0&$orderby=Modified desc&$top=${top}`;
 
       const items = await this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${listTitle}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_DOCUMENTS.slice(0, top);
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour documents:", e);
-      return Mocks.MOCK_DOCUMENTS.slice(0, top);
+      return [];
     }
   }
 
   public async getEvents(top: number = 5, scope: string = "global"): Promise<IEventItem[]> {
-    if (this._useMocks) return Mocks.MOCK_EVENTS.slice(0, top);
+    if (this._useMocks) return [];
 
     try {
       const today = new Date().toISOString();
@@ -230,15 +230,15 @@ export class DataService {
         `&$orderby=EventDate asc&$top=${top}`;
 
       const items = await this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_EVENTS.slice(0, top);
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour événements:", e);
-      return Mocks.MOCK_EVENTS.slice(0, top);
+      return [];
     }
   }
 
   public async getQuickLinks(scope: string = "global"): Promise<IQuickLink[]> {
-    if (this._useMocks) return Mocks.MOCK_QUICKLINKS;
+    if (this._useMocks) return [];
 
     try {
       const endpoint =
@@ -247,15 +247,15 @@ export class DataService {
         `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=50`;
 
       const items = await this._get<IQuickLink>(this._webUrl, endpoint, "quicklinks");
-      return items && items.length > 0 ? items : Mocks.MOCK_QUICKLINKS;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour liens rapides:", e);
-      return Mocks.MOCK_QUICKLINKS;
+      return [];
     }
   }
 
   public async getDepartements(): Promise<IDepartement[]> {
-    if (this._useMocks) return Mocks.MOCK_DEPARTEMENTS;
+    if (this._useMocks) return [];
 
     try {
       const endpoint =
@@ -269,15 +269,15 @@ export class DataService {
         "departements",
         30 * 60 * 1000
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_DEPARTEMENTS;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour départements:", e);
-      return Mocks.MOCK_DEPARTEMENTS;
+      return [];
     }
   }
 
   public async getAnnouncements(): Promise<IAnnouncement[]> {
-    if (this._useMocks) return Mocks.MOCK_ANNOUNCEMENTS;
+    if (this._useMocks) return [];
 
     try {
       const today = new Date().toISOString();
@@ -288,15 +288,15 @@ export class DataService {
         `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
 
       const items = await this._get<IAnnouncement>(this._hubUrl, endpoint, "announcements");
-      return items && items.length > 0 ? items : Mocks.MOCK_ANNOUNCEMENTS;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour annonces:", e);
-      return Mocks.MOCK_ANNOUNCEMENTS;
+      return [];
     }
   }
 
   public async getProjects(onHomeOnly: boolean = true): Promise<IProject[]> {
-    if (this._useMocks) return Mocks.MOCK_PROJECTS;
+    if (this._useMocks) return [];
 
     try {
       const filter = onHomeOnly ? "&$filter=ShowOnHome eq 1" : "";
@@ -306,15 +306,15 @@ export class DataService {
         `${filter}&$orderby=SortOrder asc&$top=20`;
 
       const items = await this._get<IProject>(this._hubUrl, endpoint, `projects.${onHomeOnly}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_PROJECTS;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour projets:", e);
-      return Mocks.MOCK_PROJECTS;
+      return [];
     }
   }
 
   public async getHeroSlides(): Promise<IHeroSlide[]> {
-    if (this._useMocks) return Mocks.MOCK_SLIDES;
+    if (this._useMocks) return [];
 
     try {
       const endpoint =
@@ -323,15 +323,15 @@ export class DataService {
         `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=10`;
 
       const items = await this._get<IHeroSlide>(this._hubUrl, endpoint, "heroslides");
-      return items && items.length > 0 ? items : Mocks.MOCK_SLIDES;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour slides hero:", e);
-      return Mocks.MOCK_SLIDES;
+      return [];
     }
   }
 
   public async getMissions(): Promise<IMission[]> {
-    if (this._useMocks) return Mocks.MOCK_MISSIONS;
+    if (this._useMocks) return [];
 
     try {
       const endpoint =
@@ -340,10 +340,10 @@ export class DataService {
         `&$orderby=SortOrder asc&$top=20`;
 
       const items = await this._get<IMission>(this._hubUrl, endpoint, "missions", 30 * 60 * 1000);
-      return items && items.length > 0 ? items : Mocks.MOCK_MISSIONS;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour missions:", e);
-      return Mocks.MOCK_MISSIONS;
+      return [];
     }
   }
 
@@ -351,9 +351,7 @@ export class DataService {
     placement: "Hero accueil" | "Page histoire" = "Hero accueil"
   ): Promise<IIndicator[]> {
     if (this._useMocks) {
-      return Mocks.MOCK_STATS.filter(
-        (s) => s.Placement === placement || s.Placement === "Les deux"
-      );
+      return [];
     }
 
     try {
@@ -364,24 +362,16 @@ export class DataService {
         `&$orderby=SortOrder asc&$top=20`;
 
       const items = await this._get<IIndicator>(this._hubUrl, endpoint, `indicators.${placement}`);
-      return items && items.length > 0
-        ? items
-        : Mocks.MOCK_STATS.filter(
-            (s) => s.Placement === placement || s.Placement === "Les deux"
-          );
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour indicateurs:", e);
-      return Mocks.MOCK_STATS.filter(
-        (s) => s.Placement === placement || s.Placement === "Les deux"
-      );
+      return [];
     }
   }
 
   public async getCollaborateurs(division?: string): Promise<ICollaborateur[]> {
     if (this._useMocks) {
-      return division
-        ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
-        : Mocks.MOCK_COLLABORATORS;
+      return [];
     }
 
     try {
@@ -418,12 +408,10 @@ export class DataService {
         endpoint,
         `collaborateurs.${division || "all"}`
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_COLLABORATORS;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour collaborateurs:", e);
-      return division
-        ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
-        : Mocks.MOCK_COLLABORATORS;
+      return [];
     }
   }
 
@@ -465,7 +453,7 @@ export class DataService {
   }
 
   public async getGalleryImages(top: number = 12): Promise<IGalleryImage[]> {
-    if (this._useMocks) return Mocks.MOCK_GALLERY.slice(0, top);
+    if (this._useMocks) return [];
 
     try {
       const endpoint =
@@ -475,15 +463,15 @@ export class DataService {
         `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
 
       const items = await this._get<IGalleryImage>(this._hubUrl, endpoint, `gallery.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_GALLERY.slice(0, top);
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour galerie:", e);
-      return Mocks.MOCK_GALLERY.slice(0, top);
+      return [];
     }
   }
 
   public async getEmployeeOfMonth(): Promise<IEmployeeOfMonth | undefined> {
-    if (this._useMocks) return Mocks.MOCK_EMPLOYEE;
+    if (this._useMocks) return undefined;
 
     try {
       const select = [
@@ -514,10 +502,10 @@ export class DataService {
         "employeeOfMonth"
       );
 
-      return items && items.length > 0 ? items[0] : Mocks.MOCK_EMPLOYEE;
+      return items && items.length > 0 ? items[0] : undefined;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour collaborateur du mois:", e);
-      return Mocks.MOCK_EMPLOYEE;
+      return undefined;
     }
   }
 
@@ -542,7 +530,7 @@ export class DataService {
   }
 
   public async getMilestones(): Promise<IMilestone[]> {
-    if (this._useMocks) return Mocks.MOCK_MILESTONES;
+    if (this._useMocks) return [];
 
     try {
       const endpoint =
@@ -551,10 +539,10 @@ export class DataService {
         `&$orderby=SortOrder asc&$top=50`;
 
       const items = await this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
-      return items && items.length > 0 ? items : Mocks.MOCK_MILESTONES;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour histoire:", e);
-      return Mocks.MOCK_MILESTONES;
+      return [];
     }
   }
 
@@ -581,10 +569,10 @@ export class DataService {
         endpoint,
         `faq.${category || "all"}`
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_FAQ;
+      return items || [];
     } catch (e) {
       console.warn("[DataService] Fallback mock pour FAQ:", e);
-      return Mocks.MOCK_FAQ;
+      return [];
     }
   }
 
@@ -603,7 +591,7 @@ export class DataService {
         30 * 60 * 1000
       );
 
-      if (!items || items.length === 0) return Mocks.MOCK_COMPANY;
+      if (!items || items.length === 0) return { name: "IKA Solution", tagline: "", legalName: "", address: "", email: "", phone: "", copyrightYears: "", social: {} };
 
       const map: Record<string, string> = {};
       items.forEach((item) => {
@@ -627,7 +615,7 @@ export class DataService {
         },
       };
     } catch {
-      return Mocks.MOCK_COMPANY;
+      return { name: "IKA Solution", tagline: "", legalName: "", address: "", email: "", phone: "", copyrightYears: "", social: {} };
     }
   }
 

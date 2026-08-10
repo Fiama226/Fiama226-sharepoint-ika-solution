@@ -24,7 +24,7 @@
       },
       "officeFabricIconFontName": "Globe2",
       "properties": {
-        "height": "large",
+        "height": "screen",
         "accent": "orange",
         "animationsEnabled": true,
         "showHero": true,

@@ -189,29 +189,15 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
                 data-interception="propagate"
                 className="ika-flex-shrink-0 ika-flex ika-items-center ika-gap-2"
               >
-                <div className="ika-h-9 ika-w-9 ika-rounded-xl ika-bg-brand-navy ika-flex ika-items-center ika-justify-center ika-text-white ika-font-black ika-text-base ika-shadow-sm">
-                  IKA
-                </div>
-                <span className="ika-font-extrabold ika-text-lg ika-text-brand-navy ika-tracking-tight">
-                  SOLUTION
-                </span>
+                <img
+                  src={context.logoUrl}
+                  alt="IKA Solution"
+                  className="ika-h-14 ika-w-auto ika-max-w-[180px] ika-object-contain"
+                />
               </a>
 
-              <nav
-                aria-label="Navigation principale"
-                className="ika-hidden ika-items-center ika-gap-1 lg:ika-flex"
-              >
-                {primaryNav.map((node) => (
-                  <NavLink
-                    key={node.key}
-                    node={node}
-                    currentPath={context.currentPath}
-                    activeRoute={activeRoute}
-                    onNavigate={onNavigate}
-                    variant="primary"
-                  />
-                ))}
-              </nav>
+              {/* La maquette Next.js réserve la barre principale aux actions à
+                  droite. Les rubriques restent disponibles dans le menu mobile. */}
             </div>
 
             <div className="ika-flex ika-items-center ika-gap-2">
@@ -222,7 +208,7 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
                   className="ika-relative ika-hidden md:ika-flex ika-items-center"
                 >
                   <span className="ika-pointer-events-none ika-absolute ika-left-3 ika-text-slate-400">
-                    <Icon name="target" className="ika-h-4 ika-w-4" />
+                    <Icon name="Search" className="ika-h-4 ika-w-4" />
                   </span>
                   <label htmlFor="ika-search" className="ika-sr-only">
                     Rechercher dans l&apos;intranet
@@ -289,6 +275,18 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
                 </div>
               ) : null}
 
+              <button
+                type="button"
+                aria-label="Notifications"
+                className="ika-relative ika-rounded-lg ika-p-2 ika-text-slate-500 ika-transition-colors hover:ika-bg-slate-100 hover:ika-text-slate-900"
+              >
+                <Icon name="Bell" className="ika-h-5 ika-w-5" />
+                <span
+                  aria-hidden="true"
+                  className="ika-absolute ika-right-1.5 ika-top-1.5 ika-h-2 ika-w-2 ika-rounded-full ika-border-2 ika-border-white ika-bg-red-500"
+                />
+              </button>
+
               <div className="ika-relative ika-hidden md:ika-block" ref={profileRef}>
                 <button
                   type="button"
@@ -299,7 +297,13 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
                 >
                   {avatar}
                   <span className="ika-sr-only">Menu utilisateur</span>
-                  <Icon name="tag" className="ika-h-3 ika-w-3 ika-text-slate-500" />
+                  <Icon
+                    name="ChevronDown"
+                    className={cn(
+                      "ika-h-4 ika-w-4 ika-text-slate-500 ika-transition-transform",
+                      profileOpen ? "ika-rotate-180" : ""
+                    )}
+                  />
                 </button>
 
                 {profileOpen ? (
