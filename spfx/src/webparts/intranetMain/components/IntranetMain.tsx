@@ -111,7 +111,7 @@ const RevealSection: React.FC<{
 };
 
 const IntranetMainSkeleton: React.FC<{ heroHeightClass: string }> = (props) => (
-  <div className="ika-root" aria-hidden="true" aria-busy="true">
+  <div className="ika-root ika-intranet-page" aria-hidden="true" aria-busy="true">
     <div
       className={`ika-relative ika-w-full ika-overflow-hidden ika-animate-pulse ika-bg-gradient-to-br ika-from-slate-800 ika-to-slate-900 ${props.heroHeightClass}`}
     >
@@ -507,7 +507,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
   };
 
   return (
-    <div className="ika-root" data-accent={props.accent}>
+    <div className="ika-root ika-intranet-page" data-accent={props.accent}>
       <div className="ika-flex ika-w-full ika-min-h-screen ika-flex-col ika-bg-white ika-text-slate-900">
         {/* HEADER IKA */}
         {props.showHeader ? (
