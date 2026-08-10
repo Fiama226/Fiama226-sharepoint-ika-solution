@@ -116,8 +116,8 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         slides: this._slides,
         missions: this._missions,
         stats: this._stats,
-        currentUser: this.context.pageContext.user.displayName || "Collaborateur IKA",
-        currentUserRole: "",
+        currentUser: this.context.pageContext.user.displayName || "Landry KABORE",
+        currentUserRole: "Responsable communication interne",
         heroHeightClass: HEIGHT_CLASSES[this.properties.height] || HEIGHT_CLASSES.large,
         accent: this.properties.accent || "orange",
 

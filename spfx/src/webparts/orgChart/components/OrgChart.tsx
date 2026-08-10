@@ -308,11 +308,11 @@ export const OrgChart: React.FC<IOrgChartProps> = (props) => {
         <div className="ika-sticky ika-top-0 ika-z-30 ika-border-b ika-border-slate-200 ika-bg-white/85 ika-backdrop-blur-xl">
           <div className="ika-mx-auto ika-flex ika-max-w-7xl ika-flex-wrap ika-items-center ika-gap-4 ika-px-6 ika-py-4">
             <div className="ika-flex ika-items-center ika-gap-3">
-              <span className="ika-grid ika-h-9 ika-w-9 ika-place-items-center ika-rounded-xl ika-bg-gradient-to-br ika-from-brand-navy ika-to-brand-cyan-dark ika-text-white ika-shadow-md">
+              <span className="ika-grid ika-h-9 ika-w-9 ika-place-items-center ika-rounded-xl ika-bg-gradient-to-br ika-from-violet-500 ika-to-purple-600 ika-text-white ika-shadow-lg ika-shadow-violet-200">
                 <Icon name="Building2" className="ika-h-4 ika-w-4" />
               </span>
               <div>
-                <h2 className="ika-text-lg ika-font-extrabold ika-tracking-tight ika-text-brand-navy">
+                <h2 className="ika-text-lg ika-font-extrabold ika-tracking-tight ika-text-slate-900">
                   {title}
                 </h2>
                 <p className="ika-text-[10px] ika-font-medium ika-text-slate-400">
@@ -335,7 +335,7 @@ export const OrgChart: React.FC<IOrgChartProps> = (props) => {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Rechercher un collaborateur…"
-                  className="ika-w-full ika-rounded-xl ika-border ika-border-slate-200 ika-bg-white ika-py-2 ika-pl-9 ika-pr-3 ika-text-sm ika-outline-none ika-transition-colors focus:ika-border-brand-cyan"
+                  className="ika-w-full ika-rounded-xl ika-border ika-border-slate-200 ika-bg-slate-50/50 ika-py-2.5 ika-pl-9 ika-pr-4 ika-text-sm ika-text-slate-700 ika-placeholder-slate-400 ika-outline-none ika-transition-all focus:ika-border-violet-300 focus:ika-bg-white focus:ika-ring-4 focus:ika-ring-violet-50"
                 />
 
                 {searchResults.length > 0 ? (

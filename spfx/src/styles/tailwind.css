@@ -17,3 +17,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/**
+ * Fidélité typographique avec la maquette Next.js.
+ * La maquette rend en Arial (font-sans → fallback Arial, Helvetica, sans-serif,
+ * aucune webfont n'est réellement chargée dans app/layout.tsx). SharePoint
+ * injecte Segoe UI par défaut : on force donc la même pile de polices dans
+ * le conteneur .ika-root pour un rendu identique.
+ */
+.ika-root {
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.ika-root *,
+.ika-root *::before,
+.ika-root *::after {
+  font-family: inherit;
+}

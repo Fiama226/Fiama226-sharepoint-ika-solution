@@ -44,19 +44,24 @@ const ICON_BY_SLUG: Record<string, string> = {
   "faq": "help",
 };
 
+/**
+ * Navigation statique alignée sur la maquette Next.js
+ * (components/layout/site-header.tsx) : mêmes libellés, mêmes icônes.
+ * La navigation primaire n'apparaît que dans le menu mobile (comme Next),
+ * la secondaire dans la barre supérieure.
+ */
 export const STATIC_PRIMARY_NAV: INavNode[] = [
-  { key: "home", label: "Accueil", url: "#accueil", iconName: "Home" },
-  { key: "annonces", label: "Annonces", url: "#annonces", iconName: "megaphone" },
-  { key: "documents", label: "Documents", url: "#documents", iconName: "FolderOpen" },
-  { key: "organigramme", label: "Organigramme", url: "#organigramme", iconName: "GitBranch" },
-  { key: "bordereau", label: "Bordereau des prix", url: "#bordereau", iconName: "xlsx" },
+  { key: "accueil", label: "Accueil", url: "#accueil", iconName: "Home" },
+  { key: "comptabilite", label: "Comptabilité", url: "#documents", iconName: "Calculator" },
+  { key: "administration", label: "Administration", url: "#documents", iconName: "ShieldCheck" },
+  { key: "commerciaux", label: "Commerciaux", url: "#documents", iconName: "Users" },
+  { key: "techniciens", label: "Techniciens", url: "#documents", iconName: "Wrench" },
 ];
 
 export const STATIC_SECONDARY_NAV: INavNode[] = [
-  { key: "histoire", label: "Notre Histoire", url: "#histoire", iconName: "book" },
-  { key: "equipe", label: "Équipe", url: "#equipe", iconName: "Users" },
-  { key: "evenements", label: "Agenda & Événements", url: "#evenements", iconName: "calendar" },
-  { key: "faq", label: "FAQ", url: "#faq", iconName: "help" },
+  { key: "organigramme", label: "Organigramme", url: "#organigramme", iconName: "GitBranch" },
+  { key: "agenda", label: "Agenda", url: "#evenements", iconName: "calendar" },
+  { key: "histoire", label: "Histoire", url: "#histoire", iconName: "book" },
 ];
 
 export class NavigationService {
