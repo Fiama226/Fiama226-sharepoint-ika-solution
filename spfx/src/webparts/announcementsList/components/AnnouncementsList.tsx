@@ -14,16 +14,6 @@ const EMOJI_BY_TYPE: Record<string, string> = {
   Promotion: "🏆",
 };
 
-const TYPE_STYLE: Record<string, string> = {
-  Mariage: "ika-bg-rose-50 ika-text-rose-700",
-  Anniversaire: "ika-bg-amber-50 ika-text-amber-700",
-  Naissance: "ika-bg-sky-50 ika-text-sky-700",
-  Événement: "ika-bg-violet-50 ika-text-violet-700",
-  Départ: "ika-bg-slate-100 ika-text-slate-700",
-  Arrivée: "ika-bg-emerald-50 ika-text-emerald-700",
-  Promotion: "ika-bg-indigo-50 ika-text-indigo-700",
-};
-
 const ALL = "__all__";
 
 export const AnnouncementsList: React.FC<IAnnouncementsListProps> = (props) => {
@@ -108,20 +98,9 @@ export const AnnouncementsList: React.FC<IAnnouncementsListProps> = (props) => {
               </span>
 
               <div className="ika-min-w-0 ika-flex-1">
-                <div className="ika-flex ika-flex-wrap ika-items-center ika-gap-2">
-                  <h2 className="ika-text-xl ika-font-semibold ika-text-brand-navy">
-                    {item.Title}
-                  </h2>
-                  <span
-                    className={cn(
-                      "ika-rounded-full ika-px-2.5 ika-py-0.5 ika-text-xs ika-font-medium",
-                      TYPE_STYLE[item.AnnouncementType] ||
-                        "ika-bg-slate-100 ika-text-slate-700"
-                    )}
-                  >
-                    {item.AnnouncementType}
-                  </span>
-                </div>
+                <h2 className="ika-text-xl ika-font-semibold ika-text-brand-navy">
+                  {item.Title}
+                </h2>
                 <p className="ika-mt-1 ika-text-sm ika-text-brand-muted">
                   <time dateTime={item.AnnouncementDate}>
                     {formatDate(item.AnnouncementDate)}
@@ -143,7 +122,7 @@ export const AnnouncementsList: React.FC<IAnnouncementsListProps> = (props) => {
     <div className="ika-root">
       <section className="ika-mx-auto ika-max-w-6xl ika-px-4 ika-py-10 sm:ika-px-6 lg:ika-px-8">
         <header className="ika-mb-8">
-          <p className="ika-text-sm ika-uppercase ika-tracking-[0.3em] ika-text-brand-cyan-dark">
+          <p className="ika-text-sm ika-uppercase ika-tracking-[0.3em] ika-text-brand-cyan">
             {eyebrow}
           </p>
           <h1 className="ika-mt-3 ika-text-3xl ika-font-semibold ika-text-brand-navy">

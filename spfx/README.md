@@ -163,6 +163,25 @@ Voir `docs/09-lot1-demarrage.md` pour l'installation et les tests de recette.
 **20 Web Parts — portage terminé.**
 Header/Footer intégrés à la Web Part principale pour un déploiement en un seul coup.
 
+### Livré — Pass fidélité design (alignement 1:1 avec la maquette Next.js)
+
+Tous les composants de la Web Part principale (header, footer, hero, marquee,
+actualités, accès rapide, équipe, galerie, collaborateur du mois, projets et
+les vues Annonces / Documents / Histoire / Organigramme / Bordereau) ont été
+**portés classe pour classe** depuis `components/*` et `app/*` de la maquette :
+mêmes couleurs (y compris les bleus/gris du header), mêmes espacements, mêmes
+icônes (registry étendu : Bell, Search, Menu, X, ChevronDown/Left/Right,
+BookOpen, Wrench, Cake, Filter, TrendingUp, CheckCircle2, AlertCircle, Cpu,
+BarChart3, File, FileCode, Table, Download, Eye, ImageIcon + glyphes solid
+Font Awesome pour le marquee/footer), même police (Arial, forçée dans
+`.ika-root`), mêmes libellés et mêmes données de démonstration.
+
+Le header n'affiche plus de navigation primaire sur desktop (comme la
+maquette : elle n'existe que dans le menu mobile) et le portail
+départemental n'est plus rendu sur l'accueil (la maquette ne l'affiche pas).
+
+➡️ Vérification après installation : **`docs/14-design-fidelity-checklist.md`**.
+
 ### Livré — Lot 7 (assembleur de page)
 
 | Web Part | Listes lues |

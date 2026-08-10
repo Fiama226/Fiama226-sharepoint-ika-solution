@@ -14,7 +14,6 @@ import { QuickAccessPanel } from "../../quickAccessPanel/components/QuickAccessP
 import { Gallery } from "../../gallery/components/Gallery";
 import { TeamHome } from "../../teamHome/components/TeamHome";
 import { IntranetSections } from "../../intranetSections/components/IntranetSections";
-import { DepartmentGrid } from "./DepartmentGrid";
 import { AnnouncementsList } from "../../announcementsList/components/AnnouncementsList";
 import { PriceSheet } from "../../priceSheet/components/PriceSheet";
 import { Timeline } from "../../timeline/components/Timeline";
@@ -218,7 +217,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
   const documentsNav: INavNode[] = React.useMemo(() => {
     return props.departments.map((dept, idx) => {
       const iconFallback =
-        ["Calculator", "ShieldCheck", "Users", "Settings", "Building2"][idx] ||
+        ["Calculator", "ShieldCheck", "Users", "Wrench", "Building2"][idx] ||
         "FolderOpen";
       return {
         key: `doc-${dept.Id || idx}`,
@@ -227,6 +226,31 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
         iconName: dept.IconName || iconFallback,
       };
     });
+  }, [props.departments]);
+
+  // Navigation primaire alignée sur la maquette Next.js : les départements
+  // pointent vers leur site SharePoint (SiteUrl) si disponible, sinon vers
+  // la vue Documents.
+  const primaryNav: INavNode[] = React.useMemo(() => {
+    const deptNav: INavNode[] = props.departments.map((dept, idx) => {
+      const iconFallback =
+        ["Calculator", "ShieldCheck", "Users", "Wrench", "Building2"][idx] ||
+        "FolderOpen";
+      return {
+        key: `dept-${dept.Slug || idx}`,
+        label: dept.Title,
+        url:
+          dept.SiteUrl && dept.SiteUrl.Url
+            ? dept.SiteUrl.Url
+            : "#documents",
+        iconName: dept.IconName || iconFallback,
+      };
+    });
+    if (deptNav.length === 0) return STATIC_PRIMARY_NAV;
+    return [
+      { key: "accueil", label: "Accueil", url: "#accueil", iconName: "Home" },
+      ...deptNav,
+    ];
   }, [props.departments]);
 
   // Early-return APRÈS tous les hooks (voir note plus haut) : rendu squelette
@@ -242,12 +266,12 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
         return (
           <div className="ika-mx-auto ika-max-w-7xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
             <AnnouncementsList
-              eyebrow="Vie d'entreprise"
+              eyebrow="Annonces"
               title="Toutes les annonces"
-              description="Retrouvez ici les événements internes, célébrations, naissances, mariages et messages de l'équipe."
+              description="Retrouvez ici les événements internes, célébrations et messages d'équipe."
               announcements={props.announcements}
               loading={false}
-              showFilters={true}
+              showFilters={false}
             />
           </div>
         );
@@ -408,12 +432,12 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
             ) : null}
 
             {/* Conteneur central identique à Next.js app/page.tsx */}
-            <div className="ika-mx-auto ika-max-w-7xl ika-px-4 sm:ika-px-6 lg:ika-px-8">
+            <div className="ika-mx-auto ika-px-4 sm:ika-px-6 lg:ika-px-8">
               {/* 2. BANDEAU D'ANNONCES DÉFILANT */}
               {props.showMarquee ? (
-                <RevealSection enabled={animate} className="ika-py-3">
+                <RevealSection enabled={animate}>
                   <AnnouncementMarquee
-                    eyebrow="Annonces"
+                    eyebrow="Actualités"
                     title="Célébrations & événements"
                     announcements={props.announcements}
                     loading={false}
@@ -423,11 +447,11 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
 
               {/* 3. ACTUALITÉS (cartes grille) */}
               {props.showNews ? (
-                <RevealSection enabled={animate} className="ika-py-2">
+                <RevealSection enabled={animate}>
                   <NewsCards
                     eyebrow="Vie interne"
                     title="Actualités de l'entreprise"
-                    description=""
+                    description="Suivez les dernières annonces internes, les évolutions techniques, les projets stratégiques et les initiatives d'innovation."
                     items={props.news}
                     loading={false}
                     ctaLabel="Voir toutes les actualités"
@@ -441,7 +465,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                   <QuickAccessPanel
                     documentsTitle="Documents clés"
                     quickLinksTitle="Accès rapide"
-                    eventsTitle="Événements à venir"
+                    eventsTitle="Événements"
                     featuredDocs={props.featuredDocs}
                     quickLinks={props.quickLinks}
                     events={props.events}
@@ -450,30 +474,31 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                 </RevealSection>
               ) : null}
 
-              {/* 5. GALERIE PHOTOS + NOTRE ÉQUIPE */}
-              {props.showGallery ? (
+              {/* 5. NOTRE ÉQUIPE + GALERIE PHOTOS (côte à côte comme Next.js) */}
+              {props.showTeam || props.showGallery ? (
                 <RevealSection enabled={animate}>
-                  <Gallery
-                    title="Galerie"
-                    description=""
-                    images={props.galleryImages}
-                    loading={false}
-                    showFilters
-                    mosaicLayout
-                  />
-                </RevealSection>
-              ) : null}
-
-              {props.showTeam ? (
-                <RevealSection enabled={animate}>
-                  <TeamHome
-                    title="Notre équipe"
-                    description="Les talents qui font avancer l'ingénierie digitale"
-                    members={props.collaborators}
-                    loading={false}
-                    showSearch
-                    showBirthdays
-                  />
+                  <div className="ika-flex ika-flex-col lg:ika-flex-row">
+                    {props.showTeam ? (
+                      <TeamHome
+                        title="Notre équipe"
+                        description="Les talents qui font avancer l'ingénierie digitale"
+                        members={props.collaborators}
+                        loading={false}
+                        showSearch
+                        showBirthdays
+                      />
+                    ) : null}
+                    {props.showGallery ? (
+                      <Gallery
+                        title="Galerie"
+                        description="Moments forts de la vie de l'entreprise"
+                        images={props.galleryImages}
+                        loading={false}
+                        showFilters
+                        mosaicLayout
+                      />
+                    ) : null}
+                  </div>
                 </RevealSection>
               ) : null}
 
@@ -493,13 +518,6 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                   />
                 </RevealSection>
               ) : null}
-
-              {/* 7. PORTAILS DÉPARTEMENTAUX */}
-              {props.departments.length > 0 ? (
-                <RevealSection enabled={animate}>
-                  <DepartmentGrid departments={props.departments} />
-                </RevealSection>
-              ) : null}
             </div>
           </>
         );
@@ -513,7 +531,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
         {props.showHeader ? (
           <IkaHeader
             context={chromeContext}
-            primaryNav={STATIC_PRIMARY_NAV}
+            primaryNav={primaryNav}
             secondaryNav={STATIC_SECONDARY_NAV}
             showSearch={true}
             showDocumentsMenu={documentsNav.length > 0}

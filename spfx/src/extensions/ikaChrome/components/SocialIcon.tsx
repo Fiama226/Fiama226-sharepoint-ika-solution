@@ -21,19 +21,21 @@ const PATHS: Record<SocialNetwork, string> = {
 };
 
 const LABELS: Record<SocialNetwork, string> = {
-  facebook: "Facebook",
-  instagram: "Instagram",
-  twitter: "X (Twitter)",
-  linkedin: "LinkedIn",
-  whatsapp: "WhatsApp",
+  facebook: "Visitez notre page Facebook",
+  instagram: "Suivez-nous sur Instagram",
+  twitter: "Suivez-nous sur Twitter",
+  linkedin: "Connectez-vous sur LinkedIn",
+  whatsapp: "Contactez-nous sur WhatsApp",
 };
 
+/** Classes hover identiques à la maquette Next.js (site-footer.tsx). */
 const HOVER: Record<SocialNetwork, string> = {
-  facebook: "hover:ika-text-blue-400",
-  instagram: "hover:ika-text-pink-400",
-  twitter: "hover:ika-text-sky-400",
-  linkedin: "hover:ika-text-blue-500",
-  whatsapp: "hover:ika-text-green-400",
+  facebook: "hover:ika-bg-[#1877F2] hover:ika-text-white",
+  instagram:
+    "hover:ika-bg-gradient-to-br hover:ika-from-purple-600 hover:ika-to-pink-500 hover:ika-text-white",
+  twitter: "hover:ika-bg-black hover:ika-text-white",
+  linkedin: "hover:ika-bg-[#0A66C2] hover:ika-text-white",
+  whatsapp: "hover:ika-bg-[#25D366] hover:ika-text-white",
 };
 
 export interface ISocialIconProps {
@@ -43,7 +45,6 @@ export interface ISocialIconProps {
 
 export const SocialIcon: React.FC<ISocialIconProps> = (props) => {
   const { network, url } = props;
-  if (!url) return null;
 
   return (
     <a
@@ -51,14 +52,14 @@ export const SocialIcon: React.FC<ISocialIconProps> = (props) => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={LABELS[network]}
-      className={`ika-transition-colors ${HOVER[network]}`}
+      className={`ika-rounded-full ika-border ika-border-white/10 ika-bg-white/5 ika-p-3 ika-backdrop-blur-sm ika-transition-all ika-duration-300 hover:ika-scale-110 hover:ika-shadow-lg hover:ika-shadow-brand-accent/20 hover:-ika-translate-y-1 ${HOVER[network]}`}
     >
       <svg
         viewBox="0 0 24 24"
         fill="currentColor"
         aria-hidden="true"
         focusable="false"
-        className="ika-h-5 ika-w-5"
+        className="ika-h-[18px] ika-w-[18px]"
       >
         <path d={PATHS[network]} />
       </svg>

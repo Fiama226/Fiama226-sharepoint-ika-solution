@@ -140,236 +140,271 @@ export const PriceSheet: React.FC<IPriceSheetProps> = (props) => {
   }
 
   const inputClass =
-    "ika-w-full ika-rounded-lg ika-border ika-border-slate-200 ika-bg-white ika-px-2 ika-py-1.5 ika-text-sm ika-outline-none focus:ika-border-brand-cyan disabled:ika-bg-slate-50 disabled:ika-text-slate-500";
+    "ika-w-full ika-border-none ika-bg-transparent ika-py-1 ika-text-sm ika-outline-none focus:ika-ring-0 disabled:ika-text-slate-500";
 
   return (
     <div className="ika-root">
-      <section aria-labelledby="ika-pricesheet-title">
-        <header className="ika-mb-5 ika-flex ika-flex-wrap ika-items-end ika-justify-between ika-gap-4">
-          <div>
-            <h2
+      <section
+        aria-labelledby="ika-pricesheet-title"
+        className="ika-min-h-screen ika-bg-gray-50 ika-p-8"
+      >
+        <div className="ika-mx-auto ika-max-w-7xl ika-rounded-lg ika-bg-white ika-p-8 ika-shadow-lg">
+          <div className="ika-mb-5 ika-flex ika-flex-wrap ika-items-center ika-justify-between ika-gap-4">
+            <h1
               id="ika-pricesheet-title"
-              className="ika-text-xl ika-font-extrabold ika-tracking-tight ika-text-brand-navy"
+              className="ika-text-2xl ika-font-bold ika-underline ika-text-center"
             >
-              {title}
-            </h2>
-            {clientName || subject ? (
-              <p className="ika-mt-1 ika-text-sm ika-text-slate-500">
-                {clientName}
-                {clientName && subject ? " — " : ""}
-                {subject}
-              </p>
-            ) : null}
-          </div>
+              {title || "BORDEREAU DES PRIX POUR LES FOURNITURES"}
+            </h1>
 
-          <div className="ika-flex ika-gap-2">
-            {canEdit ? (
+            <div className="ika-flex ika-gap-2">
+              {canEdit ? (
+                <button
+                  type="button"
+                  onClick={addLine}
+                  className="ika-inline-flex ika-items-center ika-gap-1.5 ika-rounded ika-bg-brand-navy ika-px-4 ika-py-2 ika-text-sm ika-font-bold ika-text-white ika-transition-colors hover:ika-bg-brand-navy-light"
+                >
+                  <Icon name="FileEdit" className="ika-h-4 ika-w-4" />
+                  Ajouter une ligne
+                </button>
+              ) : null}
               <button
                 type="button"
-                onClick={addLine}
-                className="ika-inline-flex ika-items-center ika-gap-1.5 ika-rounded-xl ika-bg-brand-navy ika-px-4 ika-py-2 ika-text-sm ika-font-bold ika-text-white ika-transition-colors hover:ika-bg-brand-navy-light"
+                onClick={exportCsv}
+                className="ika-inline-flex ika-items-center ika-gap-1.5 ika-rounded ika-border ika-border-gray-400 ika-bg-white ika-px-4 ika-py-2 ika-text-sm ika-font-bold ika-text-brand-navy ika-transition-colors hover:ika-bg-gray-100"
               >
-                <Icon name="FileEdit" className="ika-h-4 ika-w-4" />
-                Ajouter une ligne
+                <Icon name="xlsx" className="ika-h-4 ika-w-4" />
+                Exporter (CSV)
               </button>
-            ) : null}
-            <button
-              type="button"
-              onClick={exportCsv}
-              className="ika-inline-flex ika-items-center ika-gap-1.5 ika-rounded-xl ika-border ika-border-slate-300 ika-bg-white ika-px-4 ika-py-2 ika-text-sm ika-font-bold ika-text-brand-navy ika-transition-colors hover:ika-border-brand-cyan"
+            </div>
+          </div>
+
+          {clientName || subject ? (
+            <p className="ika-mb-4 ika-text-center ika-text-sm ika-text-slate-600">
+              {clientName}
+              {clientName && subject ? " — " : ""}
+              {subject}
+            </p>
+          ) : null}
+
+          {error ? (
+            <div
+              role="alert"
+              className="ika-mb-4 ika-rounded-lg ika-border ika-border-amber-200 ika-bg-amber-50 ika-p-4"
             >
-              <Icon name="xlsx" className="ika-h-4 ika-w-4" />
-              Exporter (CSV)
-            </button>
-          </div>
-        </header>
+              <p className="ika-text-sm ika-text-amber-800">{error}</p>
+            </div>
+          ) : null}
 
-        {error ? (
-          <div
-            role="alert"
-            className="ika-mb-4 ika-rounded-xl ika-border ika-border-amber-200 ika-bg-amber-50 ika-p-4"
-          >
-            <p className="ika-text-sm ika-text-amber-800">{error}</p>
-          </div>
-        ) : null}
-
-        <div className="ika-overflow-x-auto ika-rounded-2xl ika-border ika-border-slate-200">
-          <table className="ika-w-full ika-min-w-[720px] ika-border-collapse ika-bg-white ika-text-sm">
-            <caption className="ika-sr-only">
-              Bordereau de prix — {lines.length} ligne
-              {lines.length > 1 ? "s" : ""}
-            </caption>
-            <thead>
-              <tr className="ika-bg-slate-50 ika-text-left ika-text-xs ika-uppercase ika-tracking-wider ika-text-slate-500">
-                <th scope="col" className="ika-w-14 ika-px-3 ika-py-3">
-                  N°
-                </th>
-                <th scope="col" className="ika-px-3 ika-py-3">
-                  Désignation
-                </th>
-                <th scope="col" className="ika-w-32 ika-px-3 ika-py-3">
-                  Délai
-                </th>
-                <th scope="col" className="ika-w-24 ika-px-3 ika-py-3 ika-text-right">
-                  Qté
-                </th>
-                <th scope="col" className="ika-w-36 ika-px-3 ika-py-3 ika-text-right">
-                  Prix unitaire
-                </th>
-                <th scope="col" className="ika-w-36 ika-px-3 ika-py-3 ika-text-right">
-                  Montant
-                </th>
-                {canEdit ? (
-                  <th scope="col" className="ika-w-12 ika-px-3 ika-py-3">
-                    <span className="ika-sr-only">Actions</span>
+          <div className="ika-overflow-x-auto">
+            <table className="ika-w-full ika-min-w-[720px] ika-border-collapse ika-border ika-border-gray-800 ika-bg-white">
+              <caption className="ika-sr-only">
+                Bordereau de prix — {lines.length} ligne
+                {lines.length > 1 ? "s" : ""}
+              </caption>
+              <thead>
+                <tr className="ika-bg-gray-100">
+                  <th scope="col" className="ika-w-16 ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-left">
+                    1
                   </th>
-                ) : null}
-              </tr>
-            </thead>
-
-            <tbody className="ika-divide-y ika-divide-slate-100">
-              {lines.map((line) => (
-                <tr key={line.key} className="hover:ika-bg-slate-50/60">
-                  <td className="ika-px-3 ika-py-2 ika-font-bold ika-text-slate-500">
-                    {line.articleNo}
-                  </td>
-                  <td className="ika-px-3 ika-py-2">
-                    <label className="ika-sr-only" htmlFor={`d-${line.key}`}>
-                      Désignation ligne {line.articleNo}
-                    </label>
-                    <input
-                      id={`d-${line.key}`}
-                      type="text"
-                      value={line.description}
-                      disabled={!canEdit}
-                      onChange={(e) =>
-                        updateLine(line.key, "description", e.target.value)
-                      }
-                      className={inputClass}
-                    />
-                  </td>
-                  <td className="ika-px-3 ika-py-2">
-                    <label className="ika-sr-only" htmlFor={`l-${line.key}`}>
-                      Délai ligne {line.articleNo}
-                    </label>
-                    <input
-                      id={`l-${line.key}`}
-                      type="text"
-                      value={line.deliveryDate}
-                      disabled={!canEdit}
-                      onChange={(e) =>
-                        updateLine(line.key, "deliveryDate", e.target.value)
-                      }
-                      className={inputClass}
-                    />
-                  </td>
-                  <td className="ika-px-3 ika-py-2">
-                    <label className="ika-sr-only" htmlFor={`q-${line.key}`}>
-                      Quantité ligne {line.articleNo}
-                    </label>
-                    <input
-                      id={`q-${line.key}`}
-                      type="number"
-                      min={0}
-                      step="any"
-                      value={line.quantity}
-                      disabled={!canEdit}
-                      onChange={(e) =>
-                        updateLine(
-                          line.key,
-                          "quantity",
-                          Math.max(0, Number(e.target.value) || 0)
-                        )
-                      }
-                      className={cn(inputClass, "ika-text-right")}
-                    />
-                  </td>
-                  <td className="ika-px-3 ika-py-2">
-                    <label className="ika-sr-only" htmlFor={`p-${line.key}`}>
-                      Prix unitaire ligne {line.articleNo}
-                    </label>
-                    <input
-                      id={`p-${line.key}`}
-                      type="number"
-                      min={0}
-                      step="any"
-                      value={line.unitPrice}
-                      disabled={!canEdit}
-                      onChange={(e) =>
-                        updateLine(
-                          line.key,
-                          "unitPrice",
-                          Math.max(0, Number(e.target.value) || 0)
-                        )
-                      }
-                      className={cn(inputClass, "ika-text-right")}
-                    />
-                  </td>
-                  <td className="ika-px-3 ika-py-2 ika-text-right ika-font-bold ika-tabular-nums ika-text-brand-navy">
-                    {formatCurrency(line.quantity * line.unitPrice, currency)}
-                  </td>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-left">
+                    2
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-left">
+                    3
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-left">
+                    4
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-left">
+                    5
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-left">
+                    6
+                  </th>
                   {canEdit ? (
-                    <td className="ika-px-3 ika-py-2">
-                      <button
-                        type="button"
-                        onClick={() => removeLine(line.key)}
-                        disabled={lines.length <= 1}
-                        aria-label={`Supprimer la ligne ${line.articleNo}`}
-                        className="ika-rounded-lg ika-p-1.5 ika-text-slate-400 ika-transition-colors hover:ika-bg-red-50 hover:ika-text-red-600 disabled:ika-opacity-30"
-                      >
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          aria-hidden="true"
-                          className="ika-h-4 ika-w-4"
-                        >
-                          <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-                        </svg>
-                      </button>
-                    </td>
+                    <th scope="col" className="ika-w-12 ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                      <span className="ika-sr-only">Actions</span>
+                    </th>
                   ) : null}
                 </tr>
-              ))}
-            </tbody>
+                <tr>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-font-semibold">
+                    Article(s) N°
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-font-semibold">
+                    Description (Désignation)
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-font-semibold">
+                    Date de livraison (délais)
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-font-semibold">
+                    Quantité (Nombre d&apos;unités)
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-font-semibold">
+                    Prix unitaire
+                  </th>
+                  <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-font-semibold">
+                    Prix total par article (colonne 4 x colonne 5)
+                  </th>
+                  {canEdit ? (
+                    <th scope="col" className="ika-border ika-border-gray-800 ika-px-4 ika-py-2" />
+                  ) : null}
+                </tr>
+              </thead>
 
-            <tfoot className="ika-bg-slate-50 ika-font-bold">
-              <tr>
-                <td colSpan={canEdit ? 5 : 4} className="ika-px-3 ika-py-2 ika-text-right ika-text-slate-500">
-                  Total HT
-                </td>
-                <td className="ika-px-3 ika-py-2 ika-text-right ika-tabular-nums ika-text-brand-navy">
-                  {formatCurrency(totalHT, currency)}
-                </td>
-                {canEdit ? <td /> : null}
-              </tr>
-              <tr>
-                <td colSpan={canEdit ? 5 : 4} className="ika-px-3 ika-py-2 ika-text-right ika-text-slate-500">
-                  TVA {vatRate}%
-                </td>
-                <td className="ika-px-3 ika-py-2 ika-text-right ika-tabular-nums ika-text-brand-navy">
-                  {formatCurrency(vatAmount, currency)}
-                </td>
-                {canEdit ? <td /> : null}
-              </tr>
-              <tr className="ika-border-t-2 ika-border-brand-navy/20">
-                <td colSpan={canEdit ? 5 : 4} className="ika-px-3 ika-py-3 ika-text-right ika-text-brand-navy">
-                  Total TTC
-                </td>
-                <td className="ika-px-3 ika-py-3 ika-text-right ika-text-lg ika-tabular-nums ika-text-brand-navy">
-                  {formatCurrency(totalTTC, currency)}
-                </td>
-                {canEdit ? <td /> : null}
-              </tr>
-            </tfoot>
-          </table>
+              <tbody>
+                {lines.map((line) => (
+                  <tr key={line.key}>
+                    <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                      <input
+                        type="text"
+                        value={line.articleNo}
+                        disabled={!canEdit}
+                        onChange={(e) =>
+                          updateLine(line.key, "articleNo", e.target.value)
+                        }
+                        className={inputClass}
+                      />
+                    </td>
+                    <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                      <label className="ika-sr-only" htmlFor={`d-${line.key}`}>
+                        Désignation ligne {line.articleNo}
+                      </label>
+                      <textarea
+                        id={`d-${line.key}`}
+                        value={line.description}
+                        disabled={!canEdit}
+                        onChange={(e) =>
+                          updateLine(line.key, "description", e.target.value)
+                        }
+                        rows={2}
+                        className={cn(inputClass, "ika-resize-none")}
+                      />
+                    </td>
+                    <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                      <label className="ika-sr-only" htmlFor={`l-${line.key}`}>
+                        Délai ligne {line.articleNo}
+                      </label>
+                      <input
+                        id={`l-${line.key}`}
+                        type="text"
+                        value={line.deliveryDate}
+                        disabled={!canEdit}
+                        onChange={(e) =>
+                          updateLine(line.key, "deliveryDate", e.target.value)
+                        }
+                        className={inputClass}
+                      />
+                    </td>
+                    <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                      <label className="ika-sr-only" htmlFor={`q-${line.key}`}>
+                        Quantité ligne {line.articleNo}
+                      </label>
+                      <input
+                        id={`q-${line.key}`}
+                        type="number"
+                        min={0}
+                        step="any"
+                        value={line.quantity}
+                        disabled={!canEdit}
+                        onChange={(e) =>
+                          updateLine(
+                            line.key,
+                            "quantity",
+                            Math.max(0, Number(e.target.value) || 0)
+                          )
+                        }
+                        className={cn(inputClass, "ika-text-right")}
+                      />
+                    </td>
+                    <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                      <label className="ika-sr-only" htmlFor={`p-${line.key}`}>
+                        Prix unitaire ligne {line.articleNo}
+                      </label>
+                      <input
+                        id={`p-${line.key}`}
+                        type="number"
+                        min={0}
+                        step="any"
+                        value={line.unitPrice}
+                        disabled={!canEdit}
+                        onChange={(e) =>
+                          updateLine(
+                            line.key,
+                            "unitPrice",
+                            Math.max(0, Number(e.target.value) || 0)
+                          )
+                        }
+                        className={cn(inputClass, "ika-text-right")}
+                      />
+                    </td>
+                    <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right ika-font-bold ika-tabular-nums">
+                      {formatCurrency(line.quantity * line.unitPrice, currency)}
+                    </td>
+                    {canEdit ? (
+                      <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2">
+                        <button
+                          type="button"
+                          onClick={() => removeLine(line.key)}
+                          disabled={lines.length <= 1}
+                          aria-label={`Supprimer la ligne ${line.articleNo}`}
+                          className="ika-rounded ika-p-1.5 ika-text-slate-500 ika-transition-colors hover:ika-bg-red-50 hover:ika-text-red-600 disabled:ika-opacity-30"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            aria-hidden="true"
+                            className="ika-h-4 ika-w-4"
+                          >
+                            <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+                          </svg>
+                        </button>
+                      </td>
+                    ) : null}
+                  </tr>
+                ))}
+              </tbody>
+
+              <tfoot className="ika-font-bold">
+                <tr>
+                  <td colSpan={canEdit ? 5 : 4} className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right">
+                    Prix total hors TVA
+                  </td>
+                  <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right ika-tabular-nums">
+                    {formatCurrency(totalHT, currency)}
+                  </td>
+                  {canEdit ? <td className="ika-border ika-border-gray-800" /> : null}
+                </tr>
+                <tr>
+                  <td colSpan={canEdit ? 5 : 4} className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right">
+                    Montant TVA ({vatRate}%)
+                  </td>
+                  <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right ika-tabular-nums">
+                    {formatCurrency(vatAmount, currency)}
+                  </td>
+                  {canEdit ? <td className="ika-border ika-border-gray-800" /> : null}
+                </tr>
+                <tr>
+                  <td colSpan={canEdit ? 5 : 4} className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right">
+                    Prix total toutes taxes comprises
+                  </td>
+                  <td className="ika-border ika-border-gray-800 ika-px-4 ika-py-2 ika-text-right ika-tabular-nums">
+                    {formatCurrency(totalTTC, currency)}
+                  </td>
+                  {canEdit ? <td className="ika-border ika-border-gray-800" /> : null}
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <p className="ika-mt-3 ika-text-xs ika-text-slate-400">
+            Les modifications ne sont pas enregistrées dans SharePoint : utilisez
+            l&apos;export pour conserver le bordereau.
+          </p>
         </div>
-
-        <p className="ika-mt-3 ika-text-xs ika-text-slate-400">
-          Les modifications ne sont pas enregistrées dans SharePoint : utilisez
-          l&apos;export pour conserver le bordereau.
-        </p>
       </section>
     </div>
   );

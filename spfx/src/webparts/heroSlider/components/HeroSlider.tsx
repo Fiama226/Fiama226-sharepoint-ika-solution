@@ -3,10 +3,9 @@ import "../../../styles/tailwind.css";
 import * as React from "react";
 
 import { IHeroSliderProps } from "./IHeroSliderProps";
-import { Icon } from "../../../common/utils/Icon";
 import { useLiveClock } from "../../../common/hooks/useLiveClock";
 import { usePrefersReducedMotion } from "../../../common/hooks/usePrefersReducedMotion";
-import { cn, resolveUrl } from "../../../common/utils/spUtils";
+import { cn } from "../../../common/utils/spUtils";
 
 const SLIDE_INTERVAL_MS = 5000;
 const MISSION_INTERVAL_MS = 6000;
@@ -177,7 +176,7 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
         ))}
 
         <div className="ika-absolute ika-inset-0 ika-z-10 ika-flex ika-flex-col ika-justify-between ika-p-8 md:ika-p-14">
-          <div className="ika-flex ika-items-start ika-justify-between">
+          <div className="ika-flex ika-items-center ika-justify-between">
             <div
               aria-hidden="true"
               className="ika-h-8 ika-w-1 ika-rounded-full ika-bg-brand-accent"
@@ -208,16 +207,6 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
                 <h1 className="ika-text-3xl ika-font-extrabold ika-leading-tight ika-text-white ika-drop-shadow-xl md:ika-text-5xl">
                   {activeSlide.Caption}
                 </h1>
-                {activeSlide.SlideLink && activeSlide.CtaLabel ? (
-                  <a
-                    href={resolveUrl(activeSlide.SlideLink)}
-                    data-interception="propagate"
-                    className="ika-mt-5 ika-inline-flex ika-items-center ika-gap-2 ika-rounded-full ika-bg-brand-accent ika-px-6 ika-py-3 ika-text-sm ika-font-bold ika-text-white ika-transition-colors hover:ika-bg-brand-accent-dark"
-                  >
-                    {activeSlide.CtaLabel}
-                    <span aria-hidden="true">→</span>
-                  </a>
-                ) : null}
               </div>
 
               <div className="ika-mt-6">
@@ -272,14 +261,8 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
                         }}
                       >
                         <div className="ika-mb-1 ika-flex ika-items-center ika-gap-2">
-                          <span
-                            aria-hidden="true"
-                            className="ika-text-brand-accent"
-                          >
-                            <Icon
-                              name={mission.IconName}
-                              className="ika-h-5 ika-w-5"
-                            />
+                          <span aria-hidden="true" className="ika-text-xl">
+                            {mission.IconName}
                           </span>
                           <span className="ika-text-xs ika-font-semibold ika-uppercase ika-tracking-widest ika-text-brand-accent">
                             {mission.Tag}
@@ -314,14 +297,8 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
                         key={stat.Id}
                         className="ika-flex ika-flex-col ika-items-center ika-rounded-xl ika-border ika-border-white/20 ika-bg-white/10 ika-px-3 ika-py-3 ika-text-center ika-backdrop-blur-md"
                       >
-                        <span
-                          aria-hidden="true"
-                          className="ika-mb-1 ika-text-white/80"
-                        >
-                          <Icon
-                            name={stat.IconName}
-                            className="ika-h-5 ika-w-5"
-                          />
+                        <span aria-hidden="true" className="ika-mb-1 ika-text-lg">
+                          {stat.IconName}
                         </span>
                         <span className="ika-text-lg ika-font-extrabold ika-leading-none ika-text-white">
                           {stat.StatValue}
