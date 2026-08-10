@@ -1,4 +1,4 @@
-FileLeafRef,Title,DocCategory,DocDescription,Confidentiality,IsPinned,BusinessVersion
+﻿FileLeafRef,Title,DocCategory,DocDescription,Confidentiality,IsPinned,BusinessVersion
 charte-dev.pdf,Charte Développement,Procédure,"Spécifications et bonnes pratiques de codage internes IKA Solution.",Interne,TRUE,v2.4
 patterns-archi.pdf,Architecture Patterns,Guide,Modèles d'architecture cloud et microservices d'entreprise.,Interne,TRUE,v1.1
 templates-proj.zip,Templates de Projets,Modèle,Structures prêtes à l'emploi pour démarrer de nouveaux projets.,Public,TRUE,v3.0

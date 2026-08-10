@@ -59,31 +59,36 @@ const DEFAULT_ACCENT = {
 };
 
 /**
- * Construit l'URL vers la bibliothèque « Documents partagés » (Shared Documents)
- * du site départemental. Si `SiteUrl` n'est pas renseigné, repli sur le hub.
- *
- * Note : les sites français utilisent "Documents partages" (URL-encodé en
- * `Documents%20partages`). Si tes sites sont en anglais, remplace par
- * `Shared%20Documents`.
+ * Construit l'URL vers la bibliothèque de documents propre à chaque
+ * département. Topologie réelle : un seul site (pas de sous-sites), avec
+ * une bibliothèque dédiée par département. Si `SiteUrl` est renseigné
+ * dans la liste `Departements`, il est utilisé tel quel (il doit déjà
+ * pointer vers la vue AllItems.aspx de la bibliothèque cible). Sinon,
+ * on applique la convention de nommage `Documents_<SlugCapitalise>` sur
+ * le site courant.
  */
 function buildDocLibraryUrl(dept: IDepartement, fallbackHub: string): string {
   const origin =
     typeof window !== "undefined" ? window.location.origin : "";
-  const hubBase = fallbackHub || `${origin}/sites/ika-intranet`;
 
   if (dept.SiteUrl && dept.SiteUrl.Url) {
-    const siteRel = dept.SiteUrl.Url.replace(/^https?:\/\/[^/]+/, "");
-    return `${origin}${siteRel}/Documents%20partages/Forms/AllItems.aspx`;
+    return dept.SiteUrl.Url;
   }
 
-  // Fallback : slug => convention de nommage /sites/ika-<slug>.
-  // Le slug "commerciaux" (avec x final) est le slug interne ; le site
-  // SharePoint correspondant est typiquement nommé "ika-commerciaux" aussi.
   if (dept.Slug && dept.Slug !== "direction") {
-    return `${origin}/sites/ika-${dept.Slug}/Documents%20partages/Forms/AllItems.aspx`;
+    const libName = `Documents_${capitalize(dept.Slug)}`;
+    const sitePath = typeof window !== "undefined"
+      ? window.location.pathname.split("/").slice(0, 3).join("/")
+      : "";
+    return `${origin}${sitePath}/${encodeURIComponent(libName)}/Forms/AllItems.aspx`;
   }
 
+  const hubBase = fallbackHub || `${origin}/sites/ikareview`;
   return `${hubBase}/Documents%20partages/Forms/AllItems.aspx`;
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export interface IDepartmentGridProps {
@@ -121,7 +126,10 @@ export const DepartmentGrid: React.FC<IDepartmentGridProps> = (props) => {
 
   const origin =
     typeof window !== "undefined" ? window.location.origin : "";
-  const hubUrl = `${origin}/sites/ika-intranet`;
+  const sitePath = typeof window !== "undefined"
+    ? window.location.pathname.split("/").slice(0, 3).join("/")
+    : "";
+  const hubUrl = `${origin}${sitePath}`;
 
   return (
     <section

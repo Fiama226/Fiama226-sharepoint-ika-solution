@@ -1,9 +1,9 @@
-FileLeafRef,Title,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder
-photo1.jpg,photo1,All Hands Tech — Q2 2026,Événements,2026-06-10,TRUE,Photo de groupe de la réunion trimestrielle,1
-photo2.jpg,photo2,Workshop Architecture Cloud,Formation,2026-06-18,FALSE,Participants travaillant sur l'architecture Cloud,2
-photo3.jpg,photo3,Sprint Review Q1,Projets,2026-03-31,FALSE,Équipe projet présentant les résultats du premier trimestre,3
-photo4.jpg,photo4,Demo Day — Projets IA,Événements,2026-06-25,FALSE,Démonstration d'un assistant IA sur grand écran,4
-photo5.jpg,photo5,Audit Cybersécurité S1,Formation,2026-07-03,FALSE,Session d'analyse de vulnérabilité,5
-photo6.jpg,photo6,Déploiement Infrastructure AWS,Projets,2026-05-15,FALSE,Ingénieurs devant les consoles de supervision,6
-photo7.jpg,photo7,Soirée Annuelle Tech Awards,Événements,2026-01-15,TRUE,Remise des prix d'innovation aux lauréats,7
-photo8.jpg,photo8,Hackathon Interne 2026,Projets,2026-04-20,FALSE,Équipes codant intensivement pendant le hackathon,8
+﻿Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder
+All Hands Tech — Q2 2026,Événements,2026-06-10,TRUE,All Hands Q2 2026,1
+Workshop Architecture Cloud,Formation,2026-06-18,FALSE,Workshop Cloud,2
+Sprint Review Q1,Projets,2026-03-20,FALSE,Sprint Review,3
+Demo Day — Projets IA,Événements,2026-06-25,FALSE,Demo Day IA,4
+Audit Cybersécurité S1,Formation,2026-06-05,FALSE,Audit Cybersécurité,5
+Déploiement Infrastructure AWS,Projets,2026-04-15,FALSE,Infrastructure AWS,6
+Soirée Annuelle Tech Awards,Événements,2026-05-22,FALSE,Tech Awards,7
+Hackathon Interne 2026,Projets,2026-06-12,FALSE,Hackathon 2026,8

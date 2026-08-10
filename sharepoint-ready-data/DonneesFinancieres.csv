@@ -1,0 +1,12 @@
+﻿Title,SeriesType,Amount,FiscalYear,FiscalQuarter,CurrencyCode,SortOrder
+Achats,Charges,412,2026,T2,XOF,1
+Sous-traitance,Charges,318,2026,T2,XOF,2
+Loyers,Charges,186,2026,T2,XOF,3
+Déplacements,Charges,142,2026,T2,XOF,4
+Marketing,Charges,128,2026,T2,XOF,5
+Autres,Charges,84,2026,T2,XOF,6
+Vertex Financial,TopClients,4.2,2026,T2,XOF,7
+Apex Manufacturing,TopClients,4.8,2026,T2,XOF,8
+Northwind Solutions,TopClients,3.9,2026,T2,XOF,9
+BlueRock Systems,TopClients,3.4,2026,T2,XOF,10
+Horizon Healthcare,TopClients,2.7,2026,T2,XOF,11

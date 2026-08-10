@@ -36,7 +36,8 @@ export default class DeptHeroWebPart extends BaseClientSideWebPart<IDeptHeroWebP
 
   private get _defaultBackground(): string {
     const origin = window.location.origin;
-    return `${origin}/sites/ika-intranet/SiteAssets/hero-background.png`;
+    const sitePath = this.context.pageContext.web.serverRelativeUrl || "/sites/ikareview";
+    return `${origin}${sitePath}/SiteAssets/hero-background.png`;
   }
 
   public render(): void {

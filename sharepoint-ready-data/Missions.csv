@@ -1,4 +1,4 @@
-Title,Tag,MissionText,IconName,MissionType,ColorClass,BgClass,SortOrder
-Accélérer la transformation digitale,Notre Mission,"Nous concevons des solutions technologiques sur mesure qui permettent à nos clients de gagner en efficacité, en agilité et en compétitivité sur leur marché.",Rocket,Mission,text-sky-600,bg-sky-50,1
-Être le partenaire tech de référence,Notre Vision,"Devenir l'acteur incontournable de l'ingénierie digitale en Afrique et à l'international, en plaçant l'humain et l'innovation au cœur de chaque projet.",Globe,Vision,text-emerald-600,bg-emerald-50,2
-"Excellence, Intégrité, Collaboration",Nos Valeurs,"Chaque ligne de code, chaque architecture, chaque livraison reflète notre engagement envers la qualité, la transparence et l'esprit d'équipe.",Zap,Valeur,text-orange-600,bg-orange-50,3
+﻿Title,Tag,MissionText,IconName,MissionType,ColorClass,BgClass,SortOrder
+Accélérer la transformation digitale,Notre Mission,"Nous concevons des solutions technologiques sur mesure qui permettent à nos clients de gagner en efficacité, en agilité et en compétitivité sur leur marché.",🚀,Mission,text-brand-cyan,bg-brand-cyan/10,1
+Être le partenaire tech de référence,Notre Vision,"Devenir l'acteur incontournable de l'ingénierie digitale en Afrique et à l'international, en plaçant l'humain et l'innovation au cœur de chaque projet.",🌍,Vision,text-brand-navy,bg-brand-navy/10,2
+"Excellence, Intégrité, Collaboration",Nos Valeurs,"Chaque ligne de code, chaque architecture, chaque livraison reflète notre engagement envers la qualité, la transparence et l'esprit d'équipe.",⚡,Valeur,text-brand-cyan,bg-brand-cyan/10,3

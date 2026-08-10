@@ -1,4 +1,4 @@
-FileLeafRef,Title,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText
-slide1.jpg,Diapositive 1,"Construire le digital de demain, aujourd'hui.",Innovation · Agilité · Excellence,https://ikasolution.sharepoint.com/sites/ika-intranet,Découvrir,1,TRUE,Équipe IKA Solution au travail
-slide2.jpg,Diapositive 2,Des équipes expertes au service de vos projets.,Développement · Architecture · Data,https://ikasolution.sharepoint.com/sites/ika-intranet,Nos projets,2,TRUE,Développeurs IKA Solution collaborant
-slide3.jpg,Diapositive 3,Ensemble, nous transformons les idées en solutions.,Cloud · IA · Cybersécurité,https://ikasolution.sharepoint.com/sites/ika-intranet,Nous rejoindre,3,TRUE,Serveurs informatiques et cloud
+﻿Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,StartDate,EndDate,AltText
+Construire le digital de demain aujourd'hui,Innovation · Agilité · Excellence,,Découvrir,1,TRUE,,,Hero carrousel 1
+Des équipes expertes au service de vos projets,Développement · Architecture · Data,,Découvrir,2,TRUE,,,Hero carrousel 2
+Ensemble nous transformons les idées en solutions,Cloud · IA · Cybersécurité,,Découvrir,3,TRUE,,,Hero carrousel 3

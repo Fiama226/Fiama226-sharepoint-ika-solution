@@ -1,13 +1,16 @@
-Title,SettingValue,SettingCategory
-company.name,IKA Solution,Entreprise
-company.tagline,Ingénierie informatique & services numériques,Entreprise
-company.legalName,IKA Solution SARL,Entreprise
-company.address,"12 rue de l'Innovation, 75012 Paris, France",Entreprise
-company.email,contact@ika-solution.fr,Entreprise
-company.phone,+33 1 23 45 67 89,Entreprise
-company.copyrightYears,2024–2026,Entreprise
-social.facebook,#,Réseaux sociaux
-social.linkedin,#,Réseaux sociaux
-social.twitter,#,Réseaux sociaux
-social.instagram,#,Réseaux sociaux
-social.whatsapp,#,Réseaux sociaux
+﻿Title,SettingValue,SettingCategory
+company.name,IKA Solution,company
+company.tagline,"Ingénierie informatique & services numériques",company
+company.legalName,IKA Solution SARL,company
+company.address,"12 rue de l'Innovation, 75012 Paris, France",company
+company.email,contact@ika-solution.fr,company
+company.phone,+33 1 23 45 67 89,company
+company.copyrightYears,2024–2026,company
+company.currentUser,Landry KABORE,company
+company.currentUserRole,Responsable communication interne,company
+company.siret,123 456 789 00012,company
+social.facebook,#,social
+social.linkedin,#,social
+social.twitter,#,social
+social.instagram,#,social
+social.whatsapp,#,social

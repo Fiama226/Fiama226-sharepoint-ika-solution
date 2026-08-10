@@ -57,15 +57,19 @@ export class DataService {
 
   private _resolveHubUrl(): string {
     const legacy = this._context.pageContext.legacyPageContext as
-      | { hubSiteId?: string }
+      | { hubSiteId?: string; hubUrl?: string }
       | undefined;
 
     if (!legacy || !legacy.hubSiteId) {
       return this._webUrl;
     }
 
+    if (legacy.hubUrl) {
+      return legacy.hubUrl;
+    }
+
     const origin = new URL(this._webUrl).origin;
-    return `${origin}/sites/ika-intranet`;
+    return `${origin}/sites/ikareview`;
   }
 
   private _readCache<T>(key: string): T | undefined {

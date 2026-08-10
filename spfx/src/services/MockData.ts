@@ -1,4 +1,4 @@
-import {
+﻿import {
   INewsItem,
   IDocumentItem,
   IEventItem,
@@ -65,7 +65,7 @@ export const MOCK_DOCUMENTS: IDocumentItem[] = [
   {
     Id: 1,
     Title: "Charte informatique IKA Solution.pdf",
-    FileRef: "/sites/ika-intranet/Documents/Charte informatique IKA Solution.pdf",
+    FileRef: "/sites/ikareview/Documents/Charte informatique IKA Solution.pdf",
     FileLeafRef: "Charte informatique IKA Solution.pdf",
     DocCategory: "Procédure",
     Confidentiality: "Public",
@@ -77,7 +77,7 @@ export const MOCK_DOCUMENTS: IDocumentItem[] = [
   {
     Id: 2,
     Title: "Guide du nouvel arrivant.docx",
-    FileRef: "/sites/ika-intranet/Documents/Guide du nouvel arrivant.docx",
+    FileRef: "/sites/ikareview/Documents/Guide du nouvel arrivant.docx",
     FileLeafRef: "Guide du nouvel arrivant.docx",
     DocCategory: "Guide",
     Confidentiality: "Interne",
@@ -99,7 +99,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Vos documents financiers, rapports et échéances fiscales au même endroit.",
     Accent: "navy",
     IconName: "finance",
-    SiteUrl: { Url: "/sites/ika-intranet/SitePages/Comptabilite.aspx", Description: "Comptabilité" },
+    SiteUrl: { Url: "/sites/ikareview/SitePages/Comptabilite.aspx", Description: "Comptabilité" },
     AccentClasses: "bg-brand-navy text-white",
     BadgeClasses: "bg-blue-100 text-blue-800",
     MemberCount: 12,
@@ -117,7 +117,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Gestion administrative, RH, contrats et démarches internes.",
     Accent: "cyan",
     IconName: "admin",
-    SiteUrl: { Url: "/sites/ika-intranet/SitePages/Administration.aspx", Description: "Administration" },
+    SiteUrl: { Url: "/sites/ikareview/SitePages/Administration.aspx", Description: "Administration" },
     AccentClasses: "bg-brand-cyan text-white",
     BadgeClasses: "bg-cyan-100 text-cyan-800",
     MemberCount: 8,

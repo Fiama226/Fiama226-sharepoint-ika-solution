@@ -65,8 +65,12 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
   }
 
   private get _hubUrl(): string {
-    const origin = window.location.origin;
-    return `${origin}/sites/ika-intranet`;
+    const page = this.context.pageContext;
+    const legacy = page.legacyPageContext as
+      | { hubSiteId?: string; hubUrl?: string }
+      | undefined;
+    if (legacy && legacy.hubUrl) return legacy.hubUrl;
+    return page.web.absoluteUrl;
   }
 
   private _buildContext(): IChromeContext {
@@ -91,8 +95,9 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
   }
 
   private _documentsNav(): INavNode[] {
+    const homePath = this.context.pageContext.web.serverRelativeUrl;
     return this._primaryNav
-      .filter((node) => node.url.indexOf("ika-intranet") === -1)
+      .filter((node) => node.url !== homePath)
       .map((node) => ({
         key: `${node.key}-docs`,
         label: node.label,

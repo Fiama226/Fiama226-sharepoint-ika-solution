@@ -209,8 +209,11 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
   // de l'Application Customizer pour que la WP seule soit autosuffisante.
   const chromeContext = React.useMemo<IChromeContext>(() => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
-    const hubUrl = `${origin}/sites/ika-intranet`;
-    const siteUrl = `${origin}${window.location.pathname.split("/").slice(0, 3).join("/")}`;
+    const sitePath = typeof window !== "undefined"
+      ? window.location.pathname.split("/").slice(0, 3).join("/")
+      : "";
+    const hubUrl = `${origin}${sitePath}`;
+    const siteUrl = `${origin}${sitePath}`;
     return {
       currentUser: {
         displayName: props.currentUser,

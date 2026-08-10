@@ -1,5 +1,5 @@
-Title,ProjectLead,Progress,ProjectStatus,DueDate,TasksDone,TasksTotal,ShowOnHome,SortOrder
-Migration Microservices,Cloud Team,78,À l'heure,2026-08-30,14,18,TRUE,1
-Portail Client v3.0,Frontend,45,À risque,2026-09-15,9,20,TRUE,2
-Pipeline Data IA,Data Team,92,À l'heure,2026-08-28,22,24,TRUE,3
-Audit Cybersécurité,SecOps,30,En retard,2026-10-01,6,20,TRUE,4
+﻿Title,ProjectLead,Progress,ProjectStatus,DueDate,TasksDone,TasksTotal,ShowOnHome,SortOrder
+Migration Microservices,Cloud Team,78,À l'heure,2026-06-30,14,18,TRUE,1
+Portail Client v3.0,Frontend,45,À risque,2026-07-15,9,20,TRUE,2
+Pipeline Data IA,Data Team,92,À l'heure,2026-06-28,22,24,TRUE,3
+Audit Cybersécurité,SecOps,30,En retard,2026-08-01,6,20,TRUE,4

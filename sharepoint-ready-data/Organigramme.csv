@@ -1,0 +1,5 @@
+﻿Title,IconName,ColorClass,BgColorClass,BorderColorClass,GradientFrom,GradientTo,SortOrder
+Direction Générale,Building2,text-violet-700,bg-violet-50,border-violet-200,from-violet-500,to-purple-600,1
+Direction Technique,Code2,text-blue-700,bg-blue-50,border-blue-200,from-blue-500,to-cyan-600,2
+Direction Comptabilité,ShieldCheck,text-emerald-700,bg-emerald-50,border-emerald-200,from-emerald-500,to-teal-600,3
+Direction Commerciale,Megaphone,text-amber-700,bg-amber-50,border-amber-200,from-amber-500,to-orange-600,4

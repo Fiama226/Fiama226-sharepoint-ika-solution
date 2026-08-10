@@ -25,7 +25,7 @@ interface ICacheEntry {
 }
 
 const ICON_BY_SLUG: Record<string, string> = {
-  "ika-intranet": "Home",
+  "ikareview": "Home",
   "ika-comptabilite": "Calculator",
   "ika-administration": "ShieldCheck",
   "ika-commerciaux": "Users",
@@ -38,18 +38,20 @@ const ICON_BY_SLUG: Record<string, string> = {
   documents: "FolderOpen",
 };
 
+const HUB_PATH = "/sites/ikareview";
+
 export const STATIC_PRIMARY_NAV: INavNode[] = [
-  { key: "home", label: "Accueil", url: "/sites/ika-intranet", iconName: "Home" },
-  { key: "compta", label: "Comptabilité", url: "/sites/ika-comptabilite", iconName: "Calculator" },
-  { key: "admin", label: "Administration", url: "/sites/ika-administration", iconName: "ShieldCheck" },
-  { key: "commerce", label: "Commerciaux", url: "/sites/ika-commerciaux", iconName: "Users" },
-  { key: "tech", label: "Techniciens", url: "/sites/ika-techniciens", iconName: "Settings" },
+  { key: "home", label: "Accueil", url: HUB_PATH, iconName: "Home" },
+  { key: "compta", label: "Comptabilité", url: `${HUB_PATH}/Documents_Comptabilite/Forms/AllItems.aspx`, iconName: "Calculator" },
+  { key: "admin", label: "Administration", url: `${HUB_PATH}/Documents_Administration/Forms/AllItems.aspx`, iconName: "ShieldCheck" },
+  { key: "commerce", label: "Commerciaux", url: `${HUB_PATH}/Documents_Commerciaux/Forms/AllItems.aspx`, iconName: "Users" },
+  { key: "tech", label: "Techniciens", url: `${HUB_PATH}/Documents_Techniciens/Forms/AllItems.aspx`, iconName: "Settings" },
 ];
 
 export const STATIC_SECONDARY_NAV: INavNode[] = [
-  { key: "org", label: "Organigramme", url: "/sites/ika-intranet/SitePages/Organigramme.aspx", iconName: "GitBranch" },
-  { key: "agenda", label: "Agenda", url: "/sites/ika-intranet/SitePages/Evenements.aspx", iconName: "calendar" },
-  { key: "histoire", label: "Histoire", url: "/sites/ika-intranet/SitePages/Histoire.aspx", iconName: "book" },
+  { key: "org", label: "Organigramme", url: `${HUB_PATH}/SitePages/Organigramme.aspx`, iconName: "GitBranch" },
+  { key: "agenda", label: "Agenda", url: `${HUB_PATH}/SitePages/Evenements.aspx`, iconName: "calendar" },
+  { key: "histoire", label: "Histoire", url: `${HUB_PATH}/SitePages/Histoire.aspx`, iconName: "book" },
 ];
 
 export class NavigationService {

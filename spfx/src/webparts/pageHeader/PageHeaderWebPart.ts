@@ -42,11 +42,12 @@ export default class PageHeaderWebPart extends BaseClientSideWebPart<IPageHeader
 
     const origin = window.location.origin;
     const web = this.context.pageContext.web;
+    const hubPath = "/sites/ikareview";
     const items: IBreadcrumbItem[] = [
-      { label: "Accueil", url: `${origin}/sites/ika-intranet` },
+      { label: "Accueil", url: `${origin}${hubPath}` },
     ];
 
-    if (web.serverRelativeUrl.indexOf("/sites/ika-intranet") !== 0) {
+    if (web.serverRelativeUrl.indexOf(hubPath) !== 0) {
       items.push({ label: web.title, url: web.absoluteUrl });
     }
 
