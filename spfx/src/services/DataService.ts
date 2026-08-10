@@ -53,14 +53,17 @@ export class DataService {
     this._context = context;
     this._webUrl = context.pageContext.web.absoluteUrl;
     this._hubUrl = hubUrl || this._resolveHubUrl();
-    this._isLocal = typeof window !== 'undefined' &&
-      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    // Mode "aperçu" : sur le Workbench (local OU hébergé SPO) on sert des
-    // données de démonstration afin que la page se rende sans liste déployée.
+    this._isLocal =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1");
+
     const isWorkbench =
       this._isLocal ||
-      (typeof window !== 'undefined' && /workbench/i.test(window.location.pathname)) ||
+      (typeof window !== "undefined" &&
+        /workbench/i.test(window.location.pathname)) ||
       context.host?.hostType === "Workbench";
+
     this._useMocks = isWorkbench;
   }
 
@@ -140,155 +143,209 @@ export class DataService {
   public async getNews(top: number = 4, scope: string = "global"): Promise<INewsItem[]> {
     if (this._useMocks) return Mocks.MOCK_NEWS.slice(0, top);
 
-    const select = [
-      "Id",
-      "Title",
-      "Excerpt",
-      "Category",
-      "PublishDate",
-      "Highlighted",
-      "HeaderImage",
-      "Created",
-      "Modified",
-      "NewsAuthor/Title",
-      "NewsAuthor/EMail",
-    ].join(",");
+    try {
+      const select = [
+        "Id",
+        "Title",
+        "Excerpt",
+        "Category",
+        "PublishDate",
+        "Highlighted",
+        "HeaderImage",
+        "Created",
+        "Modified",
+        "NewsAuthor/Title",
+        "NewsAuthor/EMail",
+      ].join(",");
 
-    const scopeFilter = scope ? `Scope eq '${scope}'` : "Scope eq 'global'";
-    const endpoint =
-      `lists/getByTitle('Actualites')/items` +
-      `?$select=${select}&$expand=NewsAuthor` +
-      `&$filter=${scopeFilter}` +
-      `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
+      const scopeFilter = scope ? `Scope eq '${scope}'` : "Scope eq 'global'";
+      const endpoint =
+        `lists/getByTitle('Actualites')/items` +
+        `?$select=${select}&$expand=NewsAuthor` +
+        `&$filter=${scopeFilter}` +
+        `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
 
-    return this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
+      const items = await this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
+      return items && items.length > 0 ? items : Mocks.MOCK_NEWS.slice(0, top);
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour actualités:", e);
+      return Mocks.MOCK_NEWS.slice(0, top);
+    }
   }
 
   public async getDocuments(top: number = 10, listTitle: string = "Documents"): Promise<IDocumentItem[]> {
     if (this._useMocks) return Mocks.MOCK_DOCUMENTS.slice(0, top);
 
-    const select = [
-      "Id",
-      "Title",
-      "FileLeafRef",
-      "FileRef",
-      "DocCategory",
-      "Confidentiality",
-      "IsPinned",
-      "Modified",
-      "Created",
-      "Editor/Title",
-    ].join(",");
+    try {
+      const select = [
+        "Id",
+        "Title",
+        "FileLeafRef",
+        "FileRef",
+        "DocCategory",
+        "Confidentiality",
+        "IsPinned",
+        "Modified",
+        "Created",
+        "Editor/Title",
+      ].join(",");
 
-    const endpoint =
-      `lists/getByTitle('${listTitle}')/items` +
-      `?$select=${select}&$expand=Editor` +
-      `&$filter=FSObjType eq 0&$orderby=Modified desc&$top=${top}`;
+      const endpoint =
+        `lists/getByTitle('${listTitle}')/items` +
+        `?$select=${select}&$expand=Editor` +
+        `&$filter=FSObjType eq 0&$orderby=Modified desc&$top=${top}`;
 
-    return this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${listTitle}.${top}`);
+      const items = await this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${listTitle}.${top}`);
+      return items && items.length > 0 ? items : Mocks.MOCK_DOCUMENTS.slice(0, top);
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour documents:", e);
+      return Mocks.MOCK_DOCUMENTS.slice(0, top);
+    }
   }
 
   public async getEvents(top: number = 5, scope: string = "global"): Promise<IEventItem[]> {
     if (this._useMocks) return Mocks.MOCK_EVENTS.slice(0, top);
 
-    const today = new Date().toISOString();
-    const select = [
-      "Id",
-      "Title",
-      "EventDate",
-      "EndDate",
-      "Location",
-      "EventCategory",
-      "fAllDayEvent",
-      "EventImage",
-      "Created",
-      "Modified",
-    ].join(",");
+    try {
+      const today = new Date().toISOString();
+      const select = [
+        "Id",
+        "Title",
+        "EventDate",
+        "EndDate",
+        "Location",
+        "EventCategory",
+        "fAllDayEvent",
+        "EventImage",
+        "Created",
+        "Modified",
+      ].join(",");
 
-    const endpoint =
-      `lists/getByTitle('Evenements')/items` +
-      `?$select=${select}&$filter=EventDate ge datetime'${today}'` +
-      `&$orderby=EventDate asc&$top=${top}`;
+      const endpoint =
+        `lists/getByTitle('Evenements')/items` +
+        `?$select=${select}&$filter=EventDate ge datetime'${today}'` +
+        `&$orderby=EventDate asc&$top=${top}`;
 
-    return this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
+      const items = await this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
+      return items && items.length > 0 ? items : Mocks.MOCK_EVENTS.slice(0, top);
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour événements:", e);
+      return Mocks.MOCK_EVENTS.slice(0, top);
+    }
   }
 
   public async getQuickLinks(scope: string = "global"): Promise<IQuickLink[]> {
     if (this._useMocks) return Mocks.MOCK_QUICKLINKS;
 
-    const endpoint =
-      `lists/getByTitle('LiensRapides')/items` +
-      `?$select=Id,Title,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive,Created,Modified` +
-      `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=50`;
+    try {
+      const endpoint =
+        `lists/getByTitle('LiensRapides')/items` +
+        `?$select=Id,Title,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive,Created,Modified` +
+        `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=50`;
 
-    return this._get<IQuickLink>(this._webUrl, endpoint, "quicklinks");
+      const items = await this._get<IQuickLink>(this._webUrl, endpoint, "quicklinks");
+      return items && items.length > 0 ? items : Mocks.MOCK_QUICKLINKS;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour liens rapides:", e);
+      return Mocks.MOCK_QUICKLINKS;
+    }
   }
 
   public async getDepartements(): Promise<IDepartement[]> {
     if (this._useMocks) return Mocks.MOCK_DEPARTEMENTS;
 
-    const endpoint =
-      `lists/getByTitle('Departements')/items` +
-      `?$select=Id,Title,Slug,Tagline,DeptDescription,HeroTitle,HeroSubtitle,Accent,IconName,SiteUrl,AccentClasses,BadgeClasses,MemberCount,SortOrder,Created,Modified` +
-      `&$orderby=SortOrder asc&$top=20`;
+    try {
+      const endpoint =
+        `lists/getByTitle('Departements')/items` +
+        `?$select=Id,Title,Slug,Tagline,DeptDescription,HeroTitle,HeroSubtitle,Accent,IconName,SiteUrl,AccentClasses,BadgeClasses,MemberCount,SortOrder,Created,Modified` +
+        `&$orderby=SortOrder asc&$top=20`;
 
-    return this._get<IDepartement>(
-      this._hubUrl,
-      endpoint,
-      "departements",
-      30 * 60 * 1000
-    );
+      const items = await this._get<IDepartement>(
+        this._hubUrl,
+        endpoint,
+        "departements",
+        30 * 60 * 1000
+      );
+      return items && items.length > 0 ? items : Mocks.MOCK_DEPARTEMENTS;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour départements:", e);
+      return Mocks.MOCK_DEPARTEMENTS;
+    }
   }
 
   public async getAnnouncements(): Promise<IAnnouncement[]> {
     if (this._useMocks) return Mocks.MOCK_ANNOUNCEMENTS;
 
-    const today = new Date().toISOString();
-    const endpoint =
-      `lists/getByTitle('Annonces')/items` +
-      `?$select=Id,Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,Created,Modified` +
-      `&$filter=DisplayUntil ge datetime'${today}'` +
-      `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
+    try {
+      const today = new Date().toISOString();
+      const endpoint =
+        `lists/getByTitle('Annonces')/items` +
+        `?$select=Id,Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,Created,Modified` +
+        `&$filter=DisplayUntil ge datetime'${today}'` +
+        `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
 
-    return this._get<IAnnouncement>(this._hubUrl, endpoint, "announcements");
+      const items = await this._get<IAnnouncement>(this._hubUrl, endpoint, "announcements");
+      return items && items.length > 0 ? items : Mocks.MOCK_ANNOUNCEMENTS;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour annonces:", e);
+      return Mocks.MOCK_ANNOUNCEMENTS;
+    }
   }
 
   public async getProjects(onHomeOnly: boolean = true): Promise<IProject[]> {
     if (this._useMocks) return Mocks.MOCK_PROJECTS;
 
-    const filter = onHomeOnly ? "&$filter=ShowOnHome eq 1" : "";
-    const endpoint =
-      `lists/getByTitle('Projets')/items` +
-      `?$select=Id,Title,ProjectLead,Progress,ProjectStatus,DueDate,TasksDone,TasksTotal,ShowOnHome,SortOrder,Created,Modified` +
-      `${filter}&$orderby=SortOrder asc&$top=20`;
+    try {
+      const filter = onHomeOnly ? "&$filter=ShowOnHome eq 1" : "";
+      const endpoint =
+        `lists/getByTitle('Projets')/items` +
+        `?$select=Id,Title,ProjectLead,Progress,ProjectStatus,DueDate,TasksDone,TasksTotal,ShowOnHome,SortOrder,Created,Modified` +
+        `${filter}&$orderby=SortOrder asc&$top=20`;
 
-    return this._get<IProject>(this._hubUrl, endpoint, `projects.${onHomeOnly}`);
+      const items = await this._get<IProject>(this._hubUrl, endpoint, `projects.${onHomeOnly}`);
+      return items && items.length > 0 ? items : Mocks.MOCK_PROJECTS;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour projets:", e);
+      return Mocks.MOCK_PROJECTS;
+    }
   }
 
   public async getHeroSlides(): Promise<IHeroSlide[]> {
     if (this._useMocks) return Mocks.MOCK_SLIDES;
 
-    const endpoint =
-      `lists/getByTitle('HeroSlides')/items` +
-      `?$select=Id,Title,FileRef,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified` +
-      `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=10`;
+    try {
+      const endpoint =
+        `lists/getByTitle('HeroSlides')/items` +
+        `?$select=Id,Title,FileRef,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified` +
+        `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=10`;
 
-    return this._get<IHeroSlide>(this._hubUrl, endpoint, "heroslides");
+      const items = await this._get<IHeroSlide>(this._hubUrl, endpoint, "heroslides");
+      return items && items.length > 0 ? items : Mocks.MOCK_SLIDES;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour slides hero:", e);
+      return Mocks.MOCK_SLIDES;
+    }
   }
 
   public async getMissions(): Promise<IMission[]> {
     if (this._useMocks) return Mocks.MOCK_MISSIONS;
 
-    const endpoint =
-      `lists/getByTitle('Missions')/items` +
-      `?$select=Id,Title,Tag,MissionText,IconName,MissionType,ColorClass,BgClass,SortOrder,Created,Modified` +
-      `&$orderby=SortOrder asc&$top=20`;
+    try {
+      const endpoint =
+        `lists/getByTitle('Missions')/items` +
+        `?$select=Id,Title,Tag,MissionText,IconName,MissionType,ColorClass,BgClass,SortOrder,Created,Modified` +
+        `&$orderby=SortOrder asc&$top=20`;
 
-    return this._get<IMission>(this._hubUrl, endpoint, "missions", 30 * 60 * 1000);
+      const items = await this._get<IMission>(this._hubUrl, endpoint, "missions", 30 * 60 * 1000);
+      return items && items.length > 0 ? items : Mocks.MOCK_MISSIONS;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour missions:", e);
+      return Mocks.MOCK_MISSIONS;
+    }
   }
 
   public async getIndicators(
-    placement: "Hero accueil" | "Page histoire"
+    placement: "Hero accueil" | "Page histoire" = "Hero accueil"
   ): Promise<IIndicator[]> {
     if (this._useMocks) {
       return Mocks.MOCK_STATS.filter(
@@ -296,53 +353,75 @@ export class DataService {
       );
     }
 
-    const endpoint =
-      `lists/getByTitle('Indicateurs')/items` +
-      `?$select=Id,Title,StatValue,IconName,Placement,SortOrder,IsActive,Created,Modified` +
-      `&$filter=IsActive eq 1 and (Placement eq '${placement}' or Placement eq 'Les deux')` +
-      `&$orderby=SortOrder asc&$top=20`;
+    try {
+      const endpoint =
+        `lists/getByTitle('Indicateurs')/items` +
+        `?$select=Id,Title,StatValue,IconName,Placement,SortOrder,IsActive,Created,Modified` +
+        `&$filter=IsActive eq 1 and (Placement eq '${placement}' or Placement eq 'Les deux')` +
+        `&$orderby=SortOrder asc&$top=20`;
 
-    return this._get<IIndicator>(this._hubUrl, endpoint, `indicators.${placement}`);
+      const items = await this._get<IIndicator>(this._hubUrl, endpoint, `indicators.${placement}`);
+      return items && items.length > 0
+        ? items
+        : Mocks.MOCK_STATS.filter(
+            (s) => s.Placement === placement || s.Placement === "Les deux"
+          );
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour indicateurs:", e);
+      return Mocks.MOCK_STATS.filter(
+        (s) => s.Placement === placement || s.Placement === "Les deux"
+      );
+    }
   }
 
-  public async getCollaborateurs(
-    division?: string
-  ): Promise<ICollaborateur[]> {
-    if (this._useMocks) return Mocks.MOCK_COLLABORATORS;
+  public async getCollaborateurs(division?: string): Promise<ICollaborateur[]> {
+    if (this._useMocks) {
+      return division
+        ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
+        : Mocks.MOCK_COLLABORATORS;
+    }
 
-    const select = [
-      "Id",
-      "Title",
-      "JobTitle",
-      "Email",
-      "Phone",
-      "OfficeLocation",
-      "Birthdate",
-      "Photo",
-      "HierarchyLevel",
-      "Division",
-      "IsActive",
-      "SortOrder",
-      "Created",
-      "Modified",
-      "Manager/Id",
-      "Manager/Title",
-      "Department/Id",
-      "Department/Title",
-    ].join(",");
+    try {
+      const select = [
+        "Id",
+        "Title",
+        "JobTitle",
+        "Email",
+        "Phone",
+        "OfficeLocation",
+        "Birthdate",
+        "Photo",
+        "HierarchyLevel",
+        "Division",
+        "IsActive",
+        "SortOrder",
+        "Created",
+        "Modified",
+        "Manager/Id",
+        "Manager/Title",
+        "Department/Id",
+        "Department/Title",
+      ].join(",");
 
-    const divisionFilter = division ? ` and Division eq '${division}'` : "";
-    const endpoint =
-      `lists/getByTitle('Collaborateurs')/items` +
-      `?$select=${select}&$expand=Manager,Department` +
-      `&$filter=IsActive eq 1${divisionFilter}` +
-      `&$orderby=HierarchyLevel asc,SortOrder asc&$top=500`;
+      const divisionFilter = division ? ` and Division eq '${division}'` : "";
+      const endpoint =
+        `lists/getByTitle('Collaborateurs')/items` +
+        `?$select=${select}&$expand=Manager,Department` +
+        `&$filter=IsActive eq 1${divisionFilter}` +
+        `&$orderby=HierarchyLevel asc,SortOrder asc&$top=500`;
 
-    return this._get<ICollaborateur>(
-      this._hubUrl,
-      endpoint,
-      `collaborateurs.${division || "all"}`
-    );
+      const items = await this._get<ICollaborateur>(
+        this._hubUrl,
+        endpoint,
+        `collaborateurs.${division || "all"}`
+      );
+      return items && items.length > 0 ? items : Mocks.MOCK_COLLABORATORS;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour collaborateurs:", e);
+      return division
+        ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
+        : Mocks.MOCK_COLLABORATORS;
+    }
   }
 
   public async getOrgChart(): Promise<IOrgNode[]> {
@@ -385,131 +464,168 @@ export class DataService {
   public async getGalleryImages(top: number = 12): Promise<IGalleryImage[]> {
     if (this._useMocks) return Mocks.MOCK_GALLERY.slice(0, top);
 
-    const endpoint =
-      `lists/getByTitle('Galerie')/items` +
-      `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
-      `&$filter=FSObjType eq 0` +
-      `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
+    try {
+      const endpoint =
+        `lists/getByTitle('Galerie')/items` +
+        `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
+        `&$filter=FSObjType eq 0` +
+        `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
 
-    return this._get<IGalleryImage>(this._hubUrl, endpoint, `gallery.${top}`);
+      const items = await this._get<IGalleryImage>(this._hubUrl, endpoint, `gallery.${top}`);
+      return items && items.length > 0 ? items : Mocks.MOCK_GALLERY.slice(0, top);
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour galerie:", e);
+      return Mocks.MOCK_GALLERY.slice(0, top);
+    }
   }
 
   public async getEmployeeOfMonth(): Promise<IEmployeeOfMonth | undefined> {
     if (this._useMocks) return Mocks.MOCK_EMPLOYEE;
 
-    const select = [
-      "Id",
-      "Title",
-      "DisplayRole",
-      "Quote",
-      "NominatedBy",
-      "Photo",
-      "PeriodStart",
-      "IsCurrent",
-      "Created",
-      "Modified",
-      "Employee/Id",
-      "Employee/Title",
-      "Department/Id",
-      "Department/Title",
-    ].join(",");
+    try {
+      const select = [
+        "Id",
+        "Title",
+        "DisplayRole",
+        "Quote",
+        "NominatedBy",
+        "Photo",
+        "PeriodStart",
+        "IsCurrent",
+        "Created",
+        "Modified",
+        "Employee/Id",
+        "Employee/Title",
+        "Department/Id",
+        "Department/Title",
+      ].join(",");
 
-    const endpoint =
-      `lists/getByTitle('CollaborateurDuMois')/items` +
-      `?$select=${select}&$expand=Employee,Department` +
-      `&$filter=IsCurrent eq 1&$orderby=PeriodStart desc&$top=1`;
+      const endpoint =
+        `lists/getByTitle('CollaborateurDuMois')/items` +
+        `?$select=${select}&$expand=Employee,Department` +
+        `&$filter=IsCurrent eq 1&$orderby=PeriodStart desc&$top=1`;
 
-    const items = await this._get<IEmployeeOfMonth>(
-      this._hubUrl,
-      endpoint,
-      "employeeOfMonth"
-    );
+      const items = await this._get<IEmployeeOfMonth>(
+        this._hubUrl,
+        endpoint,
+        "employeeOfMonth"
+      );
 
-    return items.length > 0 ? items[0] : undefined;
+      return items && items.length > 0 ? items[0] : Mocks.MOCK_EMPLOYEE;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour collaborateur du mois:", e);
+      return Mocks.MOCK_EMPLOYEE;
+    }
   }
 
   public async getFinanceData(fiscalYear?: number): Promise<IFinanceData[]> {
     if (this._useMocks) return [];
 
-    const yearFilter = fiscalYear ? `&$filter=FiscalYear eq ${fiscalYear}` : "";
-    const endpoint =
-      `lists/getByTitle('DonneesFinancieres')/items` +
-      `?$select=Id,Title,SeriesType,Amount,FiscalYear,FiscalMonth,FiscalQuarter,CurrencyCode,SortOrder,Created,Modified` +
-      `${yearFilter}&$orderby=FiscalYear desc,FiscalMonth asc,SortOrder asc&$top=500`;
+    try {
+      const yearFilter = fiscalYear ? `&$filter=FiscalYear eq ${fiscalYear}` : "";
+      const endpoint =
+        `lists/getByTitle('DonneesFinancieres')/items` +
+        `?$select=Id,Title,SeriesType,Amount,FiscalYear,FiscalMonth,FiscalQuarter,CurrencyCode,SortOrder,Created,Modified` +
+        `${yearFilter}&$orderby=FiscalYear desc,FiscalMonth asc,SortOrder asc&$top=500`;
 
-    return this._get<IFinanceData>(
-      this._webUrl,
-      endpoint,
-      `finance.${fiscalYear || "all"}`
-    );
+      return await this._get<IFinanceData>(
+        this._webUrl,
+        endpoint,
+        `finance.${fiscalYear || "all"}`
+      );
+    } catch {
+      return [];
+    }
   }
 
   public async getMilestones(): Promise<IMilestone[]> {
-    if (this._useMocks) return [];
+    if (this._useMocks) return Mocks.MOCK_MILESTONES;
 
-    const endpoint =
-      `lists/getByTitle('Histoire')/items` +
-      `?$select=Id,Title,Year,Quarter,MilestoneDescription,MilestoneImage,IconName,Tag,TagColorClass,Side,Stat1Label,Stat1Value,Stat2Label,Stat2Value,SortOrder,Created,Modified` +
-      `&$orderby=SortOrder asc&$top=50`;
+    try {
+      const endpoint =
+        `lists/getByTitle('Histoire')/items` +
+        `?$select=Id,Title,Year,Quarter,MilestoneDescription,MilestoneImage,IconName,Tag,TagColorClass,Side,Stat1Label,Stat1Value,Stat2Label,Stat2Value,SortOrder,Created,Modified` +
+        `&$orderby=SortOrder asc&$top=50`;
 
-    return this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
+      const items = await this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
+      return items && items.length > 0 ? items : Mocks.MOCK_MILESTONES;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour histoire:", e);
+      return Mocks.MOCK_MILESTONES;
+    }
   }
 
   public async getFaq(category?: string): Promise<IFaqItem[]> {
-    if (this._useMocks) return [];
+    if (this._useMocks) {
+      return category
+        ? Mocks.MOCK_FAQ.filter((f) => f.FaqCategory === category)
+        : Mocks.MOCK_FAQ;
+    }
 
-    const categoryFilter = category
-      ? ` and FaqCategory eq '${category.replace(/'/g, "''")}'`
-      : "";
+    try {
+      const categoryFilter = category
+        ? ` and FaqCategory eq '${category.replace(/'/g, "''")}'`
+        : "";
 
-    const endpoint =
-      `lists/getByTitle('FAQ')/items` +
-      `?$select=Id,Title,Answer,FaqCategory,SortOrder,IsActive,ViewCount,Created,Modified` +
-      `&$filter=IsActive eq 1${categoryFilter}` +
-      `&$orderby=SortOrder asc&$top=100`;
+      const endpoint =
+        `lists/getByTitle('FAQ')/items` +
+        `?$select=Id,Title,Answer,FaqCategory,SortOrder,IsActive,ViewCount,Created,Modified` +
+        `&$filter=IsActive eq 1${categoryFilter}` +
+        `&$orderby=SortOrder asc&$top=100`;
 
-    return this._get<IFaqItem>(
-      this._hubUrl,
-      endpoint,
-      `faq.${category || "all"}`
-    );
+      const items = await this._get<IFaqItem>(
+        this._hubUrl,
+        endpoint,
+        `faq.${category || "all"}`
+      );
+      return items && items.length > 0 ? items : Mocks.MOCK_FAQ;
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour FAQ:", e);
+      return Mocks.MOCK_FAQ;
+    }
   }
 
   public async getCompanyInfo(): Promise<ICompanyInfo> {
     if (this._useMocks) return Mocks.MOCK_COMPANY;
 
-    const endpoint =
-      `lists/getByTitle('ParametresSite')/items` +
-      `?$select=Id,Title,SettingValue,SettingCategory,Created,Modified&$top=100`;
+    try {
+      const endpoint =
+        `lists/getByTitle('ParametresSite')/items` +
+        `?$select=Id,Title,SettingValue,SettingCategory,Created,Modified&$top=100`;
 
-    const items = await this._get<ISiteSetting>(
-      this._hubUrl,
-      endpoint,
-      "settings",
-      30 * 60 * 1000
-    );
+      const items = await this._get<ISiteSetting>(
+        this._hubUrl,
+        endpoint,
+        "settings",
+        30 * 60 * 1000
+      );
 
-    const map: Record<string, string> = {};
-    items.forEach((item) => {
-      map[item.Title] = item.SettingValue;
-    });
+      if (!items || items.length === 0) return Mocks.MOCK_COMPANY;
 
-    return {
-      name: map["company.name"] || "IKA Solution",
-      tagline: map["company.tagline"] || "",
-      legalName: map["company.legalName"] || "",
-      address: map["company.address"] || "",
-      email: map["company.email"] || "",
-      phone: map["company.phone"] || "",
-      copyrightYears: map["company.copyrightYears"] || "",
-      social: {
-        facebook: map["social.facebook"],
-        linkedin: map["social.linkedin"],
-        twitter: map["social.twitter"],
-        instagram: map["social.instagram"],
-        whatsapp: map["social.whatsapp"],
-      },
-    };
+      const map: Record<string, string> = {};
+      items.forEach((item) => {
+        map[item.Title] = item.SettingValue;
+      });
+
+      return {
+        name: map["company.name"] || "IKA Solution",
+        tagline: map["company.tagline"] || "",
+        legalName: map["company.legalName"] || "",
+        address: map["company.address"] || "",
+        email: map["company.email"] || "",
+        phone: map["company.phone"] || "",
+        copyrightYears: map["company.copyrightYears"] || "2015–2026",
+        social: {
+          facebook: map["social.facebook"] || "#",
+          linkedin: map["social.linkedin"] || "#",
+          twitter: map["social.twitter"] || "#",
+          instagram: map["social.instagram"] || "#",
+          whatsapp: map["social.whatsapp"] || "#",
+        },
+      };
+    } catch {
+      return Mocks.MOCK_COMPANY;
+    }
   }
 
   public static clearCache(): void {

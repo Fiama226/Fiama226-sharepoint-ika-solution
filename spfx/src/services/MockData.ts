@@ -1,4 +1,4 @@
-﻿import {
+import {
   INewsItem,
   IDocumentItem,
   IEventItem,
@@ -13,11 +13,10 @@
   ICompanyInfo,
   IAnnouncement,
   IEmployeeOfMonth,
-  IGalleryImage
+  IGalleryImage,
+  IMilestone
 } from "../models/IIkaModels";
 
-// Dégradés hors-ligne (data URI) pour que la prévisualisation Workbench
-// affiche un rendu complet sans dépendre d'images SharePoint.
 const GRAD_NAVY =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230A2540'/%3E%3Cstop offset='1' stop-color='%2306B6D4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23g)'/%3E%3C/svg%3E";
 const GRAD_CYAN =
@@ -35,7 +34,7 @@ export const MOCK_NEWS: INewsItem[] = [
     Highlighted: true,
     Created: "2026-06-25",
     Modified: "2026-06-25",
-    NewsAuthor: { Id: 1, Title: "Mehdi Benali", EMail: "mehdi.benali@ika-solution.fr" }
+    NewsAuthor: { Id: 1, Title: "YAYA Ouattara", EMail: "y.ouattara@ikasolution.com" }
   },
   {
     Id: 2,
@@ -46,7 +45,7 @@ export const MOCK_NEWS: INewsItem[] = [
     Highlighted: false,
     Created: "2026-06-20",
     Modified: "2026-06-20",
-    NewsAuthor: { Id: 2, Title: "Référent technique", EMail: "tech@ika-solution.fr" }
+    NewsAuthor: { Id: 2, Title: "SERGE GEDEON OUE", EMail: "s.gedeon@ikasolution.com" }
   },
   {
     Id: 3,
@@ -57,7 +56,7 @@ export const MOCK_NEWS: INewsItem[] = [
     Highlighted: false,
     Created: "2026-06-15",
     Modified: "2026-06-15",
-    NewsAuthor: { Id: 3, Title: "RSSI", EMail: "rssi@ika-solution.fr" }
+    NewsAuthor: { Id: 3, Title: "Daouda DAO", EMail: "d.dao@ikasolution.com" }
   },
   {
     Id: 101,
@@ -68,7 +67,7 @@ export const MOCK_NEWS: INewsItem[] = [
     Highlighted: true,
     Created: "2026-06-29",
     Modified: "2026-06-29",
-    NewsAuthor: { Id: 4, Title: "Direction Financière", EMail: "finance@ika-solution.fr" }
+    NewsAuthor: { Id: 4, Title: "Aminata HEMA", EMail: "a.hema@ikasolution.com" }
   }
 ];
 
@@ -83,7 +82,7 @@ export const MOCK_DOCUMENTS: IDocumentItem[] = [
     IsPinned: true,
     Modified: "2026-06-20",
     Created: "2026-06-20",
-    Editor: { Id: 5, Title: "RSSI" }
+    Editor: { Id: 5, Title: "Direction Technique" }
   },
   {
     Id: 2,
@@ -96,6 +95,30 @@ export const MOCK_DOCUMENTS: IDocumentItem[] = [
     Modified: "2026-06-05",
     Created: "2026-06-05",
     Editor: { Id: 6, Title: "RH" }
+  },
+  {
+    Id: 3,
+    Title: "Modele_Bordereau_Prix_2026.xlsx",
+    FileRef: "/sites/ikareview/Documents/Modele_Bordereau_Prix_2026.xlsx",
+    FileLeafRef: "Modele_Bordereau_Prix_2026.xlsx",
+    DocCategory: "Commercial",
+    Confidentiality: "Interne",
+    IsPinned: false,
+    Modified: "2026-05-18",
+    Created: "2026-05-18",
+    Editor: { Id: 7, Title: "Direction Commerciale" }
+  },
+  {
+    Id: 4,
+    Title: "Politique_Securite_SI.pdf",
+    FileRef: "/sites/ikareview/Documents/Politique_Securite_SI.pdf",
+    FileLeafRef: "Politique_Securite_SI.pdf",
+    DocCategory: "Cybersécurité",
+    Confidentiality: "Confidentiel",
+    IsPinned: false,
+    Modified: "2026-04-12",
+    Created: "2026-04-12",
+    Editor: { Id: 5, Title: "Direction Technique" }
   }
 ];
 
@@ -110,7 +133,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Vos documents financiers, rapports et échéances fiscales au même endroit.",
     Accent: "navy",
     IconName: "finance",
-    SiteUrl: { Url: "/sites/ikareview/SitePages/Comptabilite.aspx", Description: "Comptabilité" },
+    SiteUrl: { Url: "#documents", Description: "Comptabilité" },
     AccentClasses: "bg-brand-navy text-white",
     BadgeClasses: "bg-blue-100 text-blue-800",
     MemberCount: 12,
@@ -128,11 +151,47 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Gestion administrative, RH, contrats et démarches internes.",
     Accent: "cyan",
     IconName: "admin",
-    SiteUrl: { Url: "/sites/ikareview/SitePages/Administration.aspx", Description: "Administration" },
+    SiteUrl: { Url: "#documents", Description: "Administration" },
     AccentClasses: "bg-brand-cyan text-white",
     BadgeClasses: "bg-cyan-100 text-cyan-800",
     MemberCount: 8,
     SortOrder: 2,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 3,
+    Title: "Commerciaux",
+    Slug: "commerciaux",
+    Tagline: "Développement & relations clients",
+    DeptDescription: "Bordereaux de prix, propositions commerciales, suivi des opportunités et partenariats.",
+    HeroTitle: "Espace Commercial",
+    HeroSubtitle: "Bordereaux de prix, offres et relations clients.",
+    Accent: "navy",
+    IconName: "Users",
+    SiteUrl: { Url: "#bordereau", Description: "Commerciaux" },
+    AccentClasses: "bg-amber-600 text-white",
+    BadgeClasses: "bg-amber-100 text-amber-800",
+    MemberCount: 15,
+    SortOrder: 3,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 4,
+    Title: "Techniciens",
+    Slug: "techniciens",
+    Tagline: "Ingénierie & infrastructure",
+    DeptDescription: "Développement logiciel, administration systèmes, cloud DevOps et cybersécurité.",
+    HeroTitle: "Espace Technique",
+    HeroSubtitle: "Architecture logicielle, cloud et déploiements.",
+    Accent: "cyan",
+    IconName: "Settings",
+    SiteUrl: { Url: "#organigramme", Description: "Techniciens" },
+    AccentClasses: "bg-blue-600 text-white",
+    BadgeClasses: "bg-blue-100 text-blue-800",
+    MemberCount: 35,
+    SortOrder: 4,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   }
@@ -140,12 +199,12 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
 
 export const MOCK_COMPANY: ICompanyInfo = {
   name: "IKA Solution",
-  tagline: "Ingénierie informatique & services numériques",
+  tagline: "Ingénierie informatique & solutions sur mesure",
   legalName: "IKA Solution SARL",
-  address: "12 rue de l'Innovation, 75012 Paris, France",
-  email: "contact@ika-solution.fr",
-  phone: "+33 1 23 45 67 89",
-  copyrightYears: "2024–2026",
+  address: "Ouagadougou, Burkina Faso",
+  email: "contact@ikasolution.com",
+  phone: "+226 70 70 70 70",
+  copyrightYears: "2015–2026",
   social: {
     facebook: "#",
     linkedin: "#",
@@ -158,11 +217,11 @@ export const MOCK_COMPANY: ICompanyInfo = {
 export const MOCK_SLIDES: IHeroSlide[] = [
   {
     Id: 1,
-    Title: "Bienvenue sur l'intranet IKA",
+    Title: "Bienvenue sur l'intranet IKA Solution",
     FileRef: GRAD_NAVY,
     Caption: "Votre espace de travail collaboratif",
     SubCaption:
-      "Actualités, documents et équipe réunis au même endroit, dans un design fidèle à l'application.",
+      "Actualités, documents, bordereaux de prix, organigramme et équipe réunis au même endroit.",
     CtaLabel: "Découvrir",
     SortOrder: 1,
     IsActive: true,
@@ -172,11 +231,11 @@ export const MOCK_SLIDES: IHeroSlide[] = [
   },
   {
     Id: 2,
-    Title: "Nos départements",
+    Title: "Nos départements & expertises",
     FileRef: GRAD_CYAN,
-    Caption: "Ingénierie informatique & services numériques",
+    Caption: "Ingénierie digitale & services technologiques",
     SubCaption:
-      "Comptabilité, Administration, Commerciaux et Techniciens : tout votre périmètre métier.",
+      "Direction Générale, Direction Technique, Comptabilité et Direction Commerciale à votre service.",
     CtaLabel: "Explorer",
     SortOrder: 2,
     IsActive: true,
@@ -186,9 +245,9 @@ export const MOCK_SLIDES: IHeroSlide[] = [
   },
   {
     Id: 3,
-    Title: "Rejoignez la communauté",
+    Title: "Rejoignez la dynamique IKA",
     FileRef: GRAD_EMERALD,
-    Caption: "Partagez et collaborez",
+    Caption: "Collaboration & excellence",
     SubCaption:
       "Galerie photos, annonces et collaborateur du mois pour une culture d'entreprise vivante.",
     CtaLabel: "Y participer",
@@ -206,7 +265,7 @@ export const MOCK_MISSIONS: IMission[] = [
     Title: "Notre mission",
     Tag: "Mission",
     MissionText:
-      "Accompagner la transformation numérique de nos clients avec rigueur et proximité.",
+      "Accompagner la transformation numérique avec rigueur, excellence et proximité.",
     IconName: "Target",
     MissionType: "Mission",
     SortOrder: 1,
@@ -218,7 +277,7 @@ export const MOCK_MISSIONS: IMission[] = [
     Title: "Notre vision",
     Tag: "Vision",
     MissionText:
-      "Devenir la référence de l'ingénierie informatique en Afrique et en Europe.",
+      "Devenir la référence de l'ingénierie informatique et de l'innovation technologique.",
     IconName: "Eye",
     MissionType: "Vision",
     SortOrder: 2,
@@ -230,7 +289,7 @@ export const MOCK_MISSIONS: IMission[] = [
     Title: "Nos valeurs",
     Tag: "Valeurs",
     MissionText:
-      "Excellence, intégrité, collaboration et innovation au service de chaque projet.",
+      "Excellence, intégrité, collaboration et passion au service de chaque projet.",
     IconName: "Heart",
     MissionType: "Valeur",
     SortOrder: 3,
@@ -243,7 +302,7 @@ export const MOCK_STATS: IIndicator[] = [
   {
     Id: 1,
     Title: "Collaborateurs",
-    StatValue: "120+",
+    StatValue: "138",
     IconName: "Users",
     Placement: "Hero accueil",
     SortOrder: 1,
@@ -254,7 +313,7 @@ export const MOCK_STATS: IIndicator[] = [
   {
     Id: 2,
     Title: "Projets livrés",
-    StatValue: "350+",
+    StatValue: "200+",
     IconName: "Briefcase",
     Placement: "Hero accueil",
     SortOrder: 2,
@@ -264,8 +323,8 @@ export const MOCK_STATS: IIndicator[] = [
   },
   {
     Id: 3,
-    Title: "Clients accompagnés",
-    StatValue: "60+",
+    Title: "Pays d'implantation",
+    StatValue: "4",
     IconName: "Building",
     Placement: "Hero accueil",
     SortOrder: 3,
@@ -275,8 +334,8 @@ export const MOCK_STATS: IIndicator[] = [
   },
   {
     Id: 4,
-    Title: "Années d'expérience",
-    StatValue: "12",
+    Title: "Satisfaction client",
+    StatValue: "98%",
     IconName: "Calendar",
     Placement: "Hero accueil",
     SortOrder: 4,
@@ -289,9 +348,9 @@ export const MOCK_STATS: IIndicator[] = [
 export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
   {
     Id: 1,
-    Title: "Anniversaire de Aminata Traoré",
+    Title: "Anniversaire de Daouda DAO",
     AnnouncementType: "Anniversaire",
-    Detail: "Toute l'équipe lui souhaite un excellent anniversaire !",
+    Detail: "Toute l'équipe IKA Solution lui souhaite un joyeux anniversaire !",
     Emoji: "🎂",
     AnnouncementDate: "2026-08-10",
     DisplayUntil: "2026-08-31",
@@ -301,9 +360,9 @@ export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
   },
   {
     Id: 2,
-    Title: "Arrivée de Karim Ouattara",
+    Title: "Arrivée de Victorine BAZEMO",
     AnnouncementType: "Arrivée",
-    Detail: "Bienvenue à notre nouveau consultant DevOps !",
+    Detail: "Bienvenue à notre nouvelle assistante commerciale !",
     Emoji: "👋",
     AnnouncementDate: "2026-08-05",
     DisplayUntil: "2026-08-31",
@@ -313,9 +372,9 @@ export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
   },
   {
     Id: 3,
-    Title: "Séminaire annuel",
+    Title: "Séminaire annuel IKA 2026",
     AnnouncementType: "Événement",
-    Detail: "Save the date : notre séminaire se tiendra fin septembre.",
+    Detail: "Save the date : notre grand séminaire annuel aura lieu fin septembre.",
     Emoji: "📅",
     AnnouncementDate: "2026-08-08",
     DisplayUntil: "2026-09-30",
@@ -340,11 +399,11 @@ export const MOCK_EVENTS: IEventItem[] = [
   },
   {
     Id: 2,
-    Title: "Petit-déjeuner d'équipe",
+    Title: "Petit-déjeuner d'équipe & Welcome Day",
     EventDate: "2026-08-22T08:30:00Z",
     EndDate: "2026-08-22T09:30:00Z",
     fAllDayEvent: false,
-    Location: "Paris — Open space",
+    Location: "Ouagadougou — Siège",
     EventCategory: "Événement",
     IsMandatory: false,
     Created: "2026-08-02",
@@ -364,11 +423,11 @@ export const MOCK_EVENTS: IEventItem[] = [
   },
   {
     Id: 4,
-    Title: "Afterwork IKA",
+    Title: "Afterwork IKA Solution",
     EventDate: "2026-08-28T18:00:00Z",
     EndDate: "2026-08-28T21:00:00Z",
     fAllDayEvent: false,
-    Location: "Paris — Rooftop",
+    Location: "Espace convivialité",
     EventCategory: "Événement",
     IsMandatory: false,
     Created: "2026-08-04",
@@ -379,10 +438,10 @@ export const MOCK_EVENTS: IEventItem[] = [
 export const MOCK_QUICKLINKS: IQuickLink[] = [
   {
     Id: 1,
-    Title: "Portail RH",
-    LinkUrl: { Url: "#", Description: "Portail RH" },
-    LinkDescription: "Congés, fiches de paie, demandes",
-    IconName: "User",
+    Title: "Bordereau des prix",
+    LinkUrl: { Url: "#bordereau", Description: "Bordereau des prix" },
+    LinkDescription: "Calculateur et devis en ligne",
+    IconName: "xlsx",
     SortOrder: 1,
     OpenInNewTab: false,
     LinkGroup: "Outils",
@@ -392,10 +451,10 @@ export const MOCK_QUICKLINKS: IQuickLink[] = [
   },
   {
     Id: 2,
-    Title: "Helpdesk",
-    LinkUrl: { Url: "#", Description: "Helpdesk" },
-    LinkDescription: "Ouvrir un ticket support",
-    IconName: "Help",
+    Title: "Organigramme",
+    LinkUrl: { Url: "#organigramme", Description: "Organigramme" },
+    LinkDescription: "Structure hiérarchique et équipes",
+    IconName: "GitBranch",
     SortOrder: 2,
     OpenInNewTab: false,
     LinkGroup: "Outils",
@@ -406,9 +465,9 @@ export const MOCK_QUICKLINKS: IQuickLink[] = [
   {
     Id: 3,
     Title: "Bibliothèque documentaire",
-    LinkUrl: { Url: "#", Description: "Documents" },
-    LinkDescription: "Tous les documents partagés",
-    IconName: "Document",
+    LinkUrl: { Url: "#documents", Description: "Documents" },
+    LinkDescription: "Tous les documents et procédures",
+    IconName: "FolderOpen",
     SortOrder: 3,
     OpenInNewTab: false,
     LinkGroup: "Ressources",
@@ -418,10 +477,10 @@ export const MOCK_QUICKLINKS: IQuickLink[] = [
   },
   {
     Id: 4,
-    Title: "Annuaire",
-    LinkUrl: { Url: "#", Description: "Annuaire" },
-    LinkDescription: "Trouver un collaborateur",
-    IconName: "AddressBook",
+    Title: "Notre Histoire",
+    LinkUrl: { Url: "#histoire", Description: "Histoire" },
+    LinkDescription: "Origines et jalons clés depuis 2015",
+    IconName: "book",
     SortOrder: 4,
     OpenInNewTab: false,
     LinkGroup: "Ressources",
@@ -431,26 +490,13 @@ export const MOCK_QUICKLINKS: IQuickLink[] = [
   },
   {
     Id: 5,
-    Title: "Espace Comptabilité",
-    LinkUrl: { Url: "#", Description: "Comptabilité" },
-    LinkDescription: "Reporting et échéances",
-    IconName: "Calculator",
+    Title: "Toutes les annonces",
+    LinkUrl: { Url: "#annonces", Description: "Annonces" },
+    LinkDescription: "Événements, naissances et arrivées",
+    IconName: "megaphone",
     SortOrder: 5,
     OpenInNewTab: false,
-    LinkGroup: "Départements",
-    IsActive: true,
-    Created: "2026-01-01",
-    Modified: "2026-01-01"
-  },
-  {
-    Id: 6,
-    Title: "Espace Commercial",
-    LinkUrl: { Url: "#", Description: "Commerciaux" },
-    LinkDescription: "Pipelines et devis",
-    IconName: "Cart",
-    SortOrder: 6,
-    OpenInNewTab: false,
-    LinkGroup: "Départements",
+    LinkGroup: "Vie d'équipe",
     IsActive: true,
     Created: "2026-01-01",
     Modified: "2026-01-01"
@@ -460,10 +506,10 @@ export const MOCK_QUICKLINKS: IQuickLink[] = [
 export const MOCK_GALLERY: IGalleryImage[] = [
   {
     Id: 1,
-    Title: "Séminaire 2025",
+    Title: "Séminaire Annuel",
     FileLeafRef: "seminaire.jpg",
     FileRef: GRAD_NAVY,
-    Caption: "Séminaire annuel d'équipe",
+    Caption: "Séminaire annuel des équipes IKA",
     GalleryCategory: "Événements",
     IsFeatured: true,
     AltText: "Séminaire IKA",
@@ -473,10 +519,10 @@ export const MOCK_GALLERY: IGalleryImage[] = [
   },
   {
     Id: 2,
-    Title: "Atelier technique",
+    Title: "Atelier Technique & Cloud",
     FileLeafRef: "atelier.jpg",
     FileRef: GRAD_CYAN,
-    Caption: "Atelier DevOps",
+    Caption: "Atelier DevOps & architectures résilientes",
     GalleryCategory: "Technique",
     IsFeatured: true,
     AltText: "Atelier technique",
@@ -486,10 +532,10 @@ export const MOCK_GALLERY: IGalleryImage[] = [
   },
   {
     Id: 3,
-    Title: "Team building",
+    Title: "Team Building",
     FileLeafRef: "teambuilding.jpg",
     FileRef: GRAD_EMERALD,
-    Caption: "Team building à la montagne",
+    Caption: "Journée de cohésion et d'échange",
     GalleryCategory: "Événements",
     IsFeatured: false,
     AltText: "Team building",
@@ -499,40 +545,14 @@ export const MOCK_GALLERY: IGalleryImage[] = [
   },
   {
     Id: 4,
-    Title: "Remise de prix",
+    Title: "Célébration des réussites",
     FileLeafRef: "prix.jpg",
     FileRef: GRAD_CYAN,
-    Caption: "Collaborateur du mois",
+    Caption: "Remise des prix d'excellence",
     GalleryCategory: "Vie interne",
     IsFeatured: false,
     AltText: "Remise de prix",
     SortOrder: 4,
-    Created: "2026-01-01",
-    Modified: "2026-01-01"
-  },
-  {
-    Id: 5,
-    Title: "Open space",
-    FileLeafRef: "openspace.jpg",
-    FileRef: GRAD_NAVY,
-    Caption: "Notre open space parisien",
-    GalleryCategory: "Locaux",
-    IsFeatured: false,
-    AltText: "Open space",
-    SortOrder: 5,
-    Created: "2026-01-01",
-    Modified: "2026-01-01"
-  },
-  {
-    Id: 6,
-    Title: "Conférence cliente",
-    FileLeafRef: "conference.jpg",
-    FileRef: GRAD_EMERALD,
-    Caption: "Présentation chez un client",
-    GalleryCategory: "Technique",
-    IsFeatured: false,
-    AltText: "Conférence",
-    SortOrder: 6,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   }
@@ -541,9 +561,10 @@ export const MOCK_GALLERY: IGalleryImage[] = [
 export const MOCK_COLLABORATORS: ICollaborateur[] = [
   {
     Id: 1,
-    Title: "Awa Kaboré",
-    JobTitle: "Directrice Générale",
-    Email: "awa.kabore@ika-solution.fr",
+    Title: "YAYA Ouattara",
+    JobTitle: "Directeur Général",
+    Email: "y.ouattara@ikasolution.com",
+    Phone: "+226 70 70 70 70",
     HierarchyLevel: 1,
     Division: "Direction Générale",
     IsActive: true,
@@ -553,12 +574,13 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   },
   {
     Id: 2,
-    Title: "Mehdi Benali",
-    JobTitle: "Directeur Technique",
-    Email: "mehdi.benali@ika-solution.fr",
+    Title: "Sandrine T. KINI",
+    JobTitle: "Assistante de Direction",
+    Email: "s.kini@ikasolution.com",
+    Phone: "+226 70 70 70 70",
     HierarchyLevel: 2,
-    Division: "Engineering",
-    Manager: { Id: 1, Title: "Awa Kaboré" },
+    Division: "Direction Générale",
+    Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
     SortOrder: 2,
     Created: "2026-01-01",
@@ -566,12 +588,13 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   },
   {
     Id: 3,
-    Title: "Fatou Diallo",
-    JobTitle: "Responsable Comptabilité",
-    Email: "fatou.diallo@ika-solution.fr",
+    Title: "SERGE GEDEON OUE",
+    JobTitle: "Ingénieur Principal",
+    Email: "s.gedeon@ikasolution.com",
+    Phone: "+226 70 70 70 70",
     HierarchyLevel: 2,
-    Division: "Comptabilité",
-    Manager: { Id: 1, Title: "Awa Kaboré" },
+    Division: "Engineering",
+    Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
     SortOrder: 3,
     Created: "2026-01-01",
@@ -579,12 +602,13 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   },
   {
     Id: 4,
-    Title: "Koffi Mensah",
-    JobTitle: "Ingénieur DevOps",
-    Email: "koffi.mensah@ika-solution.fr",
+    Title: "Daouda DAO",
+    JobTitle: "Développeur Front End",
+    Email: "d.dao@ikasolution.com",
+    Phone: "+226 70 70 70 70",
     HierarchyLevel: 3,
     Division: "Engineering",
-    Manager: { Id: 2, Title: "Mehdi Benali" },
+    Manager: { Id: 3, Title: "SERGE GEDEON OUE" },
     IsActive: true,
     SortOrder: 4,
     Created: "2026-01-01",
@@ -592,12 +616,13 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   },
   {
     Id: 5,
-    Title: "Sandra Lopez",
-    JobTitle: "Business Developer",
-    Email: "sandra.lopez@ika-solution.fr",
+    Title: "Tegawende M. YAMEOGO",
+    JobTitle: "Développeur Junior",
+    Email: "m.yameogo@ikasolution.com",
+    Phone: "+226 70 70 70 70",
     HierarchyLevel: 3,
-    Division: "Ventes & Marketing",
-    Manager: { Id: 1, Title: "Awa Kaboré" },
+    Division: "Engineering",
+    Manager: { Id: 3, Title: "SERGE GEDEON OUE" },
     IsActive: true,
     SortOrder: 5,
     Created: "2026-01-01",
@@ -605,14 +630,43 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   },
   {
     Id: 6,
-    Title: "Yacine Cherif",
-    JobTitle: "Support Technique",
-    Email: "yacine.cherif@ika-solution.fr",
-    HierarchyLevel: 3,
-    Division: "Support Technique",
-    Manager: { Id: 2, Title: "Mehdi Benali" },
+    Title: "Aminata HEMA",
+    JobTitle: "Comptable",
+    Email: "a.hema@ikasolution.com",
+    Phone: "+226 70 70 70 70",
+    HierarchyLevel: 2,
+    Division: "Comptabilité",
+    Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
     SortOrder: 6,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 7,
+    Title: "Roukiatou OUEDRAOGO",
+    JobTitle: "Responsable Commerciale",
+    Email: "r.ouedraogo@ikasolution.com",
+    Phone: "+226 70 70 70 70",
+    HierarchyLevel: 2,
+    Division: "Ventes & Marketing",
+    Manager: { Id: 1, Title: "YAYA Ouattara" },
+    IsActive: true,
+    SortOrder: 7,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 8,
+    Title: "Victorine BAZEMO",
+    JobTitle: "Assistante Commerciale",
+    Email: "v.bazemo@ikasolution.com",
+    Phone: "+226 70 70 70 70",
+    HierarchyLevel: 3,
+    Division: "Ventes & Marketing",
+    Manager: { Id: 7, Title: "Roukiatou OUEDRAOGO" },
+    IsActive: true,
+    SortOrder: 8,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   }
@@ -621,12 +675,12 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
 export const MOCK_EMPLOYEE: IEmployeeOfMonth = {
   Id: 1,
   Title: "Collaborateur du mois — Août 2026",
-  Employee: { Id: 4, Title: "Koffi Mensah" },
-  DisplayRole: "Ingénieur DevOps",
-  Department: { Id: 2, Title: "Engineering" },
+  Employee: { Id: 4, Title: "Daouda DAO" },
+  DisplayRole: "Développeur Front End",
+  Department: { Id: 4, Title: "Engineering" },
   Quote:
-    "J'aime transformer la complexité en automatisations simples et fiables pour toute l'équipe.",
-  NominatedBy: "Mehdi Benali",
+    "Construire des interfaces fluides, intuitives et performantes pour nos collaborateurs et clients est ma plus grande fierté.",
+  NominatedBy: "SERGE GEDEON OUE",
   PeriodStart: "2026-08-01",
   IsCurrent: true,
   Created: "2026-08-01",
@@ -636,12 +690,12 @@ export const MOCK_EMPLOYEE: IEmployeeOfMonth = {
 export const MOCK_PROJECTS: IProject[] = [
   {
     Id: 1,
-    Title: "Migration SharePoint IKA",
-    ProjectLead: "Mehdi Benali",
-    Progress: 75,
+    Title: "Portail Intranet SharePoint IKA",
+    ProjectLead: "SERGE GEDEON OUE",
+    Progress: 85,
     ProjectStatus: "À l'heure",
     DueDate: "2026-09-30",
-    TasksDone: 15,
+    TasksDone: 17,
     TasksTotal: 20,
     ShowOnHome: true,
     SortOrder: 1,
@@ -650,12 +704,12 @@ export const MOCK_PROJECTS: IProject[] = [
   },
   {
     Id: 2,
-    Title: "Plateforme DevOps interne",
-    ProjectLead: "Koffi Mensah",
-    Progress: 40,
-    ProjectStatus: "À risque",
+    Title: "Plateforme Fintech Régionale",
+    ProjectLead: "Daouda DAO",
+    Progress: 60,
+    ProjectStatus: "À l'heure",
     DueDate: "2026-10-15",
-    TasksDone: 8,
+    TasksDone: 12,
     TasksTotal: 20,
     ShowOnHome: true,
     SortOrder: 2,
@@ -664,12 +718,12 @@ export const MOCK_PROJECTS: IProject[] = [
   },
   {
     Id: 3,
-    Title: "Refonte du portail client",
-    ProjectLead: "Sandra Lopez",
-    Progress: 20,
-    ProjectStatus: "En retard",
+    Title: "Automatisation Bordereaux & Devis",
+    ProjectLead: "Roukiatou OUEDRAOGO",
+    Progress: 45,
+    ProjectStatus: "À risque",
     DueDate: "2026-08-31",
-    TasksDone: 4,
+    TasksDone: 9,
     TasksTotal: 20,
     ShowOnHome: true,
     SortOrder: 3,
@@ -678,15 +732,168 @@ export const MOCK_PROJECTS: IProject[] = [
   },
   {
     Id: 4,
-    Title: "Reporting financier automatisé",
-    ProjectLead: "Fatou Diallo",
-    Progress: 90,
+    Title: "Certification ISO 27001 Audit 2026",
+    ProjectLead: "YAYA Ouattara",
+    Progress: 95,
     ProjectStatus: "À l'heure",
     DueDate: "2026-08-20",
-    TasksDone: 18,
+    TasksDone: 19,
     TasksTotal: 20,
     ShowOnHome: true,
     SortOrder: 4,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  }
+];
+
+export const MOCK_MILESTONES: IMilestone[] = [
+  {
+    Id: 1,
+    Year: "2015",
+    Quarter: "T1",
+    Title: "La genèse",
+    MilestoneDescription:
+      "YAYA Ouattara fonde IKA Solution dans un bureau de Ouagadougou avec une vision claire : démocratiser l'ingénierie digitale en Afrique de l'Ouest.",
+    IconName: "Rocket",
+    Tag: "Fondation",
+    TagColorClass: "ika-bg-violet-100 ika-text-violet-700",
+    Side: "right",
+    Stat1Label: "Fondateurs",
+    Stat1Value: "3",
+    Stat2Label: "Projets",
+    Stat2Value: "1",
+    SortOrder: 1,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 2,
+    Year: "2016",
+    Quarter: "T3",
+    Title: "Premier grand contrat",
+    MilestoneDescription:
+      "Signature du premier contrat majeur avec une institution financière. Développement d'une plateforme bancaire marquant notre entrée dans la Fintech.",
+    IconName: "Award",
+    Tag: "Fintech",
+    TagColorClass: "ika-bg-amber-100 ika-text-amber-700",
+    Side: "left",
+    Stat1Label: "Équipe",
+    Stat1Value: "8",
+    Stat2Label: "Clients",
+    Stat2Value: "4",
+    SortOrder: 2,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 3,
+    Year: "2018",
+    Quarter: "T2",
+    Title: "Expansion régionale",
+    MilestoneDescription:
+      "Ouverture de notre deuxième bureau régional à Abidjan. Lancement du pôle Cloud & Data et accélération des déploiements.",
+    IconName: "Globe",
+    Tag: "Expansion",
+    TagColorClass: "ika-bg-blue-100 ika-text-blue-700",
+    Side: "right",
+    Stat1Label: "Équipe",
+    Stat1Value: "25",
+    Stat2Label: "Pays",
+    Stat2Value: "2",
+    SortOrder: 3,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 4,
+    Year: "2020",
+    Quarter: "T1",
+    Title: "Pivot digital & résilience",
+    MilestoneDescription:
+      "Accompagnement d'urgence des entreprises vers le travail collaboratif et les infrastructures cloud hautement disponibles.",
+    IconName: "Zap",
+    Tag: "Innovation",
+    TagColorClass: "ika-bg-emerald-100 ika-text-emerald-700",
+    Side: "left",
+    Stat1Label: "Équipe",
+    Stat1Value: "40",
+    Stat2Label: "Projets actifs",
+    Stat2Value: "18",
+    SortOrder: 4,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 5,
+    Year: "2022",
+    Quarter: "T4",
+    Title: "Certification & excellence",
+    MilestoneDescription:
+      "Obtention de la certification ISO 27001 en cybersécurité et lancement du programme IKA Academy pour la formation des talents.",
+    IconName: "ShieldCheck",
+    Tag: "Certification",
+    TagColorClass: "ika-bg-rose-100 ika-text-rose-700",
+    Side: "right",
+    Stat1Label: "Certifiés",
+    Stat1Value: "12",
+    Stat2Label: "Formés",
+    Stat2Value: "80+",
+    SortOrder: 5,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 6,
+    Year: "2026",
+    Quarter: "T2",
+    Title: "IKA Solution aujourd'hui",
+    MilestoneDescription:
+      "Plus de 138 collaborateurs, présents dans 4 pays avec plus de 200 projets technologiques livrés avec succès.",
+    IconName: "TrendingUp",
+    Tag: "Aujourd'hui",
+    TagColorClass: "ika-bg-brand-cyan/20 ika-text-brand-cyan-dark",
+    Side: "left",
+    Stat1Label: "Collaborateurs",
+    Stat1Value: "138",
+    Stat2Label: "Projets livrés",
+    Stat2Value: "200+",
+    SortOrder: 6,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  }
+];
+
+export const MOCK_FAQ: IFaqItem[] = [
+  {
+    Id: 1,
+    Title: "Comment demander des congés ou une absence ?",
+    Answer:
+      "Rendez-vous dans la section Administration / RH ou utilisez le lien dédié dans l'accès rapide pour soumettre votre formulaire de demande.",
+    FaqCategory: "RH",
+    SortOrder: 1,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 2,
+    Title: "Comment exporter un bordereau de prix ?",
+    Answer:
+      "Dans l'onglet Bordereau des prix, saisissez vos articles puis cliquez sur le bouton 'Exporter (CSV)' pour télécharger votre fichier exploitable dans Excel.",
+    FaqCategory: "Commercial",
+    SortOrder: 2,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 3,
+    Title: "Qui contacter pour un support informatique interne ?",
+    Answer:
+      "L'équipe Technique est joignable via l'organigramme ou à l'adresse support@ikasolution.com.",
+    FaqCategory: "Technique",
+    SortOrder: 3,
+    IsActive: true,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   }

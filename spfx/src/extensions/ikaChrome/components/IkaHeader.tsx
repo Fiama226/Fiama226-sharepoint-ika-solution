@@ -7,8 +7,13 @@ import { Icon } from "../../../common/utils/Icon";
 import { useClickOutside } from "../../../common/hooks/useClickOutside";
 import { cn } from "../../../common/utils/spUtils";
 
-function isActive(nodeUrl: string, currentPath: string): boolean {
+function isNodeActive(nodeUrl: string, currentPath: string, activeRoute?: string): boolean {
   if (!nodeUrl) return false;
+  if (nodeUrl.startsWith("#")) {
+    const routeName = nodeUrl.replace(/^#\/?(page-)?/, "") || "accueil";
+    const current = (activeRoute || "accueil").replace(/^#\/?(page-)?/, "");
+    return current === routeName || (routeName === "accueil" && current === "");
+  }
   const target = nodeUrl.replace(/^https?:\/\/[^/]+/, "").replace(/\/$/, "");
   const current = currentPath.replace(/\/$/, "");
   if (!target) return false;
@@ -18,18 +23,32 @@ function isActive(nodeUrl: string, currentPath: string): boolean {
 const NavLink: React.FC<{
   node: INavNode;
   currentPath: string;
-  onNavigate?: () => void;
+  activeRoute?: string;
+  onNavigate?: (route: string) => void;
   variant: "primary" | "secondary" | "mobile";
 }> = (props) => {
-  const { node, currentPath, onNavigate, variant } = props;
-  const active = isActive(node.url, currentPath);
+  const { node, currentPath, activeRoute, onNavigate, variant } = props;
+  const active = isNodeActive(node.url, currentPath, activeRoute);
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    if (node.url && node.url.startsWith("#")) {
+      e.preventDefault();
+      const route = node.url.replace(/^#\/?(page-)?/, "") || "accueil";
+      window.location.hash = node.url;
+      if (onNavigate) {
+        onNavigate(route);
+      }
+    } else if (onNavigate) {
+      onNavigate(node.url);
+    }
+  };
 
   const classes =
     variant === "secondary"
       ? cn(
           "ika-flex ika-items-center ika-gap-1.5 ika-transition-colors",
           active
-            ? "ika-font-medium ika-text-brand-navy"
+            ? "ika-font-bold ika-text-brand-navy"
             : "ika-text-slate-500 hover:ika-text-brand-cyan-dark"
         )
       : variant === "mobile"
@@ -37,14 +56,14 @@ const NavLink: React.FC<{
             "ika-flex ika-items-center ika-gap-3 ika-rounded-lg ika-px-3 ika-py-2.5",
             "ika-text-sm ika-font-medium ika-transition-colors",
             active
-              ? "ika-bg-brand-surface ika-text-brand-navy"
+              ? "ika-bg-brand-surface ika-font-bold ika-text-brand-navy"
               : "ika-text-slate-700 hover:ika-bg-slate-50"
           )
         : cn(
             "ika-flex ika-items-center ika-gap-2 ika-rounded-lg ika-px-3 ika-py-2",
             "ika-text-sm ika-font-medium ika-transition-colors",
             active
-              ? "ika-bg-brand-surface ika-text-brand-navy"
+              ? "ika-bg-brand-surface ika-font-bold ika-text-brand-navy ika-shadow-xs"
               : "ika-text-slate-600 hover:ika-bg-slate-100 hover:ika-text-brand-navy"
           );
 
@@ -52,7 +71,7 @@ const NavLink: React.FC<{
     <a
       href={node.url}
       data-interception="propagate"
-      onClick={onNavigate}
+      onClick={handleClick}
       aria-current={active ? "page" : undefined}
       className={classes}
     >
@@ -65,7 +84,12 @@ const NavLink: React.FC<{
   );
 };
 
-export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
+export interface IExtendedHeaderProps extends IIkaHeaderProps {
+  activeRoute?: string;
+  onNavigate?: (route: string) => void;
+}
+
+export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
   const {
     context,
     primaryNav,
@@ -73,6 +97,8 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
     showSearch,
     showDocumentsMenu,
     documentsNav,
+    activeRoute,
+    onNavigate,
   } = props;
 
   const [menuOpen, setMenuOpen] = React.useState<boolean>(false);
@@ -94,10 +120,22 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
     event.preventDefault();
     const term = query.trim();
     if (!term) return;
-    window.location.href = `${context.hubUrl}/_layouts/15/search.aspx/siteall?q=${encodeURIComponent(term)}`;
+    if (onNavigate) {
+      onNavigate(`actualites?q=${encodeURIComponent(term)}`);
+    } else {
+      window.location.href = `${context.hubUrl}/_layouts/15/search.aspx/siteall?q=${encodeURIComponent(term)}`;
+    }
   };
 
-  const initials = context.currentUser.displayName
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    e.preventDefault();
+    window.location.hash = "#accueil";
+    if (onNavigate) {
+      onNavigate("accueil");
+    }
+  };
+
+  const initials = (context.currentUser.displayName || "IK")
     .split(" ")
     .filter((part) => part.length > 0)
     .map((part) => part.charAt(0))
@@ -134,6 +172,8 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                     key={node.key}
                     node={node}
                     currentPath={context.currentPath}
+                    activeRoute={activeRoute}
+                    onNavigate={onNavigate}
                     variant="secondary"
                   />
                 ))}
@@ -144,16 +184,17 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
           <div className="ika-flex ika-h-16 ika-items-center ika-justify-between ika-gap-4 ika-px-4 sm:ika-px-6 lg:ika-px-8">
             <div className="ika-flex ika-min-w-0 ika-items-center ika-gap-6">
               <a
-                href={context.hubUrl}
+                href="#accueil"
+                onClick={handleLogoClick}
                 data-interception="propagate"
-                className="ika-flex-shrink-0"
+                className="ika-flex-shrink-0 ika-flex ika-items-center ika-gap-2"
               >
-                <span className="ika-sr-only">IKA Solution — Accueil</span>
-                <img
-                  src={context.logoUrl}
-                  alt="IKA Solution"
-                  className="ika-h-10 ika-w-auto ika-object-contain"
-                />
+                <div className="ika-h-9 ika-w-9 ika-rounded-xl ika-bg-brand-navy ika-flex ika-items-center ika-justify-center ika-text-white ika-font-black ika-text-base ika-shadow-sm">
+                  IKA
+                </div>
+                <span className="ika-font-extrabold ika-text-lg ika-text-brand-navy ika-tracking-tight">
+                  SOLUTION
+                </span>
               </a>
 
               <nav
@@ -165,6 +206,8 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                     key={node.key}
                     node={node}
                     currentPath={context.currentPath}
+                    activeRoute={activeRoute}
+                    onNavigate={onNavigate}
                     variant="primary"
                   />
                 ))}
@@ -224,7 +267,15 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                           key={node.key}
                           href={node.url}
                           data-interception="propagate"
-                          onClick={() => setDocsOpen(false)}
+                          onClick={(e) => {
+                            setDocsOpen(false);
+                            if (node.url && node.url.startsWith("#")) {
+                              e.preventDefault();
+                              const r = node.url.replace(/^#\/?(page-)?/, "") || "documents";
+                              window.location.hash = node.url;
+                              if (onNavigate) onNavigate(r);
+                            }
+                          }}
                           className="ika-flex ika-items-center ika-gap-3 ika-px-4 ika-py-2.5 ika-text-sm ika-text-slate-700 ika-transition-colors hover:ika-bg-brand-surface hover:ika-text-brand-navy"
                         >
                           <span className="ika-grid ika-h-7 ika-w-7 ika-place-items-center ika-rounded-lg ika-bg-brand-surface ika-text-brand-navy">
@@ -255,28 +306,34 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                   <div className="ika-absolute ika-right-0 ika-z-50 ika-mt-2 ika-w-60 ika-rounded-xl ika-border ika-border-slate-200 ika-bg-white ika-py-2 ika-shadow-lg">
                     <div className="ika-border-b ika-border-slate-100 ika-px-4 ika-py-3">
                       <p className="ika-truncate ika-text-sm ika-font-semibold ika-text-brand-ink">
-                        {context.currentUser.displayName}
+                        {context.currentUser.displayName || "Utilisateur IKA"}
                       </p>
                       <p className="ika-truncate ika-text-xs ika-text-slate-500">
-                        {context.currentUser.email}
+                        {context.currentUser.email || "contact@ikasolution.com"}
                       </p>
                     </div>
-                    <a
-                      href={`https://delve.office.com/?u=${encodeURIComponent(context.currentUser.email)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ika-block ika-px-4 ika-py-2 ika-text-sm ika-text-slate-700 ika-transition-colors hover:ika-bg-slate-50"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileOpen(false);
+                        if (onNavigate) onNavigate("equipe");
+                        window.location.hash = "#equipe";
+                      }}
+                      className="ika-w-full ika-text-left ika-block ika-px-4 ika-py-2 ika-text-sm ika-text-slate-700 ika-transition-colors hover:ika-bg-slate-50"
                     >
-                      Mon profil
-                    </a>
-                    {context.currentUser.isSiteAdmin ? (
-                      <a
-                        href={`${context.siteUrl}/_layouts/15/settings.aspx`}
-                        className="ika-block ika-px-4 ika-py-2 ika-text-sm ika-text-slate-700 ika-transition-colors hover:ika-bg-slate-50"
-                      >
-                        Paramètres du site
-                      </a>
-                    ) : null}
+                      Annuaire équipe
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileOpen(false);
+                        if (onNavigate) onNavigate("organigramme");
+                        window.location.hash = "#organigramme";
+                      }}
+                      className="ika-w-full ika-text-left ika-block ika-px-4 ika-py-2 ika-text-sm ika-text-slate-700 ika-transition-colors hover:ika-bg-slate-50"
+                    >
+                      Organigramme
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -301,8 +358,12 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                     key={node.key}
                     node={node}
                     currentPath={context.currentPath}
+                    activeRoute={activeRoute}
                     variant="mobile"
-                    onNavigate={() => setMenuOpen(false)}
+                    onNavigate={(r) => {
+                      setMenuOpen(false);
+                      if (onNavigate) onNavigate(r);
+                    }}
                   />
                 ))}
               </nav>
@@ -319,8 +380,12 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                         key={node.key}
                         node={node}
                         currentPath={context.currentPath}
+                        activeRoute={activeRoute}
                         variant="mobile"
-                        onNavigate={() => setMenuOpen(false)}
+                        onNavigate={(r) => {
+                          setMenuOpen(false);
+                          if (onNavigate) onNavigate(r);
+                        }}
                       />
                     ))}
                   </nav>
@@ -333,10 +398,10 @@ export const IkaHeader: React.FC<IIkaHeaderProps> = (props) => {
                 {avatar}
                 <div className="ika-min-w-0 ika-flex-1">
                   <p className="ika-truncate ika-text-sm ika-font-medium ika-text-brand-ink">
-                    {context.currentUser.displayName}
+                    {context.currentUser.displayName || "Utilisateur IKA"}
                   </p>
                   <p className="ika-truncate ika-text-xs ika-text-slate-500">
-                    {context.currentUser.email}
+                    {context.currentUser.email || "contact@ikasolution.com"}
                   </p>
                 </div>
               </div>

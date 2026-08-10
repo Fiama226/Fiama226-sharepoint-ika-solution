@@ -5,9 +5,11 @@ import {
   IDocumentItem,
   IEmployeeOfMonth,
   IEventItem,
+  IFaqItem,
   IGalleryImage,
   IHeroSlide,
   IIndicator,
+  IMilestone,
   IMission,
   INewsItem,
   IProject,
@@ -17,14 +19,9 @@ import {
 /**
  * Propriétés du composant React « IntranetMain ».
  *
- * Ce composant est le « composant principal » qui rassemble TOUTES les sections
- * de la page d'accueil intranet à l'identique de la maquette Next.js
- * (`app/page.tsx`) : Hero slider, bandeau d'annonces défilant, actualités,
- * accès rapide (documents / liens / événements), galerie, équipe, collaborateur
- * du mois et projets.
- *
- * Les données sont chargées en parallèle par la Web Part hôte
- * (`IntranetMainWebPart.ts`) et transmises en props.
+ * Ce composant est l'orchestrateur unique de l'intranet (style Coris Meso Finance) :
+ * Header + Router SPA + Vues (Accueil, Annonces, Bordereau de prix, Histoire,
+ * Organigramme, Documents, Actualités, Équipe, FAQ) + Footer.
  */
 export interface IIntranetMainProps {
   // —— Données ——————————————————————————————————————————————
@@ -42,13 +39,12 @@ export interface IIntranetMainProps {
   employeePhotoUrl: string;
   projects: IProject[];
   departments: IDepartement[];
+  milestones: IMilestone[];
+  faqItems: IFaqItem[];
 
   // —— Chrome (header / footer) intégrés —————————————————
-  /** Affiche le header IKA en haut de la WP (évite une extension séparée). */
   showHeader: boolean;
-  /** Affiche le footer IKA en bas de la WP (évite une extension séparée). */
   showFooter: boolean;
-  /** URL du logo affiché dans le header / footer. */
   logoUrl?: string;
 
   // —— Contexte utilisateur ————————————————————————————————
@@ -56,9 +52,7 @@ export interface IIntranetMainProps {
   currentUserRole: string;
 
   // —— Apparence ———————————————————————————————————————————
-  /** Classe Tailwind préfixée `ika-` pour la hauteur du hero. */
   heroHeightClass: string;
-  /** Couleur d'accent dominante (Tailwind sans préfixe). */
   accent: "orange" | "emerald" | "sky" | "indigo" | "rose" | "amber";
 
   // —— Interrupteurs d'affichage ———————————————————————————
@@ -73,11 +67,13 @@ export interface IIntranetMainProps {
   showEmployee: boolean;
   showProjects: boolean;
 
+  // —— Navigation / Router SPA —————————————————————————————
+  initialView?: string;
+
   // —— États du cycle de vie ———————————————————————————————
   loading: boolean;
   error: string | undefined;
 
   // —— Callbacks / options d'animation —————————————————————
-  /** Active les animations (auto-rotation, défilement, fade-in). */
   animationsEnabled: boolean;
 }
