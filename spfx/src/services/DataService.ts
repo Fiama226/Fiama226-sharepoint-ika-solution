@@ -80,8 +80,11 @@ export class DataService {
       return legacy.hubUrl;
     }
 
-    const origin = new URL(this._webUrl).origin;
-    return `${origin}/sites/ikareview`;
+    // Pas d'URL de hub explicitement fournie : on replie sur le site courant
+    // (un site non rattaché à un hub ne doit PAS être redirigé vers un chemin
+    // codé en dur comme /sites/ikareview, sinon toutes les lectures de listes
+    // « hub » échoueraient silencieusement).
+    return this._webUrl;
   }
 
   private _readCache<T>(key: string): T | undefined {

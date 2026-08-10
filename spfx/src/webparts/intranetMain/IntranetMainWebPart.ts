@@ -227,8 +227,12 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
 
       this._error = undefined;
     } catch (err) {
+      const message =
+        err instanceof Error ? err.message : String(err);
       console.warn("[IntranetMainWebPart] Erreur lors du chargement des données:", err);
-      this._error = undefined;
+      this._error = message
+        ? `Erreur d'accès aux listes SharePoint : ${message}`
+        : "Erreur d'accès aux listes SharePoint.";
     } finally {
       this._loading = false;
       this.render();
