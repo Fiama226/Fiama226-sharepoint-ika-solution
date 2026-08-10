@@ -25,33 +25,38 @@ interface ICacheEntry {
 }
 
 const ICON_BY_SLUG: Record<string, string> = {
-  "ikareview": "Home",
-  "ika-comptabilite": "Calculator",
-  "ika-administration": "ShieldCheck",
-  "ika-commerciaux": "Users",
-  "ika-techniciens": "Settings",
-  organigramme: "GitBranch",
-  histoire: "book",
-  annonces: "megaphone",
-  evenements: "calendar",
-  agenda: "calendar",
-  documents: "FolderOpen",
+  "accueil": "Home",
+  "home": "Home",
+  "actualites": "newspaper",
+  "news": "newspaper",
+  "annonces": "megaphone",
+  "documents": "FolderOpen",
+  "comptabilite": "Calculator",
+  "administration": "ShieldCheck",
+  "commerciaux": "Users",
+  "techniciens": "Settings",
+  "organigramme": "GitBranch",
+  "histoire": "book",
+  "bordereau": "xlsx",
+  "equipe": "Users",
+  "evenements": "calendar",
+  "agenda": "calendar",
+  "faq": "help",
 };
 
-const HUB_PATH = "/sites/ikareview";
-
 export const STATIC_PRIMARY_NAV: INavNode[] = [
-  { key: "home", label: "Accueil", url: HUB_PATH, iconName: "Home" },
-  { key: "compta", label: "Comptabilité", url: `${HUB_PATH}/Documents_Comptabilite/Forms/AllItems.aspx`, iconName: "Calculator" },
-  { key: "admin", label: "Administration", url: `${HUB_PATH}/Documents_Administration/Forms/AllItems.aspx`, iconName: "ShieldCheck" },
-  { key: "commerce", label: "Commerciaux", url: `${HUB_PATH}/Documents_Commerciaux/Forms/AllItems.aspx`, iconName: "Users" },
-  { key: "tech", label: "Techniciens", url: `${HUB_PATH}/Documents_Techniciens/Forms/AllItems.aspx`, iconName: "Settings" },
+  { key: "home", label: "Accueil", url: "#accueil", iconName: "Home" },
+  { key: "annonces", label: "Annonces", url: "#annonces", iconName: "megaphone" },
+  { key: "documents", label: "Documents", url: "#documents", iconName: "FolderOpen" },
+  { key: "organigramme", label: "Organigramme", url: "#organigramme", iconName: "GitBranch" },
+  { key: "bordereau", label: "Bordereau des prix", url: "#bordereau", iconName: "xlsx" },
 ];
 
 export const STATIC_SECONDARY_NAV: INavNode[] = [
-  { key: "org", label: "Organigramme", url: `${HUB_PATH}/SitePages/Organigramme.aspx`, iconName: "GitBranch" },
-  { key: "agenda", label: "Agenda", url: `${HUB_PATH}/SitePages/Evenements.aspx`, iconName: "calendar" },
-  { key: "histoire", label: "Histoire", url: `${HUB_PATH}/SitePages/Histoire.aspx`, iconName: "book" },
+  { key: "histoire", label: "Notre Histoire", url: "#histoire", iconName: "book" },
+  { key: "equipe", label: "Équipe", url: "#equipe", iconName: "Users" },
+  { key: "evenements", label: "Agenda & Événements", url: "#evenements", iconName: "calendar" },
+  { key: "faq", label: "FAQ", url: "#faq", iconName: "help" },
 ];
 
 export class NavigationService {

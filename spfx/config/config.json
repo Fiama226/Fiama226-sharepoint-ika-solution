@@ -5,91 +5,11 @@
     "ika-intranet-web-parts": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/announcementMarquee/AnnouncementMarqueeWebPart.js",
-          "manifest": "./src/webparts/announcementMarquee/AnnouncementMarqueeWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/announcementsList/AnnouncementsListWebPart.js",
-          "manifest": "./src/webparts/announcementsList/AnnouncementsListWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/deptHero/DeptHeroWebPart.js",
-          "manifest": "./src/webparts/deptHero/DeptHeroWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/documentsList/DocumentsListWebPart.js",
-          "manifest": "./src/webparts/documentsList/DocumentsListWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/eventsCalendar/EventsCalendarWebPart.js",
-          "manifest": "./src/webparts/eventsCalendar/EventsCalendarWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/faqList/FaqListWebPart.js",
-          "manifest": "./src/webparts/faqList/FaqListWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/financeCharts/FinanceChartsWebPart.js",
-          "manifest": "./src/webparts/financeCharts/FinanceChartsWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/gallery/GalleryWebPart.js",
-          "manifest": "./src/webparts/gallery/GalleryWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/heroSlider/HeroSliderWebPart.js",
-          "manifest": "./src/webparts/heroSlider/HeroSliderWebPart.manifest.json"
-        },
-        {
           "entrypoint": "./lib/webparts/intranetMain/IntranetMainWebPart.js",
           "manifest": "./src/webparts/intranetMain/IntranetMainWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/intranetSections/IntranetSectionsWebPart.js",
-          "manifest": "./src/webparts/intranetSections/IntranetSectionsWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/newsCards/NewsCardsWebPart.js",
-          "manifest": "./src/webparts/newsCards/NewsCardsWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/newsList/NewsListWebPart.js",
-          "manifest": "./src/webparts/newsList/NewsListWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/orgChart/OrgChartWebPart.js",
-          "manifest": "./src/webparts/orgChart/OrgChartWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/pageHeader/PageHeaderWebPart.js",
-          "manifest": "./src/webparts/pageHeader/PageHeaderWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/priceSheet/PriceSheetWebPart.js",
-          "manifest": "./src/webparts/priceSheet/PriceSheetWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/quickAccessPanel/QuickAccessPanelWebPart.js",
-          "manifest": "./src/webparts/quickAccessPanel/QuickAccessPanelWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/quickLinks/QuickLinksWebPart.js",
-          "manifest": "./src/webparts/quickLinks/QuickLinksWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/teamDirectory/TeamDirectoryWebPart.js",
-          "manifest": "./src/webparts/teamDirectory/TeamDirectoryWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/teamHome/TeamHomeWebPart.js",
-          "manifest": "./src/webparts/teamHome/TeamHomeWebPart.manifest.json"
-        },
-        {
-          "entrypoint": "./lib/webparts/timeline/TimelineWebPart.js",
-          "manifest": "./src/webparts/timeline/TimelineWebPart.manifest.json"
         }
       ]
     }
-  }
+  },
+  "externals": {}
 }
-

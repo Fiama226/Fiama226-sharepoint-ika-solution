@@ -18,9 +18,9 @@
     {
       "groupId": "6f2b1c48-0d3a-4e7b-9a15-000000000000",
       "group": { "default": "IKA Solution" },
-      "title": { "default": "IKA — Intranet (composant principal)" },
+      "title": { "default": "IKA Solution — Portail Intranet" },
       "description": {
-        "default": "Composant UNIQUE qui reconstruit à l'identique la page d'accueil du site Next.js : Hero slider animé, annonces défilantes, actualités, accès rapide, galerie, équipe, collaborateur du mois et projets. Une Web Part = toute la page d'accueil."
+        "default": "Portail intranet complet IKA Solution : Accueil, Actualités, Annonces, Documents, Organigramme, Histoire, Bordereau des prix, Équipe et Projets."
       },
       "officeFabricIconFontName": "Globe2",
       "properties": {
@@ -36,7 +36,8 @@
         "showGallery": true,
         "showTeam": true,
         "showEmployee": true,
-        "showProjects": true
+        "showProjects": true,
+        "defaultView": "accueil"
       }
     }
   ]
