@@ -186,12 +186,12 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
     return DataService.buildTree(props.collaborators);
   }, [props.collaborators]);
 
-  if (props.loading) {
-    return <IntranetMainSkeleton heroHeightClass={props.heroHeightClass} />;
-  }
-
   const animate = props.animationsEnabled;
 
+  // Les hooks ci-dessous doivent être appelés INCONDITIONNELLEMENT (avant tout
+  // return anticipé). Placer un early-return avant un useMemo change le nombre
+  // de hooks entre deux rendus et provoque en React 17 une erreur fatale
+  // « Rendered more hooks than during the previous render » → écran blanc.
   const chromeContext = React.useMemo<IChromeContext>(() => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const sitePath =
@@ -228,6 +228,12 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
       };
     });
   }, [props.departments]);
+
+  // Early-return APRÈS tous les hooks (voir note plus haut) : rendu squelette
+  // tant que les données ne sont pas chargées.
+  if (props.loading) {
+    return <IntranetMainSkeleton heroHeightClass={props.heroHeightClass} />;
+  }
 
   // Rendu de la vue active
   const renderCurrentView = (): React.ReactElement => {
@@ -515,6 +521,24 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
             activeRoute={currentRoute}
             onNavigate={handleNavigate}
           />
+        ) : null}
+
+        {/* Bandeau d'avertissement : les listes SharePoint sont manquantes
+            ou inaccessibles (données de démonstration affichées à la place). */}
+        {!props.loading && props.error ? (
+          <div
+            role="status"
+            className="ika-mx-4 ika-mt-4 ika-flex ika-items-start ika-gap-2 ika-rounded-lg ika-border ika-border-amber-300 ika-bg-amber-50 ika-px-4 ika-py-3 ika-text-sm ika-text-amber-800"
+          >
+            <span aria-hidden="true" className="ika-mt-0.5">⚠️</span>
+            <span>
+              Certaines données SharePoint n'ont pas pu être chargées.
+              {typeof props.error === "string" && props.error.length > 0
+                ? ` ${props.error}`
+                : ""}{" "}
+              Les contenus de démonstration sont affichés temporairement.
+            </span>
+          </div>
         ) : null}
 
         {/* VUE ACTIVE DYNAMIQUE */}
