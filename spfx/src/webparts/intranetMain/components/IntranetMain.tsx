@@ -256,13 +256,13 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
   }, [props.departments, chromeContext.hubUrl]);
 
   return (
-    <div
-      className="ika-root ika-bg-white ika-text-slate-900"
-      data-accent={props.accent}
-    >
+    <div className="ika-root" data-accent={props.accent}>
+      {/* Wrapper plein écran : les utilitaires doivent être descendants de
+          .ika-root (scoping Tailwind important: ".ika-root") pour s'appliquer. */}
+      <div className="ika-flex ika-w-full ika-min-h-screen ika-flex-col ika-bg-white ika-text-slate-900">
       {/* ────────────────────────────────────────────────────────────
-          0. HEADER IKA (intégré — pas d'extension séparée à activer)
-          ──────────────────────────────────────────────────────────── */}
+           0. HEADER IKA (intégré — pas d'extension séparée à activer)
+           ──────────────────────────────────────────────────────────── */}
       {props.showHeader ? (
         <IkaHeader
           context={chromeContext}
@@ -418,6 +418,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
 
       {/* ── Espacement final pour la respiration de page ── */}
       {!props.showFooter ? <div className="ika-h-16" aria-hidden="true" /> : null}
+      </div>
     </div>
   );
 };

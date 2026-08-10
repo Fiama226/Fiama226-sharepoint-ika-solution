@@ -33,6 +33,7 @@ import {
 
 import { IntranetMain } from "./components/IntranetMain";
 import { IIntranetMainProps } from "./components/IIntranetMainProps";
+import { installFullPageChrome, isWorkbench } from "./fullPageChrome";
 import { DataService } from "../../services/DataService";
 import {
   IAnnouncement,
@@ -105,6 +106,13 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
   protected async onInit(): Promise<void> {
     await super.onInit();
     this._service = new DataService(this.context);
+
+    // Plein écran type « Coris » : sur une vraie page SharePoint (pas en
+    // Workbench), on neutralise le chrome autour de la Web Part afin qu'elle
+    // remplisse toute la page.
+    if (!isWorkbench()) {
+      installFullPageChrome();
+    }
   }
 
   public render(): void {

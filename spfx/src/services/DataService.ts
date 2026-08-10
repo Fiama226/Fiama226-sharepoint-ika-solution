@@ -39,6 +39,7 @@ export interface ISPRequestContext {
     user: { displayName: string; email: string };
     legacyPageContext?: unknown;
   };
+  host?: { hostType?: string };
 }
 
 export class DataService {
@@ -46,13 +47,21 @@ export class DataService {
   private readonly _webUrl: string;
   private readonly _hubUrl: string;
   private readonly _isLocal: boolean;
+  private readonly _useMocks: boolean;
 
   public constructor(context: ISPRequestContext, hubUrl?: string) {
     this._context = context;
     this._webUrl = context.pageContext.web.absoluteUrl;
     this._hubUrl = hubUrl || this._resolveHubUrl();
-    this._isLocal = typeof window !== 'undefined' && 
+    this._isLocal = typeof window !== 'undefined' &&
       (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    // Mode "aperçu" : sur le Workbench (local OU hébergé SPO) on sert des
+    // données de démonstration afin que la page se rende sans liste déployée.
+    const isWorkbench =
+      this._isLocal ||
+      (typeof window !== 'undefined' && /workbench/i.test(window.location.pathname)) ||
+      context.host?.hostType === "Workbench";
+    this._useMocks = isWorkbench;
   }
 
   private _resolveHubUrl(): string {
@@ -129,7 +138,7 @@ export class DataService {
   }
 
   public async getNews(top: number = 4, scope: string = "global"): Promise<INewsItem[]> {
-    if (this._isLocal) return Mocks.MOCK_NEWS.slice(0, top);
+    if (this._useMocks) return Mocks.MOCK_NEWS.slice(0, top);
 
     const select = [
       "Id",
@@ -156,7 +165,7 @@ export class DataService {
   }
 
   public async getDocuments(top: number = 10, listTitle: string = "Documents"): Promise<IDocumentItem[]> {
-    if (this._isLocal) return Mocks.MOCK_DOCUMENTS.slice(0, top);
+    if (this._useMocks) return Mocks.MOCK_DOCUMENTS.slice(0, top);
 
     const select = [
       "Id",
@@ -180,7 +189,7 @@ export class DataService {
   }
 
   public async getEvents(top: number = 5, scope: string = "global"): Promise<IEventItem[]> {
-    if (this._isLocal) return []; 
+    if (this._useMocks) return Mocks.MOCK_EVENTS.slice(0, top);
 
     const today = new Date().toISOString();
     const select = [
@@ -205,7 +214,7 @@ export class DataService {
   }
 
   public async getQuickLinks(scope: string = "global"): Promise<IQuickLink[]> {
-    if (this._isLocal) return [];
+    if (this._useMocks) return Mocks.MOCK_QUICKLINKS;
 
     const endpoint =
       `lists/getByTitle('LiensRapides')/items` +
@@ -216,7 +225,7 @@ export class DataService {
   }
 
   public async getDepartements(): Promise<IDepartement[]> {
-    if (this._isLocal) return Mocks.MOCK_DEPARTEMENTS;
+    if (this._useMocks) return Mocks.MOCK_DEPARTEMENTS;
 
     const endpoint =
       `lists/getByTitle('Departements')/items` +
@@ -232,6 +241,8 @@ export class DataService {
   }
 
   public async getAnnouncements(): Promise<IAnnouncement[]> {
+    if (this._useMocks) return Mocks.MOCK_ANNOUNCEMENTS;
+
     const today = new Date().toISOString();
     const endpoint =
       `lists/getByTitle('Annonces')/items` +
@@ -243,6 +254,8 @@ export class DataService {
   }
 
   public async getProjects(onHomeOnly: boolean = true): Promise<IProject[]> {
+    if (this._useMocks) return Mocks.MOCK_PROJECTS;
+
     const filter = onHomeOnly ? "&$filter=ShowOnHome eq 1" : "";
     const endpoint =
       `lists/getByTitle('Projets')/items` +
@@ -253,6 +266,8 @@ export class DataService {
   }
 
   public async getHeroSlides(): Promise<IHeroSlide[]> {
+    if (this._useMocks) return Mocks.MOCK_SLIDES;
+
     const endpoint =
       `lists/getByTitle('HeroSlides')/items` +
       `?$select=Id,Title,FileRef,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified` +
@@ -262,6 +277,8 @@ export class DataService {
   }
 
   public async getMissions(): Promise<IMission[]> {
+    if (this._useMocks) return Mocks.MOCK_MISSIONS;
+
     const endpoint =
       `lists/getByTitle('Missions')/items` +
       `?$select=Id,Title,Tag,MissionText,IconName,MissionType,ColorClass,BgClass,SortOrder,Created,Modified` +
@@ -273,6 +290,12 @@ export class DataService {
   public async getIndicators(
     placement: "Hero accueil" | "Page histoire"
   ): Promise<IIndicator[]> {
+    if (this._useMocks) {
+      return Mocks.MOCK_STATS.filter(
+        (s) => s.Placement === placement || s.Placement === "Les deux"
+      );
+    }
+
     const endpoint =
       `lists/getByTitle('Indicateurs')/items` +
       `?$select=Id,Title,StatValue,IconName,Placement,SortOrder,IsActive,Created,Modified` +
@@ -285,6 +308,8 @@ export class DataService {
   public async getCollaborateurs(
     division?: string
   ): Promise<ICollaborateur[]> {
+    if (this._useMocks) return Mocks.MOCK_COLLABORATORS;
+
     const select = [
       "Id",
       "Title",
@@ -358,6 +383,8 @@ export class DataService {
   }
 
   public async getGalleryImages(top: number = 12): Promise<IGalleryImage[]> {
+    if (this._useMocks) return Mocks.MOCK_GALLERY.slice(0, top);
+
     const endpoint =
       `lists/getByTitle('Galerie')/items` +
       `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
@@ -368,6 +395,8 @@ export class DataService {
   }
 
   public async getEmployeeOfMonth(): Promise<IEmployeeOfMonth | undefined> {
+    if (this._useMocks) return Mocks.MOCK_EMPLOYEE;
+
     const select = [
       "Id",
       "Title",
@@ -400,6 +429,8 @@ export class DataService {
   }
 
   public async getFinanceData(fiscalYear?: number): Promise<IFinanceData[]> {
+    if (this._useMocks) return [];
+
     const yearFilter = fiscalYear ? `&$filter=FiscalYear eq ${fiscalYear}` : "";
     const endpoint =
       `lists/getByTitle('DonneesFinancieres')/items` +
@@ -414,6 +445,8 @@ export class DataService {
   }
 
   public async getMilestones(): Promise<IMilestone[]> {
+    if (this._useMocks) return [];
+
     const endpoint =
       `lists/getByTitle('Histoire')/items` +
       `?$select=Id,Title,Year,Quarter,MilestoneDescription,MilestoneImage,IconName,Tag,TagColorClass,Side,Stat1Label,Stat1Value,Stat2Label,Stat2Value,SortOrder,Created,Modified` +
@@ -423,6 +456,8 @@ export class DataService {
   }
 
   public async getFaq(category?: string): Promise<IFaqItem[]> {
+    if (this._useMocks) return [];
+
     const categoryFilter = category
       ? ` and FaqCategory eq '${category.replace(/'/g, "''")}'`
       : "";
@@ -441,7 +476,7 @@ export class DataService {
   }
 
   public async getCompanyInfo(): Promise<ICompanyInfo> {
-    if (this._isLocal) return Mocks.MOCK_COMPANY;
+    if (this._useMocks) return Mocks.MOCK_COMPANY;
 
     const endpoint =
       `lists/getByTitle('ParametresSite')/items` +

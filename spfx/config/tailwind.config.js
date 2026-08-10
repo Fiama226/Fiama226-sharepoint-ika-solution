@@ -1,3 +1,4 @@
+const path = require("path");
 const {
   scopedPreflightStyles,
   isolateInsideOfContainer,
@@ -7,7 +8,15 @@ const {
 module.exports = {
   prefix: "ika-",
   important: ".ika-root",
-  content: ["./src/**/*.{ts,tsx}"],
+  // Chemins ABSOLUS (relatifs à ce fichier de config) : lors du build Heft,
+  // le cwd n'est pas forcément la racine du projet, et Tailwind ne résolvait
+  // pas le glob relatif « ./src » (avertissement « content missing or empty »
+  // → aucune classe utilitaire générée). L'absolu rend le scan indépendant
+  // du cwd. __dirname = config/ → ../src = racine/src.
+  content: [
+    path.resolve(__dirname, "../src/**/*.ts"),
+    path.resolve(__dirname, "../src/**/*.tsx"),
+  ],
   corePlugins: {
     preflight: false,
   },

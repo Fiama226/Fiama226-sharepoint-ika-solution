@@ -27,12 +27,6 @@
     },
     "features": [
       {
-        "title": "IKA Intranet — Web Parts",
-        "description": "Déploie l'ensemble des web parts IKA Solution",
-        "id": "4f0b8d26-5c39-4e70-82b4-6d8f901c3e75",
-        "version": "1.0.0.0"
-      },
-      {
         "title": "IKA Intranet — Extension de chrome",
         "description": "Déploie le header et le footer IKA sur les sites du hub",
         "id": "501c9e37-6d4a-4f81-93c5-7e9012d4f086",

@@ -52,11 +52,21 @@ module.exports = function patchTailwindPostcss(generatedConfig) {
   generatedConfig.module.rules = generatedConfig.module.rules.map((rule) => {
     if (!rule || !rule.test) return rule;
     const testSource = rule.test.toString();
-    // On ne patche que la règle CSS non-module
-    if (/\.css$/i.test(testSource) && !/module/i.test(testSource)) {
+    // On ne patche que les règles CSS non-module. Le test du rig SPFx est
+    // /(\.css|\.scss|\.sass)$/i : un match ancré en fin (/\.css$/) échoue
+    // car la chaîne se termine par le flag « i ». On cherche donc « .css »
+    // en sous-chaîne et on exclut explicitement les CSS modules.
+    const isCssRule =
+      /\.css/i.test(testSource) &&
+      !/module/.test(testSource) &&
+      !/scss-module/.test(testSource) &&
+      !/sass-module/.test(testSource);
+    if (isCssRule) {
       const use = Array.isArray(rule.use) ? rule.use.slice() : [];
-      // postcss-loader doit s'exécuter AVANT les loaders CSS du rig
-      return { ...rule, use: [tailwindPostcssLoader, ...use] };
+      // postcss-loader (Tailwind) doit s'exécuter AVANT le sp-css-loader du
+      // rig. Or Webpack applique les loaders de droite à gauche : pour qu'il
+      // tourne en premier, on l'AJOUTE EN FIN de tableau (et non au début).
+      return { ...rule, use: [...use, tailwindPostcssLoader] };
     }
     return rule;
   });
