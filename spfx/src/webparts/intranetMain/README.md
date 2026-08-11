@@ -28,6 +28,10 @@ posée sur la page d'accueil SharePoint reconstruit la page d'accueil Next.js
 Voir [`docs/11-deploiement-intranet-main.md`](../../../docs/11-deploiement-intranet-main.md) :
 les 12 listes marquées 🏠 doivent exister sur le site hub.
 
+Pour diagnostiquer le cycle de rendu, les sections invisibles, le mode immersif
+et le profil de l'utilisateur connecté, voir
+[`docs/15-rendering-full-page-current-user.md`](../../../docs/15-rendering-full-page-current-user.md).
+
 ## Comment choisir ce composant sur une page
 
 1. Éditez la page.

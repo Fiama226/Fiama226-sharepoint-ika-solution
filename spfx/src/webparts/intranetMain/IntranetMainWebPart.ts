@@ -19,7 +19,11 @@ import {
 
 import { IntranetMain } from "./components/IntranetMain";
 import { IIntranetMainProps } from "./components/IIntranetMainProps";
-import { installFullPageChrome, isWorkbench } from "./fullPageChrome";
+import {
+  installFullPageChrome,
+  isWorkbench,
+  removeFullPageChrome,
+} from "./fullPageChrome";
 import { DataService } from "../../services/DataService";
 import {
   IAnnouncement,
@@ -110,14 +114,21 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
       void this._load();
     }
 
+    const pageUser = this.context.pageContext.user;
+    const displayName = pageUser.displayName
+      ? pageUser.displayName.trim()
+      : "";
+    const currentUser = displayName || "Collaborateur IKA";
+
     const element: React.ReactElement<IIntranetMainProps> = React.createElement(
       IntranetMain,
       {
         slides: this._slides,
         missions: this._missions,
         stats: this._stats,
-        currentUser: this.context.pageContext.user.displayName || "Landry KABORE",
-        currentUserRole: "Responsable communication interne",
+        currentUser,
+        currentUserEmail: pageUser.email || "",
+        currentUserRole: "",
         heroHeightClass: HEIGHT_CLASSES[this.properties.height] || HEIGHT_CLASSES.large,
         accent: this.properties.accent || "orange",
 
@@ -151,6 +162,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         showProjects: this.properties.showProjects !== false,
         showHeader: true,
         showFooter: true,
+        initialView: this.properties.defaultView || "accueil",
       }
     );
 
@@ -257,6 +269,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
 
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
+    removeFullPageChrome();
   }
 
   protected get dataVersion(): Version {

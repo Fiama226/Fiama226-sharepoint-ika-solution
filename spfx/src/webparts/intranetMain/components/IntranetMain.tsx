@@ -39,9 +39,14 @@ function parseHashRoute(): string {
   return routeName || "accueil";
 }
 
-function useReveal(enabled: boolean): React.RefObject<HTMLDivElement> {
+interface IRevealState {
+  ref: React.RefObject<HTMLDivElement>;
+  visible: boolean;
+}
+
+function useReveal(enabled: boolean): IRevealState {
   const ref = React.useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = React.useState<boolean>(false);
+  const [visible, setVisible] = React.useState<boolean>(!enabled);
 
   React.useEffect(() => {
     const node = ref.current;
@@ -53,12 +58,12 @@ function useReveal(enabled: boolean): React.RefObject<HTMLDivElement> {
     }
 
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mql.matches) {
+    if (mql.matches || typeof window.IntersectionObserver === "undefined") {
       setVisible(true);
       return undefined;
     }
 
-    const observer = new IntersectionObserver(
+    const observer = new window.IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -74,13 +79,7 @@ function useReveal(enabled: boolean): React.RefObject<HTMLDivElement> {
     return () => observer.disconnect();
   }, [enabled]);
 
-  React.useEffect(() => {
-    if (ref.current) {
-      ref.current.dataset.visible = visible ? "true" : "false";
-    }
-  }, [visible]);
-
-  return ref;
+  return { ref, visible };
 }
 
 const RevealSection: React.FC<{
@@ -88,22 +87,20 @@ const RevealSection: React.FC<{
   className?: string;
   children: React.ReactNode;
 }> = (props) => {
-  const ref = useReveal(props.enabled);
+  const reveal = useReveal(props.enabled);
   const base = "ika-transition-all ika-duration-700 ika-ease-out";
-  const hidden = props.enabled
-    ? "ika-opacity-0 ika-translate-y-4"
-    : "ika-opacity-100 ika-translate-y-0";
+  const hidden = "ika-opacity-0 ika-translate-y-4";
   const shown = "ika-opacity-100 ika-translate-y-0";
-  const cls = `${base} ${
-    props.enabled
-      ? ref.current?.dataset.visible === "true"
-        ? shown
-        : hidden
-      : shown
-  } ${props.className ?? ""}`;
+  const cls = `${base} ${reveal.visible ? shown : hidden} ${
+    props.className ?? ""
+  }`;
 
   return (
-    <div ref={ref} className={cls}>
+    <div
+      ref={reveal.ref}
+      className={cls}
+      data-visible={reveal.visible ? "true" : "false"}
+    >
       {props.children}
     </div>
   );
@@ -202,17 +199,18 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
     return {
       currentUser: {
         displayName: props.currentUser || "Collaborateur IKA",
-        email: "contact@ikasolution.com",
-        loginName: "",
+        email: props.currentUserEmail,
+        loginName: props.currentUserEmail,
         photoUrl: "",
         isSiteAdmin: false,
       },
-      currentPath: window.location.pathname,
+      currentPath:
+        typeof window !== "undefined" ? window.location.pathname : "",
       hubUrl,
       siteUrl,
       logoUrl: props.logoUrl || `${hubUrl}/SiteAssets/logo.png`,
     };
-  }, [props.currentUser, props.logoUrl]);
+  }, [props.currentUser, props.currentUserEmail, props.logoUrl]);
 
   const documentsNav: INavNode[] = React.useMemo(() => {
     return props.departments.map((dept, idx) => {
