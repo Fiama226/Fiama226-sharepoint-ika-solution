@@ -49,6 +49,7 @@ export interface IIntranetMainProps {
 
   // —— Contexte utilisateur ————————————————————————————————
   currentUser: string;
+  currentUserEmail: string;
   currentUserRole: string;
 
   // —— Apparence ———————————————————————————————————————————

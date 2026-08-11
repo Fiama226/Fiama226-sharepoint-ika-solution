@@ -21,6 +21,9 @@ const CHROME_CSS = `
     padding: 0 !important;
   }
   #sideNavBox,
+  #spLeftNav,
+  [data-automation-id="quickLaunch"],
+  [data-automation-id="sideNav"],
   #DeltaTopNavigation,
   #DeltaSuiteNavigation,
   .sp-pageLayout-pageFooter,
@@ -63,6 +66,14 @@ export function installFullPageChrome(): void {
     style.type = "text/css";
     style.textContent = CHROME_CSS;
     document.head.appendChild(style);
+  }
+}
+
+export function removeFullPageChrome(): void {
+  if (typeof document === "undefined") return;
+  const style = document.getElementById(STYLE_ID);
+  if (style && style.parentNode) {
+    style.parentNode.removeChild(style);
   }
 }
 
