@@ -30,6 +30,7 @@ import {
   STATIC_PRIMARY_NAV,
   STATIC_SECONDARY_NAV,
 } from "../../../services/NavigationService";
+import { buildUserPhotoUrl } from "../../../common/utils/spUtils";
 
 function parseHashRoute(): string {
   if (typeof window === "undefined") return "accueil";
@@ -194,23 +195,23 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
       typeof window !== "undefined"
         ? window.location.pathname.split("/").slice(0, 3).join("/")
         : "";
-    const hubUrl = `${origin}${sitePath}`;
-    const siteUrl = `${origin}${sitePath}`;
+    const fallbackUrl = `${origin}${sitePath}`;
+    const siteUrl = props.siteUrl || fallbackUrl;
     return {
       currentUser: {
         displayName: props.currentUser || "Collaborateur IKA",
         email: props.currentUserEmail,
         loginName: props.currentUserEmail,
-        photoUrl: "",
+        photoUrl: buildUserPhotoUrl(props.currentUserEmail, "M"),
         isSiteAdmin: false,
       },
       currentPath:
         typeof window !== "undefined" ? window.location.pathname : "",
-      hubUrl,
+      hubUrl: siteUrl,
       siteUrl,
-      logoUrl: props.logoUrl || `${hubUrl}/SiteAssets/logo.png`,
+      logoUrl: props.logoUrl || `${siteUrl}/SiteAssets/logo.png`,
     };
-  }, [props.currentUser, props.currentUserEmail, props.logoUrl]);
+  }, [props.currentUser, props.currentUserEmail, props.logoUrl, props.siteUrl]);
 
   const documentsNav: INavNode[] = React.useMemo(() => {
     return props.departments.map((dept, idx) => {

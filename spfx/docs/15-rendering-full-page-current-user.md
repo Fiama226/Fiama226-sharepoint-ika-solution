@@ -114,11 +114,13 @@ For direct validation, the component can also be opened with:
 
 ### Existing Team site / page-specific fallback
 
-The repository's `fullPageChrome.ts` now covers both the classic
-`#sideNavBox` and modern `#spLeftNav` quick-launch containers, and only applies
-in published/read mode. This can make a single page immersive, but selectors
-outside the Web Part DOM are inherently more fragile than site settings or an
-App Page.
+`fullPageChrome.ts` hides the modern Microsoft 365 suite bar, the SharePoint
+app bar, the site header, left navigation, command bar, page title and canvas
+padding. It runs on **hosted workbench** and on published pages. It stays off
+only when a modern page is in `Mode=Edit`, so authors keep the SharePoint
+editing tools.
+
+Toggle **Plein écran** in the Web Part property pane to turn this off.
 
 If this behavior must apply to several selected pages, package the logic as an
 SPFx Application Customizer and activate it with explicit page/path rules.

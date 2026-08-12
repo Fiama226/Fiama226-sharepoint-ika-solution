@@ -20,9 +20,11 @@ export interface IOrgProfilePanelProps {
 }
 
 function photoFor(member: ICollaborateur, size: number): string {
-  return member.Photo
-    ? buildImageUrl(member.Photo, size)
-    : buildUserPhotoUrl(member.Email, "L");
+  if (member.Photo) {
+    const fromList = buildImageUrl(member.Photo, size);
+    if (fromList) return fromList;
+  }
+  return buildUserPhotoUrl(member.Email, "L");
 }
 
 const Row: React.FC<{

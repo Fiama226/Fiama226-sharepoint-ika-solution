@@ -46,6 +46,7 @@ export interface IIntranetMainProps {
   showHeader: boolean;
   showFooter: boolean;
   logoUrl?: string;
+  siteUrl?: string;
 
   // —— Contexte utilisateur ————————————————————————————————
   currentUser: string;

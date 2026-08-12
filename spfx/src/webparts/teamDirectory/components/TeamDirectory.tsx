@@ -114,9 +114,8 @@ export const TeamDirectory: React.FC<ITeamDirectoryProps> = (props) => {
         )}
       >
         {members.map((member) => {
-          const photo = member.Photo
-            ? buildImageUrl(member.Photo, 96)
-            : buildUserPhotoUrl(member.Email, "M");
+          const fromList = member.Photo ? buildImageUrl(member.Photo, 96) : "";
+          const photo = fromList || buildUserPhotoUrl(member.Email, "M");
 
           return (
             <li key={member.Id}>

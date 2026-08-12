@@ -20,9 +20,11 @@ export interface IOrgNodeCardProps {
 }
 
 function photoFor(node: IOrgNode, size: number): string {
-  return node.Photo
-    ? buildImageUrl(node.Photo, size)
-    : buildUserPhotoUrl(node.Email, "M");
+  if (node.Photo) {
+    const fromList = buildImageUrl(node.Photo, size);
+    if (fromList) return fromList;
+  }
+  return buildUserPhotoUrl(node.Email, "M");
 }
 
 export const OrgNodeCard: React.FC<IOrgNodeCardProps> = (props) => {

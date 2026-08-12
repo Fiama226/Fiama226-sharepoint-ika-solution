@@ -184,6 +184,7 @@ export interface IProject extends IListItemBase {
 export interface IGalleryImage extends IListItemBase {
   FileLeafRef: string;
   FileRef: string;
+  EncodedAbsUrl?: string;
   Caption: string;
   GalleryCategory: string;
   PhotoDate?: string;
@@ -205,6 +206,7 @@ export interface IEmployeeOfMonth extends IListItemBase {
 
 export interface IHeroSlide extends IListItemBase {
   FileRef: string;
+  EncodedAbsUrl?: string;
   Caption: string;
   SubCaption: string;
   SlideLink?: ISPUrlField;
