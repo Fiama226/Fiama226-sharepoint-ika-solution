@@ -20,6 +20,7 @@ import {
   IProject,
   IQuickLink,
   ISiteSetting,
+  ISPImageField,
 } from "../models/IIkaModels";
 
 import * as Mocks from "./MockData";
@@ -45,6 +46,7 @@ export interface ISPRequestContext {
 export class DataService {
   private readonly _context: ISPRequestContext;
   private readonly _webUrl: string;
+  private readonly _webServerRelativeUrl: string;
   private readonly _hubUrl: string;
   private readonly _isLocal: boolean;
   private readonly _useMocks: boolean;
@@ -52,6 +54,8 @@ export class DataService {
   public constructor(context: ISPRequestContext, hubUrl?: string) {
     this._context = context;
     this._webUrl = context.pageContext.web.absoluteUrl;
+    this._webServerRelativeUrl =
+      context.pageContext.web.serverRelativeUrl || "/";
     this._hubUrl = hubUrl || this._resolveHubUrl();
     this._isLocal =
       typeof window !== "undefined" &&
@@ -85,6 +89,84 @@ export class DataService {
     // codé en dur comme /sites/ikareview, sinon toutes les lectures de listes
     // « hub » échoueraient silencieusement).
     return this._webUrl;
+  }
+
+  private _toServerRelativeUrl(url: string): string {
+    try {
+      return new URL(url).pathname.replace(/\/+$/, "") || "/";
+    } catch {
+      return this._webServerRelativeUrl;
+    }
+  }
+
+  /**
+   * Normalise une colonne « Image » moderne SharePoint Online.
+   *
+   * Avec `odata=nometadata`, l'API REST renvoie la colonne sous forme de
+   * **JSON string** (ex. `{"fileName":"Reserved_ImageAttachment_[5]_[Photo]
+   * [32]_[guid]_[1]_[2].jpg","originalImageName":"DG"}`) et, quand la liste a
+   * les pièces jointes activées (défaut), le fichier est stocké dans
+   * `/Lists/<Liste>/Attachments/<Id>/` **sans `serverRelativeUrl` exploitable**.
+   * On reconstruit alors l'URL d'accès au fichier.
+   */
+  private _normalizeImageField(
+    field: ISPImageField | string | undefined,
+    itemId: number,
+    listTitle: string,
+    siteUrl: string
+  ): ISPImageField | undefined {
+    if (!field) return undefined;
+
+    if (typeof field !== "string") return field;
+
+    const trimmed = field.trim();
+
+    if (!trimmed.startsWith("{")) {
+      return /^https?:\/\//i.test(trimmed)
+        ? { serverUrl: trimmed }
+        : { serverRelativeUrl: trimmed };
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed) as {
+        fileName?: string;
+        originalImageName?: string;
+        serverRelativeUrl?: string;
+        serverUrl?: string;
+      };
+
+      const isAbsoluteFile =
+        !!parsed.fileName && /^https?:\/\//i.test(parsed.fileName);
+      const siteRelative = this._toServerRelativeUrl(siteUrl);
+      let siteOrigin = siteUrl;
+      try {
+        siteOrigin = new URL(siteUrl).origin;
+      } catch {
+        // siteUrl non-URL : on conserve la valeur brute en secours
+      }
+
+      const serverRelativeUrl = isAbsoluteFile
+        ? undefined
+        : parsed.serverRelativeUrl ||
+          (parsed.fileName
+            ? `${siteRelative}/Lists/${listTitle}/Attachments/${itemId}/${parsed.fileName}`
+            : undefined);
+
+      const serverUrl =
+        parsed.serverUrl ||
+        (isAbsoluteFile && parsed.fileName) ||
+        (serverRelativeUrl
+          ? `${siteOrigin}${serverRelativeUrl}`
+          : undefined);
+
+      return {
+        serverRelativeUrl,
+        serverUrl,
+        fileName: parsed.fileName,
+      };
+    } catch {
+      return { serverRelativeUrl: trimmed };
+    }
   }
 
   private _readCache<T>(key: string): T | undefined {
@@ -169,7 +251,13 @@ export class DataService {
         `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
 
       const items = await this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_NEWS.slice(0, top);
+      const normalized = (items || []).map((item) => ({
+        ...item,
+        HeaderImage: item.HeaderImage
+          ? this._normalizeImageField(item.HeaderImage, item.Id, "Actualites", this._webUrl)
+          : undefined,
+      }));
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_NEWS.slice(0, top);
     } catch (e) {
       console.warn("[DataService] Fallback mock pour actualités:", e);
       return Mocks.MOCK_NEWS.slice(0, top);
@@ -230,7 +318,13 @@ export class DataService {
         `&$orderby=EventDate asc&$top=${top}`;
 
       const items = await this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_EVENTS.slice(0, top);
+      const normalized = (items || []).map((item) => ({
+        ...item,
+        EventImage: item.EventImage
+          ? this._normalizeImageField(item.EventImage, item.Id, "Evenements", this._webUrl)
+          : undefined,
+      }));
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_EVENTS.slice(0, top);
     } catch (e) {
       console.warn("[DataService] Fallback mock pour événements:", e);
       return Mocks.MOCK_EVENTS.slice(0, top);
@@ -418,7 +512,13 @@ export class DataService {
         endpoint,
         `collaborateurs.${division || "all"}`
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_COLLABORATORS;
+      const normalized = (items || []).map((item) => ({
+        ...item,
+        Photo: item.Photo
+          ? this._normalizeImageField(item.Photo, item.Id, "Collaborateurs", this._hubUrl)
+          : undefined,
+      }));
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_COLLABORATORS;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour collaborateurs:", e);
       return division
@@ -514,7 +614,14 @@ export class DataService {
         "employeeOfMonth"
       );
 
-      return items && items.length > 0 ? items[0] : Mocks.MOCK_EMPLOYEE;
+      if (!items || items.length === 0) return Mocks.MOCK_EMPLOYEE;
+      const first = items[0];
+      return {
+        ...first,
+        Photo: first.Photo
+          ? this._normalizeImageField(first.Photo, first.Id, "CollaborateurDuMois", this._hubUrl)
+          : undefined,
+      };
     } catch (e) {
       console.warn("[DataService] Fallback mock pour collaborateur du mois:", e);
       return Mocks.MOCK_EMPLOYEE;
@@ -551,7 +658,13 @@ export class DataService {
         `&$orderby=SortOrder asc&$top=50`;
 
       const items = await this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
-      return items && items.length > 0 ? items : Mocks.MOCK_MILESTONES;
+      const normalized = (items || []).map((item) => ({
+        ...item,
+        MilestoneImage: item.MilestoneImage
+          ? this._normalizeImageField(item.MilestoneImage, item.Id, "Histoire", this._hubUrl)
+          : undefined,
+      }));
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_MILESTONES;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour histoire:", e);
       return Mocks.MOCK_MILESTONES;
