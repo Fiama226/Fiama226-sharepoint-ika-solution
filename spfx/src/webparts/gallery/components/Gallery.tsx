@@ -193,6 +193,13 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
                   src={buildImageUrl(img.FileRef, 600)}
                   alt={img.Caption}
                   loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (img.FileRef && !target.dataset.fallbackApplied) {
+                      target.dataset.fallbackApplied = "1";
+                      target.src = img.FileRef;
+                    }
+                  }}
                   className="ika-h-full ika-w-full ika-object-cover ika-transition-transform ika-duration-500 group-hover:ika-scale-105"
                   style={{ minHeight: "inherit" }}
                 />
@@ -234,6 +241,13 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
               <img
                 src={buildImageUrl(lightbox.FileRef, 1200)}
                 alt={lightbox.Caption}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (lightbox.FileRef && !target.dataset.fallbackApplied) {
+                    target.dataset.fallbackApplied = "1";
+                    target.src = lightbox.FileRef;
+                  }
+                }}
                 className="ika-max-h-[70vh] ika-w-full ika-object-cover"
               />
               <div className="ika-flex ika-items-center ika-justify-between ika-bg-slate-900 ika-px-6 ika-py-4">

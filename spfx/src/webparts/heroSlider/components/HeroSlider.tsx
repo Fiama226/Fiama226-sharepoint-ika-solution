@@ -91,6 +91,9 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
   } = props;
 
   const [hovered, setHovered] = React.useState<boolean>(false);
+  const [failedSlides, setFailedSlides] = React.useState<Set<number>>(
+    () => new Set()
+  );
   const reduced = usePrefersReducedMotion();
   const clock = useLiveClock("fr-FR");
 
@@ -165,11 +168,20 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
               zIndex: index === slideIndex ? 1 : 0,
             }}
           >
-            <img
-              src={slide.FileRef}
-              alt={slide.AltText || ""}
-              className="ika-h-full ika-w-full ika-object-cover"
-            />
+            {slide.FileRef && !failedSlides.has(slide.Id) ? (
+              <img
+                src={slide.FileRef}
+                alt={slide.AltText || ""}
+                onError={() =>
+                  setFailedSlides((prev) => {
+                    const next = new Set(prev);
+                    next.add(slide.Id);
+                    return next;
+                  })
+                }
+                className="ika-h-full ika-w-full ika-object-cover"
+              />
+            ) : null}
             <div className="ika-absolute ika-inset-0 ika-bg-gradient-to-r ika-from-black/80 ika-via-black/40 ika-to-black/10" />
             <div className="ika-absolute ika-inset-0 ika-bg-gradient-to-t ika-from-black/60 ika-via-transparent ika-to-transparent" />
           </div>

@@ -2,28 +2,88 @@ import { ISPImageField, ISPUrlField } from "../../models/IIkaModels";
 
 const PERSON_PLACEHOLDER = "/_layouts/15/images/person.gif";
 
+/**
+ * Valeur brute d'une colonne « Image » moderne SharePoint Online telle que
+ * renvoyée par l'API REST (odata=nometadata) :
+ * `{"fileName":"Reserved_ImageAttachment_[5]_[Photo][32]_[guid]_[1]_[2].jpg",
+ *  "originalImageName":"DG","serverRelativeUrl":"...","serverUrl":"..."}`.
+ *
+ * ⚠️ Piège SharePoint : avec `odata=nometadata` la colonne arrive sous forme de
+ * **JSON string** (pas d'objet), et lorsque la liste a les pièces jointes
+ * activées (défaut des nouvelles listes), le fichier est stocké dans
+ * `/Lists/<Liste>/Attachments/<Id>/` et `serverRelativeUrl` est **absent**.
+ */
+export interface IModernImageFieldValue {
+  fileName?: string;
+  originalImageName?: string;
+  serverRelativeUrl?: string;
+  serverUrl?: string;
+}
+
+function extractImagePath(
+  value: IModernImageFieldValue | undefined
+): string | undefined {
+  if (!value) return undefined;
+  if (value.serverRelativeUrl) return value.serverRelativeUrl;
+  if (value.serverUrl) return value.serverUrl;
+  if (value.fileName && /^https?:\/\//i.test(value.fileName)) {
+    return value.fileName;
+  }
+  // `fileName` seul ne peut pas être résolu sans le contexte de la liste
+  // (nom de liste + Id d'élément) : c'est DataService qui reconstruit l'URL.
+  return undefined;
+}
+
+function parseImageField(
+  field: ISPImageField | string | undefined
+): string | undefined {
+  if (!field) return undefined;
+
+  if (typeof field === "string") {
+    const trimmed = field.trim();
+    if (trimmed.startsWith("{")) {
+      try {
+        return extractImagePath(
+          JSON.parse(trimmed) as IModernImageFieldValue
+        );
+      } catch {
+        // Pas du JSON : chemin/URL direct (FileRef, URL externe, data URI…)
+        return trimmed;
+      }
+    }
+    return trimmed;
+  }
+
+  return extractImagePath(field);
+}
+
 export function buildImageUrl(
   field: ISPImageField | string | undefined,
   width?: number
 ): string {
-  let path: string | undefined;
-
-  if (typeof field === "string") {
-    path = field;
-  } else if (field) {
-    path = field.serverRelativeUrl || field.serverUrl;
-  }
+  const path = parseImageField(field);
 
   if (!path) return PERSON_PLACEHOLDER;
 
   if (!width) return path;
 
-  return (
-    "/_layouts/15/getpreview.ashx?path=" +
-    encodeURIComponent(path) +
-    "&resolution=" +
-    String(width)
-  );
+  // getpreview.ashx est réservé aux chemins serveur-relative de bibliothèques :
+  // il est notoirement instable pour les fichiers de pièces jointes
+  // (`/Lists/.../Attachments/...`) et ne sait rien faire des URL externes.
+  const isServerRelative = path.startsWith("/") && !path.startsWith("//");
+  const isAttachment = /\/attachments\//i.test(path);
+  const isExternalOrData = /^(https?:|data:)/i.test(path);
+
+  if (isServerRelative && !isAttachment && !isExternalOrData) {
+    return (
+      "/_layouts/15/getpreview.ashx?path=" +
+      encodeURIComponent(path) +
+      "&resolution=" +
+      String(width)
+    );
+  }
+
+  return path;
 }
 
 export function buildUserPhotoUrl(
