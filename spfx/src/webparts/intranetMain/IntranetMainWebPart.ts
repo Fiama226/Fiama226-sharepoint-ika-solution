@@ -21,9 +21,8 @@ import { IntranetMain } from "./components/IntranetMain";
 import { IIntranetMainProps } from "./components/IIntranetMainProps";
 import {
   installFullPageChrome,
-  isWorkbench,
   removeFullPageChrome,
-} from "./fullPageChrome";
+} from "../../common/utils/fullPageChrome";
 import { DataService } from "../../services/DataService";
 import {
   IAnnouncement,
@@ -54,6 +53,8 @@ export interface IIntranetMainWebPartProps {
   height: HeroHeight;
   accent: AccentColor;
   animationsEnabled: boolean;
+  hideSharePointChrome: boolean;
+  useMockData: boolean;
   showHero: boolean;
   showClock: boolean;
   showWelcomePanel: boolean;
@@ -100,11 +101,35 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
 
   protected async onInit(): Promise<void> {
     await super.onInit();
-    this._service = new DataService(this.context);
+    this._service = new DataService(this.context, undefined, {
+      useMocks: this.properties.useMockData === true,
+    });
 
-    // Plein écran type « Coris » sur une page SharePoint (mode lecture)
-    if (!isWorkbench()) {
+    // Plein écran : workbench hébergé + page SharePoint en lecture
+    if (this.properties.hideSharePointChrome !== false) {
       installFullPageChrome();
+    }
+  }
+
+  protected onPropertyPaneFieldChanged(
+    propertyPath: string,
+    oldValue: unknown,
+    newValue: unknown
+  ): void {
+    super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
+
+    if (propertyPath === "useMockData") {
+      this._service.setUseMocks(newValue === true);
+      this._loaded = false;
+      this._loading = true;
+    }
+
+    if (propertyPath === "hideSharePointChrome") {
+      if (newValue !== false) {
+        installFullPageChrome();
+      } else {
+        removeFullPageChrome();
+      }
     }
   }
 
@@ -119,6 +144,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
       ? pageUser.displayName.trim()
       : "";
     const currentUser = displayName || "Collaborateur IKA";
+    const webUrl = this.context.pageContext.web.absoluteUrl;
 
     const element: React.ReactElement<IIntranetMainProps> = React.createElement(
       IntranetMain,
@@ -311,6 +337,16 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
                   label: "Animations (auto-rotation carrousel, reveal au scroll)",
                   onText: "Activées (recommandé)",
                   offText: "Désactivées",
+                }),
+                PropertyPaneToggle("hideSharePointChrome", {
+                  label: "Plein écran (masquer les barres SharePoint)",
+                  onText: "Plein écran",
+                  offText: "Chrome SharePoint visible",
+                }),
+                PropertyPaneToggle("useMockData", {
+                  label: "Données de démonstration (ignorer les listes)",
+                  onText: "Mocks",
+                  offText: "Listes SharePoint",
                 }),
               ],
             },

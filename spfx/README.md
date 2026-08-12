@@ -89,9 +89,16 @@ spfx/
 
 ### Outils fournis
 
+Sur le **workbench hébergé** (`/_layouts/15/workbench.aspx`), la Web Part
+lit les listes du site (plus les mocks) et passe en **plein écran**
+(barres SharePoint masquées). Volet de propriétés :
+
+- **Plein écran** — masquer / réafficher le chrome SharePoint
+- **Données de démonstration** — forcer les mocks si besoin
+
 ```bash
 # Valider tous les artefacts avant deploiement
-node config/validate.js
+node config/validate.js && node config/run-unit-tests.js
 ```
 
 État actuel de la validation : **20 listes, 155 champs**.

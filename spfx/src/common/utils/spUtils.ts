@@ -1,30 +1,11 @@
-import { ISPImageField, ISPUrlField } from "../../models/IIkaModels";
+import { ISPUrlField } from "../../models/IIkaModels";
+
+export {
+  parseImageField,
+  buildImageUrl,
+} from "./imageUrl";
 
 const PERSON_PLACEHOLDER = "/_layouts/15/images/person.gif";
-
-export function buildImageUrl(
-  field: ISPImageField | string | undefined,
-  width?: number
-): string {
-  let path: string | undefined;
-
-  if (typeof field === "string") {
-    path = field;
-  } else if (field) {
-    path = field.serverRelativeUrl || field.serverUrl;
-  }
-
-  if (!path) return PERSON_PLACEHOLDER;
-
-  if (!width) return path;
-
-  return (
-    "/_layouts/15/getpreview.ashx?path=" +
-    encodeURIComponent(path) +
-    "&resolution=" +
-    String(width)
-  );
-}
 
 export function buildUserPhotoUrl(
   email: string | undefined,

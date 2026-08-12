@@ -5,7 +5,7 @@ import * as React from "react";
 import { IHeroSliderProps } from "./IHeroSliderProps";
 import { useLiveClock } from "../../../common/hooks/useLiveClock";
 import { usePrefersReducedMotion } from "../../../common/hooks/usePrefersReducedMotion";
-import { cn } from "../../../common/utils/spUtils";
+import { buildImageUrl, cn } from "../../../common/utils/spUtils";
 
 const SLIDE_INTERVAL_MS = 5000;
 const MISSION_INTERVAL_MS = 6000;
@@ -166,7 +166,7 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
             }}
           >
             <img
-              src={slide.FileRef}
+              src={buildImageUrl(slide.EncodedAbsUrl || slide.FileRef)}
               alt={slide.AltText || ""}
               className="ika-h-full ika-w-full ika-object-cover"
             />

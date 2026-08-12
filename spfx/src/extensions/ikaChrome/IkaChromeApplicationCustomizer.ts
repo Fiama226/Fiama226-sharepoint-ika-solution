@@ -23,6 +23,7 @@ import {
 } from "../../services/NavigationService";
 import { DataService } from "../../services/DataService";
 import { buildUserPhotoUrl } from "../../common/utils/spUtils";
+import { installFullPageChrome } from "../../common/utils/fullPageChrome";
 
 const LOG_SOURCE = "IkaChrome";
 
@@ -42,6 +43,7 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
   @override
   public onInit(): Promise<void> {
     this._hideDefaultHeader();
+    installFullPageChrome();
 
     this.context.placeholderProvider.changedEvent.add(this, this._renderChrome);
     this._renderChrome();

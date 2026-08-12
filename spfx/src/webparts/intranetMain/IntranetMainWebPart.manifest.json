@@ -27,6 +27,8 @@
         "height": "screen",
         "accent": "orange",
         "animationsEnabled": true,
+        "hideSharePointChrome": true,
+        "useMockData": false,
         "showHero": true,
         "showClock": true,
         "showWelcomePanel": true,

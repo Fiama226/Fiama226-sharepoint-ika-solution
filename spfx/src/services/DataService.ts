@@ -23,6 +23,9 @@ import {
 } from "../models/IIkaModels";
 
 import * as Mocks from "./MockData";
+import { shouldUseMockDataByDefault } from "../common/utils/imageUrl";
+
+export { shouldUseMockDataByDefault };
 
 const CACHE_PREFIX = "ika.cache.";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
@@ -42,14 +45,27 @@ export interface ISPRequestContext {
   host?: { hostType?: string };
 }
 
+export interface IDataServiceOptions {
+  /**
+   * Force les données de démonstration. Par défaut : uniquement sur
+   * localhost (workbench local). Le workbench **hébergé**
+   * (`/_layouts/15/workbench.aspx`) interroge les listes du site.
+   */
+  useMocks?: boolean;
+}
+
 export class DataService {
   private readonly _context: ISPRequestContext;
   private readonly _webUrl: string;
   private readonly _hubUrl: string;
   private readonly _isLocal: boolean;
-  private readonly _useMocks: boolean;
+  private _useMocks: boolean;
 
-  public constructor(context: ISPRequestContext, hubUrl?: string) {
+  public constructor(
+    context: ISPRequestContext,
+    hubUrl?: string,
+    options?: IDataServiceOptions
+  ) {
     this._context = context;
     this._webUrl = context.pageContext.web.absoluteUrl;
     this._hubUrl = hubUrl || this._resolveHubUrl();
@@ -58,13 +74,24 @@ export class DataService {
       (window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1");
 
-    const isWorkbench =
-      this._isLocal ||
-      (typeof window !== "undefined" &&
-        /workbench/i.test(window.location.pathname)) ||
-      context.host?.hostType === "Workbench";
+    // Hosted workbench = page SharePoint → REST disponible.
+    // Mocks uniquement si on est vraiment hors SharePoint, ou si demandé.
+    const hostname =
+      typeof window !== "undefined" && window.location
+        ? window.location.hostname
+        : "";
+    this._useMocks = shouldUseMockDataByDefault(
+      hostname,
+      options ? options.useMocks : undefined
+    );
+  }
 
-    this._useMocks = isWorkbench;
+  public setUseMocks(value: boolean): void {
+    this._useMocks = value;
+  }
+
+  public get useMocks(): boolean {
+    return this._useMocks;
   }
 
   private _resolveHubUrl(): string {
@@ -143,7 +170,40 @@ export class DataService {
     return value;
   }
 
-  public async getNews(top: number = 4, scope: string = "global"): Promise<INewsItem[]> {
+  /**
+   * Relance la requête sans $filter si SharePoint renvoie 400
+   * (colonne de filtre absente, ex. Scope sur Actualites).
+   */
+  private async _getWithFallback<T>(
+    siteUrl: string,
+    endpoint: string,
+    cacheKey?: string,
+    ttl: number = DEFAULT_TTL_MS
+  ): Promise<T[]> {
+    try {
+      return await this._get<T>(siteUrl, endpoint, cacheKey, ttl);
+    } catch (error) {
+      const withoutFilter = endpoint
+        .replace(/([?&])\$filter=[^&]*/i, "$1")
+        .replace(/\?&/, "?")
+        .replace(/&&+/g, "&")
+        .replace(/\?$/, "")
+        .replace(/&$/, "");
+      if (withoutFilter === endpoint) throw error;
+      console.warn(
+        "[DataService] Requête relancée sans $filter:",
+        endpoint
+      );
+      return await this._get<T>(siteUrl, withoutFilter, undefined, ttl);
+    }
+  }
+
+  private _onListError<T>(label: string, error: unknown, mock: T): T {
+    console.warn(`[DataService] ${label}:`, error);
+    return this._useMocks ? mock : (Array.isArray(mock) ? ([] as unknown as T) : (undefined as T));
+  }
+
+  public async getNews(top: number = 4, _scope: string = "global"): Promise<INewsItem[]> {
     if (this._useMocks) return Mocks.MOCK_NEWS.slice(0, top);
 
     try {
@@ -161,18 +221,20 @@ export class DataService {
         "NewsAuthor/EMail",
       ].join(",");
 
-      const scopeFilter = scope ? `Scope eq '${scope}'` : "Scope eq 'global'";
+      // Pas de filtre Scope : la colonne n'existe pas sur Actualites
+      // (voir docs/10-listes-a-creer.md) et ferait échouer la requête.
       const endpoint =
         `lists/getByTitle('Actualites')/items` +
         `?$select=${select}&$expand=NewsAuthor` +
-        `&$filter=${scopeFilter}` +
         `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
 
-      const items = await this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_NEWS.slice(0, top);
+      return await this._getWithFallback<INewsItem>(
+        this._webUrl,
+        endpoint,
+        `news.all.${top}`
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour actualités:", e);
-      return Mocks.MOCK_NEWS.slice(0, top);
+      return this._onListError("actualités", e, Mocks.MOCK_NEWS.slice(0, top));
     }
   }
 
@@ -198,11 +260,13 @@ export class DataService {
         `?$select=${select}&$expand=Editor` +
         `&$filter=FSObjType eq 0&$orderby=Modified desc&$top=${top}`;
 
-      const items = await this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${listTitle}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_DOCUMENTS.slice(0, top);
+      return await this._getWithFallback<IDocumentItem>(
+        this._webUrl,
+        endpoint,
+        `docs.${listTitle}.${top}`
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour documents:", e);
-      return Mocks.MOCK_DOCUMENTS.slice(0, top);
+      return this._onListError("documents", e, Mocks.MOCK_DOCUMENTS.slice(0, top));
     }
   }
 
@@ -229,11 +293,13 @@ export class DataService {
         `?$select=${select}&$filter=EventDate ge datetime'${today}'` +
         `&$orderby=EventDate asc&$top=${top}`;
 
-      const items = await this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_EVENTS.slice(0, top);
+      return await this._getWithFallback<IEventItem>(
+        this._webUrl,
+        endpoint,
+        `events.${top}`
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour événements:", e);
-      return Mocks.MOCK_EVENTS.slice(0, top);
+      return this._onListError("événements", e, Mocks.MOCK_EVENTS.slice(0, top));
     }
   }
 
@@ -246,11 +312,13 @@ export class DataService {
         `?$select=Id,Title,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive,Created,Modified` +
         `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=50`;
 
-      const items = await this._get<IQuickLink>(this._webUrl, endpoint, "quicklinks");
-      return items && items.length > 0 ? items : Mocks.MOCK_QUICKLINKS;
+      return await this._getWithFallback<IQuickLink>(
+        this._webUrl,
+        endpoint,
+        "quicklinks"
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour liens rapides:", e);
-      return Mocks.MOCK_QUICKLINKS;
+      return this._onListError("liens rapides", e, Mocks.MOCK_QUICKLINKS);
     }
   }
 
@@ -263,16 +331,14 @@ export class DataService {
         `?$select=Id,Title,Slug,Tagline,DeptDescription,HeroTitle,HeroSubtitle,Accent,IconName,SiteUrl,AccentClasses,BadgeClasses,MemberCount,SortOrder,Created,Modified` +
         `&$orderby=SortOrder asc&$top=20`;
 
-      const items = await this._get<IDepartement>(
+      return await this._getWithFallback<IDepartement>(
         this._hubUrl,
         endpoint,
         "departements",
         30 * 60 * 1000
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_DEPARTEMENTS;
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour départements:", e);
-      return Mocks.MOCK_DEPARTEMENTS;
+      return this._onListError("départements", e, Mocks.MOCK_DEPARTEMENTS);
     }
   }
 
@@ -287,11 +353,13 @@ export class DataService {
         `&$filter=DisplayUntil ge datetime'${today}'` +
         `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
 
-      const items = await this._get<IAnnouncement>(this._hubUrl, endpoint, "announcements");
-      return items && items.length > 0 ? items : Mocks.MOCK_ANNOUNCEMENTS;
+      return await this._getWithFallback<IAnnouncement>(
+        this._hubUrl,
+        endpoint,
+        "announcements"
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour annonces:", e);
-      return Mocks.MOCK_ANNOUNCEMENTS;
+      return this._onListError("annonces", e, Mocks.MOCK_ANNOUNCEMENTS);
     }
   }
 
@@ -305,11 +373,13 @@ export class DataService {
         `?$select=Id,Title,ProjectLead,Progress,ProjectStatus,DueDate,TasksDone,TasksTotal,ShowOnHome,SortOrder,Created,Modified` +
         `${filter}&$orderby=SortOrder asc&$top=20`;
 
-      const items = await this._get<IProject>(this._hubUrl, endpoint, `projects.${onHomeOnly}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_PROJECTS;
+      return await this._getWithFallback<IProject>(
+        this._hubUrl,
+        endpoint,
+        `projects.${onHomeOnly}`
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour projets:", e);
-      return Mocks.MOCK_PROJECTS;
+      return this._onListError("projets", e, Mocks.MOCK_PROJECTS);
     }
   }
 
@@ -319,14 +389,16 @@ export class DataService {
     try {
       const endpoint =
         `lists/getByTitle('HeroSlides')/items` +
-        `?$select=Id,Title,FileRef,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified` +
+        `?$select=Id,Title,FileLeafRef,FileRef,EncodedAbsUrl,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified` +
         `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=10`;
 
-      const items = await this._get<IHeroSlide>(this._hubUrl, endpoint, "heroslides");
-      return items && items.length > 0 ? items : Mocks.MOCK_SLIDES;
+      return await this._getWithFallback<IHeroSlide>(
+        this._hubUrl,
+        endpoint,
+        "heroslides"
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour slides hero:", e);
-      return Mocks.MOCK_SLIDES;
+      return this._onListError("slides hero", e, Mocks.MOCK_SLIDES);
     }
   }
 
@@ -339,11 +411,14 @@ export class DataService {
         `?$select=Id,Title,Tag,MissionText,IconName,MissionType,ColorClass,BgClass,SortOrder,Created,Modified` +
         `&$orderby=SortOrder asc&$top=20`;
 
-      const items = await this._get<IMission>(this._hubUrl, endpoint, "missions", 30 * 60 * 1000);
-      return items && items.length > 0 ? items : Mocks.MOCK_MISSIONS;
+      return await this._getWithFallback<IMission>(
+        this._hubUrl,
+        endpoint,
+        "missions",
+        30 * 60 * 1000
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour missions:", e);
-      return Mocks.MOCK_MISSIONS;
+      return this._onListError("missions", e, Mocks.MOCK_MISSIONS);
     }
   }
 
@@ -363,16 +438,18 @@ export class DataService {
         `&$filter=IsActive eq 1 and (Placement eq '${placement}' or Placement eq 'Les deux')` +
         `&$orderby=SortOrder asc&$top=20`;
 
-      const items = await this._get<IIndicator>(this._hubUrl, endpoint, `indicators.${placement}`);
-      return items && items.length > 0
-        ? items
-        : Mocks.MOCK_STATS.filter(
-            (s) => s.Placement === placement || s.Placement === "Les deux"
-          );
+      return await this._getWithFallback<IIndicator>(
+        this._hubUrl,
+        endpoint,
+        `indicators.${placement}`
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour indicateurs:", e);
-      return Mocks.MOCK_STATS.filter(
-        (s) => s.Placement === placement || s.Placement === "Les deux"
+      return this._onListError(
+        "indicateurs",
+        e,
+        Mocks.MOCK_STATS.filter(
+          (s) => s.Placement === placement || s.Placement === "Les deux"
+        )
       );
     }
   }
@@ -413,17 +490,19 @@ export class DataService {
         `&$filter=IsActive eq 1${divisionFilter}` +
         `&$orderby=HierarchyLevel asc,SortOrder asc&$top=500`;
 
-      const items = await this._get<ICollaborateur>(
+      return await this._getWithFallback<ICollaborateur>(
         this._hubUrl,
         endpoint,
         `collaborateurs.${division || "all"}`
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_COLLABORATORS;
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour collaborateurs:", e);
-      return division
-        ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
-        : Mocks.MOCK_COLLABORATORS;
+      return this._onListError(
+        "collaborateurs",
+        e,
+        division
+          ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
+          : Mocks.MOCK_COLLABORATORS
+      );
     }
   }
 
@@ -470,15 +549,26 @@ export class DataService {
     try {
       const endpoint =
         `lists/getByTitle('Galerie')/items` +
-        `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
+        `?$select=Id,Title,FileLeafRef,FileRef,EncodedAbsUrl,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
         `&$filter=FSObjType eq 0` +
         `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
 
-      const items = await this._get<IGalleryImage>(this._hubUrl, endpoint, `gallery.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_GALLERY.slice(0, top);
+      try {
+        return await this._getWithFallback<IGalleryImage>(
+          this._hubUrl,
+          endpoint,
+          `gallery.${top}`
+        );
+      } catch (_first) {
+        const withoutAbs = endpoint.replace(/,?EncodedAbsUrl,?/, ",");
+        return await this._getWithFallback<IGalleryImage>(
+          this._hubUrl,
+          withoutAbs,
+          `gallery.${top}`
+        );
+      }
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour galerie:", e);
-      return Mocks.MOCK_GALLERY.slice(0, top);
+      return this._onListError("galerie", e, Mocks.MOCK_GALLERY.slice(0, top));
     }
   }
 
@@ -508,16 +598,16 @@ export class DataService {
         `?$select=${select}&$expand=Employee,Department` +
         `&$filter=IsCurrent eq 1&$orderby=PeriodStart desc&$top=1`;
 
-      const items = await this._get<IEmployeeOfMonth>(
+      const items = await this._getWithFallback<IEmployeeOfMonth>(
         this._hubUrl,
         endpoint,
         "employeeOfMonth"
       );
 
-      return items && items.length > 0 ? items[0] : Mocks.MOCK_EMPLOYEE;
+      return items && items.length > 0 ? items[0] : undefined;
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour collaborateur du mois:", e);
-      return Mocks.MOCK_EMPLOYEE;
+      console.warn("[DataService] collaborateur du mois:", e);
+      return this._useMocks ? Mocks.MOCK_EMPLOYEE : undefined;
     }
   }
 
@@ -550,11 +640,14 @@ export class DataService {
         `?$select=Id,Title,Year,Quarter,MilestoneDescription,MilestoneImage,IconName,Tag,TagColorClass,Side,Stat1Label,Stat1Value,Stat2Label,Stat2Value,SortOrder,Created,Modified` +
         `&$orderby=SortOrder asc&$top=50`;
 
-      const items = await this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
-      return items && items.length > 0 ? items : Mocks.MOCK_MILESTONES;
+      return await this._getWithFallback<IMilestone>(
+        this._hubUrl,
+        endpoint,
+        "milestones",
+        30 * 60 * 1000
+      );
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour histoire:", e);
-      return Mocks.MOCK_MILESTONES;
+      return this._onListError("histoire", e, Mocks.MOCK_MILESTONES);
     }
   }
 
@@ -576,15 +669,13 @@ export class DataService {
         `&$filter=IsActive eq 1${categoryFilter}` +
         `&$orderby=SortOrder asc&$top=100`;
 
-      const items = await this._get<IFaqItem>(
+      return await this._getWithFallback<IFaqItem>(
         this._hubUrl,
         endpoint,
         `faq.${category || "all"}`
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_FAQ;
     } catch (e) {
-      console.warn("[DataService] Fallback mock pour FAQ:", e);
-      return Mocks.MOCK_FAQ;
+      return this._onListError("FAQ", e, Mocks.MOCK_FAQ);
     }
   }
 

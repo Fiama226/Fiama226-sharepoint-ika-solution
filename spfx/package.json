@@ -1,6 +1,6 @@
 {
   "name": "ika-intranet",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "main": "lib/index.js",
   "engines": {
@@ -17,7 +17,7 @@
     "start": "heft start --clean",
     "test": "heft test --production",
     "trust-cert": "heft trust-dev-cert",
-    "validate": "node config/validate.js"
+    "validate": "node config/validate.js && node config/run-unit-tests.js"
   },
   "dependencies": {
     "@microsoft/sp-application-base": "1.23.2",

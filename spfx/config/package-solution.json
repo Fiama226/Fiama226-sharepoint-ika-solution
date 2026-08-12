@@ -3,7 +3,7 @@
   "solution": {
     "name": "ika-intranet-client-side-solution",
     "id": "3e9a7c15-4b28-4d6f-91a3-5c7e8f0b2d64",
-    "version": "1.0.1.0",
+    "version": "1.0.2.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

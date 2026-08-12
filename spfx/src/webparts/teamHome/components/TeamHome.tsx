@@ -71,7 +71,10 @@ function isBirthdaySoon(dateStr: string | undefined): boolean {
 }
 
 function personPhoto(person: ICollaborateur): string {
-  if (person.Photo) return buildImageUrl(person.Photo, 600);
+  if (person.Photo) {
+    const fromList = buildImageUrl(person.Photo, 600);
+    if (fromList) return fromList;
+  }
   return buildUserPhotoUrl(person.Email, "L");
 }
 

@@ -14,6 +14,11 @@ export declare abstract class BaseClientSideWebPart<TProps> {
   protected properties: TProps;
   protected domElement: HTMLElement;
   protected onInit(): Promise<void>;
+  protected onPropertyPaneFieldChanged(
+    propertyPath: string,
+    oldValue: unknown,
+    newValue: unknown
+  ): void;
   protected onDispose(): void;
   protected get dataVersion(): Version;
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration;
