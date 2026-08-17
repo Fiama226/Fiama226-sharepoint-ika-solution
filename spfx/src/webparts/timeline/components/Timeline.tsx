@@ -18,10 +18,93 @@ const VALUE_STYLES = [
 
 const STAT_ICONS = ["Users", "Globe", "Code2", "Star", "Calendar", "Award"];
 
+const HISTORY_VALUES: ITimelineProps["values"] = [
+  {
+    Id: -1,
+    Title: "Excellence Technique",
+    Tag: "",
+    MissionText: "Chaque ligne de code reflète notre obsession de la qualité et du détail.",
+    IconName: "Code2",
+    MissionType: "Valeur",
+    SortOrder: 1,
+    Created: "2026-01-01",
+    Modified: "2026-01-01",
+  },
+  {
+    Id: -2,
+    Title: "Passion & Engagement",
+    Tag: "",
+    MissionText: "Nous mettons notre cœur dans chaque projet, chaque client, chaque défi.",
+    IconName: "Heart",
+    MissionType: "Valeur",
+    SortOrder: 2,
+    Created: "2026-01-01",
+    Modified: "2026-01-01",
+  },
+  {
+    Id: -3,
+    Title: "Esprit d'équipe",
+    Tag: "",
+    MissionText: "Notre force réside dans la diversité et la complémentarité de nos talents.",
+    IconName: "Users",
+    MissionType: "Valeur",
+    SortOrder: 3,
+    Created: "2026-01-01",
+    Modified: "2026-01-01",
+  },
+  {
+    Id: -4,
+    Title: "Impact africain",
+    Tag: "",
+    MissionText: "Nous croyons au potentiel du numérique pour transformer l'Afrique.",
+    IconName: "Globe",
+    MissionType: "Valeur",
+    SortOrder: 4,
+    Created: "2026-01-01",
+    Modified: "2026-01-01",
+  },
+];
+
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1600&q=80";
 const STATS_BG_IMAGE =
   "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1600&q=80";
+
+const MILESTONE_IMAGE_BY_YEAR: Record<string, string> = {
+  "2015": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+  "2016": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+  "2018": "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
+  "2020": "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80",
+  "2022": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80",
+  "2024": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+  "2026": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+};
+
+const TAG_STYLE: Record<string, string> = {
+  "bg-violet-100": "ika-bg-violet-100",
+  "text-violet-700": "ika-text-violet-700",
+  "bg-amber-100": "ika-bg-amber-100",
+  "text-amber-700": "ika-text-amber-700",
+  "bg-blue-100": "ika-bg-blue-100",
+  "text-blue-700": "ika-text-blue-700",
+  "bg-emerald-100": "ika-bg-emerald-100",
+  "text-emerald-700": "ika-text-emerald-700",
+  "bg-rose-100": "ika-bg-rose-100",
+  "text-rose-700": "ika-text-rose-700",
+  "bg-brand-accent/10": "ika-bg-brand-accent/10",
+  "text-brand-accent": "ika-text-brand-accent",
+};
+
+function tagStyle(value: string | undefined): string {
+  if (!value) return "ika-bg-slate-100 ika-text-slate-700";
+  const classes = value
+    .split(/\s+/)
+    .map((token) => TAG_STYLE[token] || (token.indexOf("ika-") === 0 ? token : ""))
+    .filter(Boolean);
+  return classes.length > 0
+    ? classes.join(" ")
+    : "ika-bg-slate-100 ika-text-slate-700";
+}
 
 const FOUNDER_AVATAR = "/SiteAssets/team/DG.jpg";
 
@@ -128,7 +211,7 @@ const Founders: React.FC = () => (
           <div className="ika-flex ika-items-start ika-gap-6">
             <div className="ika-h-20 ika-w-20 ika-shrink-0 ika-overflow-hidden ika-rounded-2xl ika-border-2 ika-border-brand-accent/30 ika-shadow-md">
               <img
-                src={FOUNDER_AVATAR}
+                src={buildImageUrl(FOUNDER_AVATAR)}
                 alt="YAYA Ouattara"
                 className="ika-h-full ika-w-full ika-object-cover ika-object-top"
               />
@@ -178,14 +261,16 @@ const MilestoneCard: React.FC<{
       )}
     >
       <div className="ika-relative ika-h-52 ika-overflow-hidden">
-        {item.MilestoneImage ? (
-          <img
-            src={buildImageUrl(item.MilestoneImage, 800)}
-            alt={item.Title}
-            loading="lazy"
-            className="ika-h-full ika-w-full ika-object-cover ika-transition-transform ika-duration-500 group-hover:ika-scale-105"
-          />
-        ) : null}
+        <img
+          src={
+            item.MilestoneImage
+              ? buildImageUrl(item.MilestoneImage, 800)
+              : MILESTONE_IMAGE_BY_YEAR[item.Year] || HERO_IMAGE
+          }
+          alt={item.Title}
+          loading="lazy"
+          className="ika-h-full ika-w-full ika-object-cover ika-transition-transform ika-duration-500 group-hover:ika-scale-105"
+        />
         <div className="ika-absolute ika-inset-0 ika-bg-gradient-to-t ika-from-black/60 ika-to-transparent" />
 
         <div className="ika-absolute ika-left-4 ika-top-4 ika-rounded-xl ika-bg-black/50 ika-px-3 ika-py-1.5 ika-backdrop-blur-sm">
@@ -203,7 +288,7 @@ const MilestoneCard: React.FC<{
           <span
             className={cn(
               "ika-rounded-full ika-px-3 ika-py-1 ika-text-[10px] ika-font-bold ika-uppercase ika-tracking-widest",
-              item.TagColorClass || "ika-bg-slate-100 ika-text-slate-700"
+              tagStyle(item.TagColorClass)
             )}
           >
             {item.Tag}
@@ -471,8 +556,7 @@ const VisionCta: React.FC = () => (
 );
 
 export const Timeline: React.FC<ITimelineProps> = (props) => {
-  const { milestones, values, stats, loading, error, showValues, showStats } =
-    props;
+  const { milestones, stats, loading, error, showValues, showStats } = props;
 
   if (loading) {
     return (
@@ -509,7 +593,7 @@ export const Timeline: React.FC<ITimelineProps> = (props) => {
         <Hero stats={stats} />
         <Founders />
         <TimelineSection milestones={milestones} />
-        {showValues ? <Values values={values} /> : null}
+        {showValues ? <Values values={HISTORY_VALUES} /> : null}
         {showStats ? <FullStats stats={stats} /> : null}
         <VisionCta />
       </main>

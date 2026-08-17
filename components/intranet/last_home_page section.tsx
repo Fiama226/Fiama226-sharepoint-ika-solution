@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Award,
   Star,
@@ -8,7 +7,6 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  Users,
   Briefcase,
 } from "lucide-react";
 import type {
@@ -195,7 +193,7 @@ function EmployeeCardA({ employee }: { employee: HomeEmployeeOfMonth }) {
         {/* Header */}
         <div className="mb-8 flex flex-wrap items-center gap-3">
           <Award size={26} className="text-amber-400" />
-          <h2 className="text-3xl font-extrabold tracking-tight text-#0a0a0a">
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
             Collaborateur du mois
           </h2>
           <span className="ml-auto rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1 text-xs font-bold text-amber-300">
@@ -272,7 +270,6 @@ function EmployeeCardA({ employee }: { employee: HomeEmployeeOfMonth }) {
 export default function IntranetSections({
   employee,
   projects,
-  departments,
 }: IntranetSectionsProps) {
   return (
     <div className="bg-white">

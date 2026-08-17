@@ -36,6 +36,16 @@ export function buildImageUrl(
     path = `/${path}`;
   }
 
+  if (path.startsWith("/SiteAssets/") && typeof window !== "undefined") {
+    const pageContext = (
+      window as unknown as {
+        _spPageContextInfo?: { webServerRelativeUrl?: string };
+      }
+    )._spPageContextInfo;
+    const webPath = (pageContext?.webServerRelativeUrl || "").replace(/\/$/, "");
+    if (webPath && webPath !== "/") path = `${webPath}${path}`;
+  }
+
   if (!width) return path;
 
   const isDirectUrl = /^https?:\/\//i.test(path) || path.includes("/_api/");
@@ -73,7 +83,7 @@ export function formatDate(iso: string | undefined): string {
   const date = new Date(iso);
   if (isNaN(date.getTime())) return "";
   return date.toLocaleDateString("fr-FR", {
-    day: "2-digit",
+    day: "numeric",
     month: "long",
     year: "numeric",
   });

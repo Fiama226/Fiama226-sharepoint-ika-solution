@@ -17,7 +17,8 @@
     "start": "heft start --clean",
     "test": "heft test --production",
     "trust-cert": "heft trust-dev-cert",
-    "validate": "node config/validate.js"
+    "validate": "node config/validate.js",
+    "validate:design": "node config/validate-design-parity.js"
   },
   "dependencies": {
     "@microsoft/sp-application-base": "1.23.2",

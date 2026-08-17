@@ -32,7 +32,7 @@ const ICON_BY_SLUG: Record<string, string> = {
   "annonces": "megaphone",
   "documents": "FolderOpen",
   "comptabilite": "Calculator",
-  "administration": "ShieldCheck",
+  "administration": "Shield",
   "commerciaux": "Users",
   "techniciens": "Settings",
   "organigramme": "GitBranch",
@@ -53,15 +53,15 @@ const ICON_BY_SLUG: Record<string, string> = {
 export const STATIC_PRIMARY_NAV: INavNode[] = [
   { key: "accueil", label: "Accueil", url: "#accueil", iconName: "Home" },
   { key: "comptabilite", label: "Comptabilité", url: "#documents", iconName: "Calculator" },
-  { key: "administration", label: "Administration", url: "#documents", iconName: "ShieldCheck" },
+  { key: "administration", label: "Administration", url: "#documents", iconName: "Shield" },
   { key: "commerciaux", label: "Commerciaux", url: "#documents", iconName: "Users" },
   { key: "techniciens", label: "Techniciens", url: "#documents", iconName: "Wrench" },
 ];
 
 export const STATIC_SECONDARY_NAV: INavNode[] = [
   { key: "organigramme", label: "Organigramme", url: "#organigramme", iconName: "GitBranch" },
-  { key: "agenda", label: "Agenda", url: "#evenements", iconName: "calendar" },
-  { key: "histoire", label: "Histoire", url: "#histoire", iconName: "book" },
+  { key: "agenda", label: "Agenda", url: "#evenements", iconName: "Calendar" },
+  { key: "histoire", label: "Histoire", url: "#histoire", iconName: "BookOpen" },
 ];
 
 export class NavigationService {

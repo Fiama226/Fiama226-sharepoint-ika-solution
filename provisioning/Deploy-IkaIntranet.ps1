@@ -180,6 +180,25 @@ function Upload-FileToLibrary {
     }
 }
 
+function ConvertTo-ModernImageValue {
+    param(
+        [object]$File,
+        [string]$FieldName = "Photo"
+    )
+    if (-not $File) { return "" }
+    Get-PnPProperty -ClientObject $File -Property Name, ServerRelativeUrl, UniqueId | Out-Null
+    $web = Get-PnPWeb -Includes Url
+    $authority = ([Uri]$web.Url).GetLeftPart([System.UriPartial]::Authority)
+    return (@{
+        type              = "thumbnail"
+        fileName          = $File.Name
+        fieldName         = $FieldName
+        serverUrl         = $authority
+        serverRelativeUrl = $File.ServerRelativeUrl
+        id                = $File.UniqueId.ToString()
+    } | ConvertTo-Json -Compress)
+}
+
 # ─────────────────────────────────────────────────────────────────────
 # 1. LISTES DU HUB
 # ─────────────────────────────────────────────────────────────────────
@@ -304,6 +323,7 @@ Ensure-Field -ListTitle "HeroSlides" -DisplayName "EndDate" -InternalName "EndDa
 Ensure-Field -ListTitle "HeroSlides" -DisplayName "AltText" -InternalName "AltText" -Type Text
 
 # ── LiensRapides ────────────────────────────────────────────────────
+Ensure-Field -ListTitle "LiensRapides" -DisplayName "Scope" -InternalName "Scope" -Type Text -Required
 Ensure-Field -ListTitle "LiensRapides" -DisplayName "LinkUrl" -InternalName "LinkUrl" -Type URL -Required
 Ensure-Field -ListTitle "LiensRapides" -DisplayName "LinkDescription" -InternalName "LinkDescription" -Type Text
 Ensure-Field -ListTitle "LiensRapides" -DisplayName "IconName" -InternalName "IconName" -Type Text -Required
@@ -317,8 +337,11 @@ Ensure-Field -ListTitle "LiensRapides" -DisplayName "IsActive" -InternalName "Is
 # ── Evenements (calendrier) ─────────────────────────────────────────
 # EventDate/EndDate/fAllDayEvent existent déjà sur un Calendrier
 Ensure-Field -ListTitle "Evenements" -DisplayName "Location" -InternalName "Location" -Type Text
+Ensure-Field -ListTitle "Evenements" -DisplayName "DisplayDate" -InternalName "DisplayDate" -Type Text
+Ensure-Field -ListTitle "Evenements" -DisplayName "DisplayMonth" -InternalName "DisplayMonth" -Type Text
+Ensure-Field -ListTitle "Evenements" -DisplayName "DisplayDay" -InternalName "DisplayDay" -Type Text
 Ensure-Field -ListTitle "Evenements" -DisplayName "EventCategory" -InternalName "EventCategory" -Type Choice `
-    -Choices @("Entreprise","Réunion","Formation","Échéance","RH","Maintenance","Astreinte","Événement","Célébration","Séminaire","Autre")
+    -Choices @("Stratégie","Tech","Innovation","SecOps","Entreprise","Réunion","Formation","Échéance","RH","Maintenance","Astreinte","Événement","Célébration","Séminaire","Autre")
 Ensure-Field -ListTitle "Evenements" -DisplayName "EventDescription" -InternalName "EventDescription" -Type Note
 Ensure-Field -ListTitle "Evenements" -DisplayName "EventImage" -InternalName "EventImage" -Type Image
 Ensure-Field -ListTitle "Evenements" -DisplayName "RegistrationLink" -InternalName "RegistrationLink" -Type URL
@@ -334,7 +357,7 @@ Ensure-Field -ListTitle "Documents" -DisplayName "DocDescription" -InternalName 
 Ensure-Field -ListTitle "Documents" -DisplayName "Confidentiality" -InternalName "Confidentiality" -Type Choice `
     -Choices @("Public","Interne","Confidentiel") -Required
 Ensure-Field -ListTitle "Documents" -DisplayName "ExpiryDate" -InternalName "ExpiryDate" -Type DateTime
-Ensure-Field -ListTitle "Documents" -DisplayName "DocOwner" -InternalName "DocOwner" -Type User -Required
+Ensure-Field -ListTitle "Documents" -DisplayName "DocOwner" -InternalName "DocOwner" -Type User
 Ensure-Field -ListTitle "Documents" -DisplayName "IsPinned" -InternalName "IsPinned" -Type Boolean `
     -DefaultValue "0"
 Ensure-Field -ListTitle "Documents" -DisplayName "BusinessVersion" -InternalName "BusinessVersion" -Type Text
@@ -395,6 +418,7 @@ Ensure-Field -ListTitle "Annonces" -DisplayName "AnnouncementDate" -InternalName
 Ensure-Field -ListTitle "Annonces" -DisplayName "DisplayUntil" -InternalName "DisplayUntil" -Type DateTime -Required
 Ensure-Field -ListTitle "Annonces" -DisplayName "Priority" -InternalName "Priority" -Type Choice `
     -Choices @("Basse","Normale","Haute")
+Ensure-Field -ListTitle "Annonces" -DisplayName "SortOrder" -InternalName "SortOrder" -Type Number -Required
 
 Write-Host "    colonne: RelatedPerson [Lookup->Collaborateurs]" -NoNewline
 try {
@@ -601,9 +625,15 @@ foreach ($lib in @("Documents_Comptabilite","Documents_Administration","Document
     Ensure-Field -ListTitle $lib -DisplayName "Confidentiality" -InternalName "Confidentiality" -Type Choice `
         -Choices @("Public","Interne","Confidentiel") -Required
     Ensure-Field -ListTitle $lib -DisplayName "ExpiryDate" -InternalName "ExpiryDate" -Type DateTime
-    Ensure-Field -ListTitle $lib -DisplayName "DocOwner" -InternalName "DocOwner" -Type User -Required
+    Ensure-Field -ListTitle $lib -DisplayName "DocOwner" -InternalName "DocOwner" -Type User
     Ensure-Field -ListTitle $lib -DisplayName "IsPinned" -InternalName "IsPinned" -Type Boolean -DefaultValue "0"
     Ensure-Field -ListTitle $lib -DisplayName "BusinessVersion" -InternalName "BusinessVersion" -Type Text
+}
+
+if (-not $DryRun) {
+    foreach ($lib in @("Documents","Documents_Comptabilite","Documents_Administration","Documents_Commerciaux","Documents_Techniciens")) {
+        Set-PnPField -List $lib -Identity "DocOwner" -Values @{ Required = $false } | Out-Null
+    }
 }
 
 Write-Ok "Toutes les colonnes créées."
@@ -649,23 +679,83 @@ if (-not $SkipDataImport) {
     # Missions (3 lignes)
     Import-CsvToList -CsvPath (Join-Path $csvDir "Missions.csv") -ListTitle "Missions"
 
-    # Indicateurs (3 lignes)
+    # Indicateurs (3 accueil + 6 histoire)
     Import-CsvToList -CsvPath (Join-Path $csvDir "Indicateurs.csv") -ListTitle "Indicateurs"
 
     # ParametresSite (15 clés)
     Import-CsvToList -CsvPath (Join-Path $csvDir "ParametresSite.csv") -ListTitle "ParametresSite"
 
-    # LiensRapides (30 lignes — scope inclus)
+    # LiensRapides (10 globaux + 24 départementaux)
     Import-CsvToList -CsvPath (Join-Path $csvDir "LiensRapides.csv") -ListTitle "LiensRapides"
 
-    # Collaborateurs (28 lignes)
+    # Collaborateurs (8 profils maquette actifs + 20 profils archivés)
     Import-CsvToList -CsvPath (Join-Path $csvDir "Collaborateurs.csv") -ListTitle "Collaborateurs"
+
+    if (-not $DryRun) {
+        $collaboratorItems = Get-PnPListItem -List "Collaborateurs" -Fields "ID", "Title", "Division"
+        $collaboratorByTitle = @{}
+        foreach ($item in $collaboratorItems) {
+            $collaboratorByTitle[$item["Title"]] = $item
+        }
+
+        $managerLinks = @{
+            "Sandrine Tiahoun KINI"      = "YAYA Ouattara"
+            "SERGE GEDEON OUE"           = "YAYA Ouattara"
+            "Daouda DAO"                 = "SERGE GEDEON OUE"
+            "Tegawende Martin YAMEOGO"   = "SERGE GEDEON OUE"
+            "Aminata HEMA"               = "YAYA Ouattara"
+            "Roukiatou OUEDRAOGO"        = "YAYA Ouattara"
+            "Victorine BAZEMO"           = "Roukiatou OUEDRAOGO"
+        }
+        $departmentSlugByDivision = @{
+            "Direction Générale" = "administration"
+            "Engineering"        = "techniciens"
+            "Comptabilité"       = "comptabilite"
+            "Ventes & Marketing" = "commerciaux"
+        }
+        $departmentItems = Get-PnPListItem -List "Departements" -Fields "ID", "Slug"
+        $departmentBySlug = @{}
+        foreach ($department in $departmentItems) {
+            $departmentBySlug[$department["Slug"]] = $department
+        }
+
+        foreach ($childName in $managerLinks.Keys) {
+            $child = $collaboratorByTitle[$childName]
+            $manager = $collaboratorByTitle[$managerLinks[$childName]]
+            if ($child -and $manager) {
+                Set-PnPListItem -List "Collaborateurs" -Identity $child.Id -Values @{ Manager = $manager.Id } | Out-Null
+            }
+        }
+        foreach ($collaborator in $collaboratorItems) {
+            $slug = $departmentSlugByDivision[$collaborator["Division"]]
+            $department = $departmentBySlug[$slug]
+            if ($department) {
+                Set-PnPListItem -List "Collaborateurs" -Identity $collaborator.Id -Values @{ Department = $department.Id } | Out-Null
+            }
+        }
+        Write-Ok "hiérarchie et départements des collaborateurs liés"
+    }
 
     # Annonces (4 lignes)
     Import-CsvToList -CsvPath (Join-Path $csvDir "Annonces.csv") -ListTitle "Annonces"
 
-    # CollaborateurDuMois (1 ligne — Employee/Department à lier après import)
+    # CollaborateurDuMois (1 ligne)
     Import-CsvToList -CsvPath (Join-Path $csvDir "CollaborateurDuMois.csv") -ListTitle "CollaborateurDuMois"
+
+    if (-not $DryRun) {
+        $serge = Get-PnPListItem -List "Collaborateurs" -Fields "ID", "Title" | Where-Object { $_["Title"] -eq "SERGE GEDEON OUE" } | Select-Object -First 1
+        $engineering = Get-PnPListItem -List "Departements" -Fields "ID", "Title", "Slug" | Where-Object { $_["Slug"] -eq "techniciens" } | Select-Object -First 1
+        $currentEmployee = Get-PnPListItem -List "CollaborateurDuMois" -Fields "ID", "IsCurrent" | Where-Object { $_["IsCurrent"] -eq $true } | Select-Object -First 1
+        if ($serge -and $engineering -and $currentEmployee) {
+            Set-PnPListItem -List "CollaborateurDuMois" -Identity $currentEmployee.Id -Values @{
+                Employee   = $serge.Id
+                Department = $engineering.Id
+            } | Out-Null
+            Write-Ok "Collaborateur du mois lié à SERGE GEDEON OUE"
+        } else {
+            Write-Warn "Lookup CollaborateurDuMois non lié : vérifiez Collaborateurs, Departements et IsCurrent."
+        }
+    }
 
     # Projets (4 lignes)
     Import-CsvToList -CsvPath (Join-Path $csvDir "Projets.csv") -ListTitle "Projets"
@@ -728,6 +818,7 @@ if (-not $SkipImages) {
     $galleryDir = Join-Path $env:TEMP "ika-gallery"
     if (-not (Test-Path $galleryDir)) { New-Item -ItemType Directory -Path $galleryDir -Force | Out-Null }
 
+    $uploadedGalleryFiles = @{}
     foreach ($g in $galleryUrls) {
         $fileName = "gallery_$($g.SortOrder).jpg"
         $localPath = Join-Path $galleryDir $fileName
@@ -748,32 +839,88 @@ if (-not $SkipImages) {
             SortOrder      = $g.SortOrder
             Title          = $g.Caption
         }
-        Upload-FileToLibrary -LibraryName "Galerie" -LocalPath $localPath -Metadata $meta
+        $galleryFile = Upload-FileToLibrary -LibraryName "Galerie" -LocalPath $localPath -Metadata $meta
+        if ($galleryFile) {
+            $uploadedGalleryFiles[$g.Caption] = $galleryFile
+        }
     }
 
-    # 4.3 Photos des collaborateurs (depuis public/assets/team/)
+    $eventGalleryMap = @{
+        "All Hands Tech — Q2 Review"     = "All Hands Tech — Q2 2026"
+        "Workshop Architecture Cloud"    = "Workshop Architecture Cloud"
+        "Demo Day — Projets IA"          = "Demo Day — Projets IA"
+        "Revue Cybersécurité S1"         = "Audit Cybersécurité S1"
+    }
+    if (-not $DryRun) {
+        foreach ($eventTitle in $eventGalleryMap.Keys) {
+            $eventItem = Get-PnPListItem -List "Evenements" -Fields "ID", "Title" | Where-Object { $_["Title"] -eq $eventTitle } | Select-Object -First 1
+            $eventFile = $uploadedGalleryFiles[$eventGalleryMap[$eventTitle]]
+            if ($eventItem -and $eventFile) {
+                $eventImageValue = ConvertTo-ModernImageValue -File $eventFile -FieldName "EventImage"
+                Set-PnPListItem -List "Evenements" -Identity $eventItem.Id -Values @{ EventImage = $eventImageValue } | Out-Null
+            }
+        }
+        Write-Ok "images des événements liées à la galerie"
+
+        $newsGalleryMap = @{
+            "Nouvelle plateforme DevOps disponible"              = "Déploiement Infrastructure AWS"
+            "Lancement du programme de certification Cloud"      = "Workshop Architecture Cloud"
+            "Mise à jour de la politique cybersécurité"          = "Audit Cybersécurité S1"
+            "Roadmap IA et automatisation 2026"                  = "Demo Day — Projets IA"
+        }
+        foreach ($newsTitle in $newsGalleryMap.Keys) {
+            $newsItem = Get-PnPListItem -List "Actualites" -Fields "ID", "Title" | Where-Object { $_["Title"] -eq $newsTitle } | Select-Object -First 1
+            $newsFile = $uploadedGalleryFiles[$newsGalleryMap[$newsTitle]]
+            if ($newsItem -and $newsFile) {
+                $newsImageValue = ConvertTo-ModernImageValue -File $newsFile -FieldName "HeaderImage"
+                Set-PnPListItem -List "Actualites" -Identity $newsItem.Id -Values @{ HeaderImage = $newsImageValue } | Out-Null
+            }
+        }
+        Write-Ok "images des actualités liées à la galerie"
+    }
+
+    # 4.3 Assets du portail et photos des collaborateurs
+    $logoPath = Join-Path $imageDir "logo.png"
+    if (Test-Path $logoPath) {
+        Upload-FileToLibrary -LibraryName "SiteAssets" -LocalPath $logoPath -Metadata @{}
+    } else {
+        Write-Warn "Logo introuvable: $logoPath"
+    }
+
     $teamPhotos = @(
-        @{ Name = "DG.jpg";      Collaborateur = "YAYA Ouattara" },
-        @{ Name = "serge.jpg";   Collaborateur = "SERGE GEDEON OUE" },
-        @{ Name = "daouda.jpg";  Collaborateur = "Daouda DAO" },
-        @{ Name = "sandrine.jpg";Collaborateur = "Sandrine Tiahoun KINI" },
-        @{ Name = "Martin.jpg";  Collaborateur = "Tegawende Martin YAMEOGO" },
-        @{ Name = "roukie.jpg";  Collaborateur = "Roukiatou OUEDRAOGO" },
-        @{ Name = "victorine.jpg";Collaborateur = "Victorine BAZEMO" },
-        @{ Name = "aminata.jpg"; Collaborateur = "Aminata HEMA" }
+        @{ Name = "12-Modifier.jpg" },
+        @{ Name = "13-Modifier.jpg" },
+        @{ Name = "14-Modifier.jpg" },
+        @{ Name = "DG.jpg";       Collaborateur = "YAYA Ouattara" },
+        @{ Name = "Serge.jpg";    Collaborateur = "SERGE GEDEON OUE" },
+        @{ Name = "Daouda.jpg";   Collaborateur = "Daouda DAO" },
+        @{ Name = "SANDRINE.jpg"; Collaborateur = "Sandrine Tiahoun KINI" },
+        @{ Name = "Martin.jpg";   Collaborateur = "Tegawende Martin YAMEOGO" },
+        @{ Name = "Roukie.jpg";   Collaborateur = "Roukiatou OUEDRAOGO" },
+        @{ Name = "Victorine.jpg";Collaborateur = "Victorine BAZEMO" },
+        @{ Name = "aminata.jpg";  Collaborateur = "Aminata HEMA" }
     )
 
-    $photoLib = "PhotosCollaborateurs"
-    if (-not (Get-PnPList -Identity $photoLib -ErrorAction SilentlyContinue)) {
-        New-PnPList -Title $photoLib -TemplateType 101 | Out-Null
+    $photoFolder = "SiteAssets/team"
+    if (-not $DryRun) {
+        Resolve-PnPFolder -SiteRelativePath $photoFolder | Out-Null
     }
+    $uploadedTeamFiles = @{}
 
     foreach ($tp in $teamPhotos) {
         $src = Join-Path $imageDir "team\$($tp.Name)"
         if (Test-Path $src) {
-            $item = Upload-FileToLibrary -LibraryName $photoLib -LocalPath $src -Metadata @{ Title = $tp.Collaborateur }
-            if ($item) {
-                Write-Ok "photo $($tp.Name) uploadée pour $($tp.Collaborateur)"
+            $file = Upload-FileToLibrary -LibraryName $photoFolder -LocalPath $src -Metadata @{}
+            if ($file -and $tp.Collaborateur) {
+                $uploadedTeamFiles[$tp.Collaborateur] = $file
+                $collaborator = Get-PnPListItem -List "Collaborateurs" -Fields "ID", "Title" | Where-Object { $_["Title"] -eq $tp.Collaborateur } | Select-Object -First 1
+                if ($collaborator) {
+                    $imageValue = ConvertTo-ModernImageValue -File $file -FieldName "Photo"
+                    Set-PnPListItem -List "Collaborateurs" -Identity $collaborator.Id -Values @{ Photo = $imageValue } | Out-Null
+                    Write-Ok "photo $($tp.Name) liée à $($tp.Collaborateur)"
+                } else {
+                    Write-Warn "Collaborateur introuvable pour la photo: $($tp.Collaborateur)"
+                }
             }
         } else {
             Write-Warn "Photo introuvable: $src"
@@ -781,21 +928,24 @@ if (-not $SkipImages) {
     }
 
     # 4.4 CollaborateurDuMois — photo Serge
-    $cdmPhoto = Join-Path $imageDir "team\Serge.jpg"
-    if (Test-Path $cdmPhoto) {
-        $cdmItem = Get-PnPListItem -List "CollaborateurDuMois" -Fields "ID" -ErrorAction SilentlyContinue
+    $sergeFile = $uploadedTeamFiles["SERGE GEDEON OUE"]
+    if ($sergeFile) {
+        $cdmItem = Get-PnPListItem -List "CollaborateurDuMois" -Fields "ID", "IsCurrent" | Where-Object { $_["IsCurrent"] -eq $true } | Select-Object -First 1
         if ($cdmItem) {
-            $cdmItem = Upload-FileToLibrary -LibraryName "CollaborateurDuMois" -LocalPath $cdmPhoto `
-                -Metadata @{ Title = "Collaborateur du mois — Juin 2026" }
+            $cdmImageValue = ConvertTo-ModernImageValue -File $sergeFile -FieldName "Photo"
+            Set-PnPListItem -List "CollaborateurDuMois" -Identity $cdmItem.Id -Values @{ Photo = $cdmImageValue } | Out-Null
+            Write-Ok "photo du collaborateur du mois liée à Serge.jpg"
         }
     }
 
-    # 4.5 Fichiers placeholder pour Documents (globaux) + 4 bibliothèques départementales
+    # 4.5 Fichiers placeholder pour Documents (6 globaux) + 4 bibliothèques départementales
     $docFiles = @(
-        @{ Name = "Charte informatique IKA Solution.pdf";       Cat = "Procédure";     Confidentiality = "Public";   Library = "Documents" },
-        @{ Name = "Guide du nouvel arrivant.docx";               Cat = "Guide";         Confidentiality = "Interne"; Library = "Documents" },
-        @{ Name = "Politique de télétravail.pdf";                Cat = "Politique";     Confidentiality = "Interne"; Library = "Documents" },
-        @{ Name = "Annuaire interne.xlsx";                       Cat = "Rapport";       Confidentiality = "Public";  Library = "Documents" },
+        @{ Name = "Charte Développement.pdf";                    Title = "Charte Développement";   Cat = "Procédure"; Confidentiality = "Interne"; Library = "Documents" },
+        @{ Name = "Architecture Patterns.pdf";                    Title = "Architecture Patterns";   Cat = "Guide";     Confidentiality = "Interne"; Library = "Documents" },
+        @{ Name = "Templates de Projets.docx";                    Title = "Templates de Projets";    Cat = "Modèle";    Confidentiality = "Interne"; Library = "Documents" },
+        @{ Name = "Processus CI-CD.pdf";                          Title = "Processus CI/CD";          Cat = "Procédure"; Confidentiality = "Interne"; Library = "Documents" },
+        @{ Name = "Politique de Dépenses.pdf";                    Title = "Politique de Dépenses";    Cat = "Politique"; Confidentiality = "Interne"; Library = "Documents" },
+        @{ Name = "Guide Cybersécurité.pdf";                      Title = "Guide Cybersécurité";      Cat = "Guide";     Confidentiality = "Interne"; Library = "Documents" },
         @{ Name = "Bilan 2025 - version finale.xlsx";           Cat = "Rapport";       Confidentiality = "Confidentiel"; Library = "Documents_Comptabilite" },
         @{ Name = "Liasse fiscale 2025.pdf";                     Cat = "Facture";       Confidentiality = "Confidentiel"; Library = "Documents_Comptabilite" },
         @{ Name = "Suivi factures fournisseurs.xlsx";           Cat = "Rapport";       Confidentiality = "Interne"; Library = "Documents_Comptabilite" },
@@ -825,11 +975,13 @@ if (-not $SkipImages) {
         if (-not (Test-Path $local)) {
             $null = New-Item -ItemType File -Path $local -Force | Out-Null
         }
+        $documentTitle = if ($doc.Title) { $doc.Title } else { $doc.Name }
+        $isPinned = if ($doc.Library -eq "Documents") { "TRUE" } else { "FALSE" }
         $meta = @{
-            Title           = $doc.Name
+            Title           = $documentTitle
             DocCategory     = $doc.Cat
             Confidentiality = $doc.Confidentiality
-            DocOwner        = "IKA Intranet"
+            IsPinned        = $isPinned
             BusinessVersion = "1.0"
         }
         Upload-FileToLibrary -LibraryName $doc.Library -LocalPath $local -Metadata $meta
@@ -849,8 +1001,8 @@ $indexColumns = @{
     "Actualites"         = @("Scope","Highlighted","PublishDate")
     "Documents"          = @("DocCategory","IsPinned")
     "Evenements"         = @("EventDate")
-    "LiensRapides"       = @("IsActive")
-    "Annonces"           = @("DisplayUntil","Priority")
+    "LiensRapides"       = @("Scope","IsActive")
+    "Annonces"           = @("SortOrder","Priority")
     "Projets"            = @("ShowOnHome")
     "HeroSlides"         = @("IsActive")
     "Indicateurs"        = @("Placement","IsActive")
@@ -907,8 +1059,8 @@ Write-Host "  PROVISIONING TERMINÉ" -ForegroundColor Cyan
 Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "  Listes créées        : $($createdLists.Count)" -ForegroundColor White
 Write-Host "  Colonnes créées      : $($createdFields.Count)" -ForegroundColor White
-Write-Host "  Images uploadées     : HeroSlides(3) + Galerie(8) + PhotosCollaborateurs(8)" -ForegroundColor White
-Write-Host "  Fichiers documents   : 23 placeholders uploadés" -ForegroundColor White
+Write-Host "  Images uploadées     : HeroSlides(3) + Galerie(8) + SiteAssets(1) + SiteAssets/team(11)" -ForegroundColor White
+Write-Host "  Fichiers documents   : 25 placeholders uploadés" -ForegroundColor White
 Write-Host "`nProchaine étape :" -ForegroundColor Yellow
 Write-Host "  1. Ajouter la Web Part 'IKA — Intranet (composant principal)' sur la page d'accueil" -ForegroundColor White
 Write-Host "  2. Passer la section en PLEINE LARGEUR" -ForegroundColor White

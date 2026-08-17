@@ -13,6 +13,7 @@ export interface IHeroSliderProps {
   loading: boolean;
   error?: string;
   heightClass: string;
+  autoPlay: boolean;
   showClock: boolean;
   showPanel: boolean;
 }

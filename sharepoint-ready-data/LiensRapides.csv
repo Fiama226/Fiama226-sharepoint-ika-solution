@@ -1,31 +1,35 @@
-﻿Scope,Title,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive
-global,Demande de congés,Formulaires RH centralisés,calendar,1,FALSE,Accueil,TRUE
-global,Annuaire interne,Rechercher un collaborateur,people,2,FALSE,Accueil,TRUE
-global,Demande de matériel,Bons de commande IT,package,3,FALSE,Accueil,TRUE
-global,Base de connaissance,Wiki & procédures,book,4,FALSE,Accueil,TRUE
-global,Tickets support IT,Demander de l'aide,lifebuoy,5,FALSE,Accueil,TRUE
-global,Organigramme,Structure des équipes,tree,6,FALSE,Accueil,TRUE
-comptabilite,Factures fournisseurs,Validation & suivi,invoice,1,FALSE,Comptabilité,TRUE
-comptabilite,Factures clients,Émission & relances,invoice,2,FALSE,Comptabilité,TRUE
-comptabilite,Déclarations fiscales,"TVA, IS, liasse fiscale",doc,3,FALSE,Comptabilité,TRUE
-comptabilite,Budget & reporting,Tableaux de bord,chart,4,FALSE,Comptabilité,TRUE
-comptabilite,Notes de frais,Saisie & validation,wallet,5,FALSE,Comptabilité,TRUE
-comptabilite,Paie,Bulletins & variables,people,6,FALSE,Comptabilité,TRUE
-administration,Demande de congés,Solde & validation,calendar,1,FALSE,Administration,TRUE
-administration,Contrats & avenants,Modèles RH,doc,2,FALSE,Administration,TRUE
-administration,Notes de service,Communications internes,megaphone,3,FALSE,Administration,TRUE
-administration,Organigramme,Structure & rattachements,tree,4,FALSE,Administration,TRUE
-administration,Bibliothèque RH,Politiques & procédures,book,5,FALSE,Administration,TRUE
-administration,Vie sociale (CSE),Événements & avantages,gift,6,FALSE,Administration,TRUE
-commerciaux,Pipeline CRM,Opportunités en cours,chart,1,FALSE,Commerciaux,TRUE
-commerciaux,Devis,Création & suivi,invoice,2,FALSE,Commerciaux,TRUE
-commerciaux,Fiches clients,Base clients,people,3,FALSE,Commerciaux,TRUE
-commerciaux,Propositions commerciales,Modèles & gabarits,doc,4,FALSE,Commerciaux,TRUE
-commerciaux,Objectifs & commissions,Suivi par commercial,target,5,FALSE,Commerciaux,TRUE
-commerciaux,Catalogue & tarifs,Grille de prix 2026,tag,6,FALSE,Commerciaux,TRUE
-techniciens,Tickets d'intervention,File & planning,lifebuoy,1,FALSE,Techniciens,TRUE
-techniciens,Base de connaissance,KB technique,book,2,FALSE,Techniciens,TRUE
-techniciens,Planning interventions,Agenda technique,calendar,3,FALSE,Techniciens,TRUE
-techniciens,Inventaire matériel,Parc & prêts,package,4,FALSE,Techniciens,TRUE
-techniciens,Procédures & runbooks,Mode opératoire,doc,5,FALSE,Techniciens,TRUE
-techniciens,Suivi projets clients,Jalons & livrables,tree,6,FALSE,Techniciens,TRUE
+﻿Scope,Title,LinkDescription,LinkUrl,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive
+global,Calcul bordereau des prix,Calculateur et devis en ligne,#bordereau,Users,1,FALSE,Outils,TRUE
+global,Demande de conges,Demande de congés,#commerciaux,Globe,2,FALSE,Outils,TRUE
+global,#,,#administration,Clock,3,FALSE,Outils,TRUE
+global,RH & Avantages,Avantages collaborateurs,#administration,Heart,4,FALSE,Ressources,TRUE
+global,Support IT,Assistance technique,#techniciens,Headphones,5,FALSE,Ressources,TRUE
+global,Base de Connaissances,Documentation et guides,#histoire,Database,6,FALSE,Ressources,TRUE
+global,Specs Techniques,Spécifications techniques,#techniciens,FileText,7,FALSE,Ressources,TRUE
+global,Outils DevOps,Outils et pipelines,#techniciens,Settings,8,FALSE,Ressources,TRUE
+global,Portail Conformité,Politiques et conformité,#comptabilite,Scale,9,FALSE,Ressources,TRUE
+global,Politique Déplacements,Politique de déplacements,#administration,Plane,10,FALSE,Ressources,TRUE
+comptabilite,Factures fournisseurs,Validation & suivi,#documents,invoice,1,FALSE,Comptabilité,TRUE
+comptabilite,Factures clients,Émission & relances,#documents,invoice,2,FALSE,Comptabilité,TRUE
+comptabilite,Déclarations fiscales,"TVA, IS, liasse fiscale",#documents,doc,3,FALSE,Comptabilité,TRUE
+comptabilite,Budget & reporting,Tableaux de bord,#documents,chart,4,FALSE,Comptabilité,TRUE
+comptabilite,Notes de frais,Saisie & validation,#documents,wallet,5,FALSE,Comptabilité,TRUE
+comptabilite,Paie,Bulletins & variables,#documents,people,6,FALSE,Comptabilité,TRUE
+administration,Demande de congés,Solde & validation,#documents,calendar,1,FALSE,Administration,TRUE
+administration,Contrats & avenants,Modèles RH,#documents,doc,2,FALSE,Administration,TRUE
+administration,Notes de service,Communications internes,#documents,megaphone,3,FALSE,Administration,TRUE
+administration,Organigramme,Structure & rattachements,#documents,tree,4,FALSE,Administration,TRUE
+administration,Bibliothèque RH,Politiques & procédures,#documents,book,5,FALSE,Administration,TRUE
+administration,Vie sociale (CSE),Événements & avantages,#documents,gift,6,FALSE,Administration,TRUE
+commerciaux,Pipeline CRM,Opportunités en cours,#documents,chart,1,FALSE,Commerciaux,TRUE
+commerciaux,Devis,Création & suivi,#documents,invoice,2,FALSE,Commerciaux,TRUE
+commerciaux,Fiches clients,Base clients,#documents,people,3,FALSE,Commerciaux,TRUE
+commerciaux,Propositions commerciales,Modèles & gabarits,#documents,doc,4,FALSE,Commerciaux,TRUE
+commerciaux,Objectifs & commissions,Suivi par commercial,#documents,target,5,FALSE,Commerciaux,TRUE
+commerciaux,Catalogue & tarifs,Grille de prix 2026,#documents,tag,6,FALSE,Commerciaux,TRUE
+techniciens,Tickets d'intervention,File & planning,#documents,lifebuoy,1,FALSE,Techniciens,TRUE
+techniciens,Base de connaissance,KB technique,#documents,book,2,FALSE,Techniciens,TRUE
+techniciens,Planning interventions,Agenda technique,#documents,calendar,3,FALSE,Techniciens,TRUE
+techniciens,Inventaire matériel,Parc & prêts,#documents,package,4,FALSE,Techniciens,TRUE
+techniciens,Procédures & runbooks,Mode opératoire,#documents,doc,5,FALSE,Techniciens,TRUE
+techniciens,Suivi projets clients,Jalons & livrables,#documents,tree,6,FALSE,Techniciens,TRUE

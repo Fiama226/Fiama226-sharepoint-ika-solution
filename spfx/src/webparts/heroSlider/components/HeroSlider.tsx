@@ -5,7 +5,7 @@ import * as React from "react";
 import { IHeroSliderProps } from "./IHeroSliderProps";
 import { useLiveClock } from "../../../common/hooks/useLiveClock";
 import { usePrefersReducedMotion } from "../../../common/hooks/usePrefersReducedMotion";
-import { cn } from "../../../common/utils/spUtils";
+import { buildImageUrl, cn } from "../../../common/utils/spUtils";
 
 const SLIDE_INTERVAL_MS = 5000;
 const MISSION_INTERVAL_MS = 6000;
@@ -86,15 +86,15 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
     loading,
     error,
     heightClass,
+    autoPlay,
     showClock,
     showPanel,
   } = props;
 
-  const [hovered, setHovered] = React.useState<boolean>(false);
   const reduced = usePrefersReducedMotion();
   const clock = useLiveClock("fr-FR");
 
-  const paused = hovered || reduced;
+  const paused = !autoPlay || reduced;
   const [slideIndex, setSlideIndex] = useRotator(
     slides.length,
     SLIDE_INTERVAL_MS,
@@ -152,8 +152,6 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
         aria-roledescription="carrousel"
         aria-label="Actualités de l'entreprise"
         className={cn("ika-relative ika-w-full ika-overflow-hidden", heightClass)}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
       >
         {slides.map((slide, index) => (
           <div
@@ -166,7 +164,7 @@ export const HeroSlider: React.FC<IHeroSliderProps> = (props) => {
             }}
           >
             <img
-              src={slide.FileRef}
+              src={buildImageUrl(slide.FileRef)}
               alt={slide.AltText || ""}
               className="ika-h-full ika-w-full ika-object-cover"
             />

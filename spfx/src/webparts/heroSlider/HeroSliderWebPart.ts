@@ -62,7 +62,8 @@ export default class HeroSliderWebPart extends BaseClientSideWebPart<IHeroSlider
         loading: this._loading,
         error: this._error,
         heightClass:
-          HEIGHT_CLASSES[this.properties.height] || HEIGHT_CLASSES.large,
+          HEIGHT_CLASSES[this.properties.height] || HEIGHT_CLASSES.screen,
+        autoPlay: true,
         showClock: this.properties.showClock !== false,
         showPanel: this.properties.showPanel !== false,
       }

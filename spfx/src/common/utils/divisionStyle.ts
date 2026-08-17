@@ -65,6 +65,12 @@ const STYLES: Record<string, IDivisionStyle> = {
   },
 };
 
+const ALIASES: Record<string, string> = {
+  "Direction Technique": "Engineering",
+  "Direction Comptabilité": "Comptabilité",
+  "Direction Commerciale": "Ventes & Marketing",
+};
+
 const FALLBACK: IDivisionStyle = {
   bg: "ika-bg-slate-50",
   text: "ika-text-slate-700",
@@ -77,7 +83,7 @@ const FALLBACK: IDivisionStyle = {
 
 export function divisionStyle(division: string | undefined): IDivisionStyle {
   if (!division) return FALLBACK;
-  return STYLES[division] || FALLBACK;
+  return STYLES[ALIASES[division] || division] || FALLBACK;
 }
 
 export function divisionNames(): string[] {

@@ -82,6 +82,9 @@ export interface IDocumentItem extends IListItemBase {
 export interface IEventItem extends IListItemBase {
   EventDate: string;
   EndDate: string;
+  DisplayDate?: string;
+  DisplayMonth?: string;
+  DisplayDay?: string;
   fAllDayEvent: boolean;
   Location?: string;
   EventCategory: string;
@@ -93,6 +96,7 @@ export interface IEventItem extends IListItemBase {
 }
 
 export interface IQuickLink extends IListItemBase {
+  Scope?: string;
   LinkUrl: ISPUrlField;
   LinkDescription?: string;
   IconName: string;
@@ -119,6 +123,10 @@ export interface IDepartement extends IListItemBase {
 
 export type Division =
   | "Direction Générale"
+  | "Direction"
+  | "Direction Technique"
+  | "Direction Comptabilité"
+  | "Direction Commerciale"
   | "Engineering"
   | "Ventes & Marketing"
   | "Comptabilité"
@@ -164,6 +172,7 @@ export interface IAnnouncement extends IListItemBase {
   DisplayUntil: string;
   RelatedPerson?: ISPLookupField;
   Priority?: "Normale" | "Haute";
+  SortOrder?: number;
 }
 
 export type ProjectStatus = "À l'heure" | "À risque" | "En retard" | "Terminé";
