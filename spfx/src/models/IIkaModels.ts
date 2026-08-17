@@ -213,8 +213,7 @@ export interface IHeroSlide extends IListItemBase {
   IsActive: boolean;
   StartDate?: string;
   EndDate?: string;
-  AltText: string;
-}
+  AltText: string;  AttachmentFiles?: Array<{ FileName?: string; ServerRelativeUrl?: string; ServerUrl?: string }>;}
 
 export interface IMission extends IListItemBase {
   Tag: string;

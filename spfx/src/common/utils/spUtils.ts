@@ -6,17 +6,46 @@ export function buildImageUrl(
   field: ISPImageField | string | undefined,
   width?: number
 ): string {
-  let path: string | undefined;
+  let parsedField: ISPImageField | string | undefined;
 
   if (typeof field === "string") {
-    path = field;
-  } else if (field) {
-    path = field.serverRelativeUrl || field.serverUrl;
+    try {
+      const json = JSON.parse(field);
+      if (json && typeof json === "object") {
+        parsedField = json as ISPImageField;
+      } else {
+        parsedField = field;
+      }
+    } catch {
+      parsedField = field;
+    }
+  } else {
+    parsedField = field;
+  }
+
+  let path: string | undefined;
+  if (typeof parsedField === "string") {
+    path = parsedField;
+  } else if (parsedField) {
+    path = parsedField.serverRelativeUrl || parsedField.serverUrl;
   }
 
   if (!path) return PERSON_PLACEHOLDER;
 
+  if (path.startsWith("sites/") || path.startsWith("_api/")) {
+    path = `/${path}`;
+  }
+
   if (!width) return path;
+
+  const isDirectUrl = /^https?:\/\//i.test(path) || path.includes("/_api/");
+  const isImageFilePath = /\.(jpg|jpeg|png|gif|svg|webp|bmp|tiff|avif)(\?.*)?$/i.test(
+    path
+  );
+
+  if (isDirectUrl || isImageFilePath) {
+    return path;
+  }
 
   return (
     "/_layouts/15/getpreview.ashx?path=" +

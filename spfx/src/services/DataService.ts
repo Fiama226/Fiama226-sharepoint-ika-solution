@@ -58,13 +58,17 @@ export class DataService {
       (window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1");
 
-    const isWorkbench =
-      this._isLocal ||
-      (typeof window !== "undefined" &&
-        /workbench/i.test(window.location.pathname)) ||
-      context.host?.hostType === "Workbench";
+    const isWorkbench = this._isLocal;
 
-    this._useMocks = isWorkbench;
+    let forceMocks = false;
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search || "");
+      forceMocks =
+        params.get("useMocks") === "1" ||
+        params.get("useMocks")?.toLowerCase() === "true";
+    }
+
+    this._useMocks = forceMocks || isWorkbench;
   }
 
   private _resolveHubUrl(): string {
@@ -143,6 +147,145 @@ export class DataService {
     return value;
   }
 
+  private static _getFirstAttachmentUrl(item: any): string | undefined {
+    const attachment = item?.AttachmentFiles?.[0];
+    return attachment?.ServerRelativeUrl || attachment?.ServerUrl;
+  }
+
+  private static _parseImageField(value: unknown): unknown {
+    if (!value) return undefined;
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && typeof parsed === "object") {
+          return parsed;
+        }
+      } catch {
+        return value;
+      }
+      return value;
+    }
+    return value;
+  }
+
+  private static _getAttachmentUrlForImageField(
+    item: any,
+    fieldValue: unknown
+  ): string | undefined {
+    const attachments: Array<{
+      FileName?: string;
+      ServerRelativeUrl?: string;
+      ServerUrl?: string;
+    }> = item?.AttachmentFiles || [];
+    if (attachments.length === 0) return undefined;
+
+    const parsed = DataService._parseImageField(fieldValue);
+    if (parsed && typeof parsed === "object" && "fileName" in parsed) {
+      const candidate = attachments.find(
+        (attachment) => attachment.FileName === (parsed as any).fileName
+      );
+      if (candidate) {
+        return candidate.ServerRelativeUrl || candidate.ServerUrl;
+      }
+    }
+
+    const first = attachments[0];
+    return first?.ServerRelativeUrl || first?.ServerUrl;
+  }
+
+  private static _buildImageFieldUrlFromFileName(
+    item: any,
+    fieldValue: unknown,
+    listName: string,
+    webServerRelativeUrl: string
+  ): string | undefined {
+    const parsed = DataService._parseImageField(fieldValue);
+    if (!parsed || typeof parsed !== "object" || !("fileName" in parsed)) {
+      return undefined;
+    }
+    const fileName = String((parsed as any).fileName || "");
+    const itemId = item?.Id ?? item?.ID;
+    if (!fileName || itemId === undefined || itemId === null) {
+      return undefined;
+    }
+
+    const siteUrl = webServerRelativeUrl.endsWith("/")
+      ? webServerRelativeUrl.slice(0, -1)
+      : webServerRelativeUrl;
+    const listPath = listName.startsWith("/") ? listName : `/Lists/${listName}`;
+    return `${siteUrl}${listPath}/Attachments/${itemId}/${encodeURIComponent(fileName)}`;
+  }
+
+  private static _isValidImageField(value: unknown): boolean {
+    const parsed = DataService._parseImageField(value);
+    if (!parsed) return false;
+    if (typeof parsed === "string") {
+      return (
+        parsed.startsWith("/") ||
+        /^https?:\/\//i.test(parsed) ||
+        parsed.startsWith("_api/") ||
+        parsed.startsWith("sites/")
+      );
+    }
+    if (typeof parsed === "object") {
+      return Boolean(
+        (parsed as Record<string, unknown>).serverRelativeUrl ||
+        (parsed as Record<string, unknown>).serverUrl
+      );
+    }
+    return false;
+  }
+
+  private static _normalizeAttachmentImageField<T extends object>(
+    item: T,
+    imageField: string,
+    listName: string,
+    webServerRelativeUrl: string
+  ): T {
+    const normalized = { ...(item as Record<string, unknown>) } as Record<string, unknown>;
+    const currentValue = normalized[imageField];
+
+    if (!DataService._isValidImageField(currentValue)) {
+      let attachmentUrl = DataService._getAttachmentUrlForImageField(
+        item,
+        currentValue
+      );
+      if (!attachmentUrl) {
+        attachmentUrl = DataService._buildImageFieldUrlFromFileName(
+          item,
+          currentValue,
+          listName,
+          webServerRelativeUrl
+        );
+      }
+      if (attachmentUrl) {
+        normalized[imageField] = {
+          serverRelativeUrl: attachmentUrl,
+          serverUrl: attachmentUrl,
+        };
+      }
+    }
+
+    return normalized as T;
+  }
+
+  private static _shouldReplaceFileRef(fileRef: string | undefined): boolean {
+    if (!fileRef) return true;
+    const extensionRegex = /\.(jpg|jpeg|png|gif|svg|webp|bmp|tiff|avif)(\?|$)/i;
+    return !extensionRegex.test(fileRef) && /\/Lists\//i.test(fileRef);
+  }
+
+  private static _replaceFileRefWithAttachment<T extends Record<string, any>>(item: T): T {
+    const attachmentUrl = DataService._getFirstAttachmentUrl(item);
+    if (!attachmentUrl) return item;
+
+    const fileRef = item?.FileRef;
+    if (typeof fileRef === "string" && DataService._shouldReplaceFileRef(fileRef)) {
+      return { ...item, FileRef: attachmentUrl };
+    }
+    return item;
+  }
+
   public async getNews(top: number = 4, scope: string = "global"): Promise<INewsItem[]> {
     if (this._useMocks) return Mocks.MOCK_NEWS.slice(0, top);
 
@@ -164,12 +307,20 @@ export class DataService {
       const scopeFilter = scope ? `Scope eq '${scope}'` : "Scope eq 'global'";
       const endpoint =
         `lists/getByTitle('Actualites')/items` +
-        `?$select=${select}&$expand=NewsAuthor` +
+        `?$select=${select}&$expand=NewsAuthor,AttachmentFiles` +
         `&$filter=${scopeFilter}` +
         `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
 
       const items = await this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_NEWS.slice(0, top);
+      const normalized = (items || []).map((item) =>
+        DataService._normalizeAttachmentImageField(
+          item,
+          "HeaderImage",
+          "Actualites",
+          this._context.pageContext.web.serverRelativeUrl
+        )
+      );
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_NEWS.slice(0, top);
     } catch (e) {
       console.warn("[DataService] Fallback mock pour actualités:", e);
       return Mocks.MOCK_NEWS.slice(0, top);
@@ -226,11 +377,19 @@ export class DataService {
 
       const endpoint =
         `lists/getByTitle('Evenements')/items` +
-        `?$select=${select}&$filter=EventDate ge datetime'${today}'` +
+        `?$select=${select}&$expand=AttachmentFiles&$filter=EventDate ge datetime'${today}'` +
         `&$orderby=EventDate asc&$top=${top}`;
 
       const items = await this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_EVENTS.slice(0, top);
+      const normalized = (items || []).map((item) =>
+        DataService._normalizeAttachmentImageField(
+          item,
+          "EventImage",
+          "Evenements",
+          this._context.pageContext.web.serverRelativeUrl
+        )
+      );
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_EVENTS.slice(0, top);
     } catch (e) {
       console.warn("[DataService] Fallback mock pour événements:", e);
       return Mocks.MOCK_EVENTS.slice(0, top);
@@ -319,11 +478,24 @@ export class DataService {
     try {
       const endpoint =
         `lists/getByTitle('HeroSlides')/items` +
-        `?$select=Id,Title,FileRef,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified` +
+        `?$select=Id,Title,FileRef,Caption,SubCaption,SlideLink,CtaLabel,SortOrder,IsActive,AltText,Created,Modified,AttachmentFiles/ServerRelativeUrl,AttachmentFiles/FileName` +
+        `&$expand=AttachmentFiles` +
         `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=10`;
 
       const items = await this._get<IHeroSlide>(this._hubUrl, endpoint, "heroslides");
-      return items && items.length > 0 ? items : Mocks.MOCK_SLIDES;
+      const normalizedSlides = (items || []).map((item) => {
+        const attachment = item.AttachmentFiles?.[0];
+        const attachmentUrl = attachment?.ServerRelativeUrl || attachment?.ServerUrl;
+        if (attachmentUrl) {
+          return {
+            ...item,
+            FileRef: attachmentUrl,
+          };
+        }
+        return item;
+      });
+
+      return normalizedSlides.length > 0 ? normalizedSlides : Mocks.MOCK_SLIDES;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour slides hero:", e);
       return Mocks.MOCK_SLIDES;
@@ -409,7 +581,7 @@ export class DataService {
       const divisionFilter = division ? ` and Division eq '${division}'` : "";
       const endpoint =
         `lists/getByTitle('Collaborateurs')/items` +
-        `?$select=${select}&$expand=Manager,Department` +
+        `?$select=${select}&$expand=Manager,Department,AttachmentFiles` +
         `&$filter=IsActive eq 1${divisionFilter}` +
         `&$orderby=HierarchyLevel asc,SortOrder asc&$top=500`;
 
@@ -418,7 +590,15 @@ export class DataService {
         endpoint,
         `collaborateurs.${division || "all"}`
       );
-      return items && items.length > 0 ? items : Mocks.MOCK_COLLABORATORS;
+      const normalized = (items || []).map((item) =>
+        DataService._normalizeAttachmentImageField(
+          item,
+          "Photo",
+          "Collaborateurs",
+          this._context.pageContext.web.serverRelativeUrl
+        )
+      );
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_COLLABORATORS;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour collaborateurs:", e);
       return division
@@ -467,19 +647,39 @@ export class DataService {
   public async getGalleryImages(top: number = 12): Promise<IGalleryImage[]> {
     if (this._useMocks) return Mocks.MOCK_GALLERY.slice(0, top);
 
-    try {
-      const endpoint =
-        `lists/getByTitle('Galerie')/items` +
-        `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
-        `&$filter=FSObjType eq 0` +
-        `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
+    const endpoint =
+      `lists/getByTitle('Galerie')/items` +
+      `?$select=Id,Title,FileLeafRef,FileRef,Caption,GalleryCategory,PhotoDate,IsFeatured,AltText,SortOrder,Created,Modified` +
+      `&$filter=FSObjType eq 0` +
+      `&$orderby=IsFeatured desc,SortOrder asc,PhotoDate desc&$top=${top}`;
 
+    try {
       const items = await this._get<IGalleryImage>(this._hubUrl, endpoint, `gallery.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_GALLERY.slice(0, top);
-    } catch (e) {
-      console.warn("[DataService] Fallback mock pour galerie:", e);
-      return Mocks.MOCK_GALLERY.slice(0, top);
+      let normalized = (items || []).map((item) => item);
+      if (normalized && normalized.length > 0) {
+        return normalized;
+      }
+    } catch (firstError) {
+      console.warn("[DataService] Galerie hub failed, retrying site:", firstError);
     }
+
+    if (this._webUrl !== this._hubUrl) {
+      try {
+        const fallbackItems = await this._get<IGalleryImage>(
+          this._webUrl,
+          endpoint,
+          `gallery.web.${top}`
+        );
+        const normalized = (fallbackItems || []).map((item) => item);
+        if (normalized && normalized.length > 0) {
+          return normalized;
+        }
+      } catch (fallbackError) {
+        console.warn("[DataService] Galerie site fallback failed:", fallbackError);
+      }
+    }
+
+    return Mocks.MOCK_GALLERY.slice(0, top);
   }
 
   public async getEmployeeOfMonth(): Promise<IEmployeeOfMonth | undefined> {
@@ -505,7 +705,7 @@ export class DataService {
 
       const endpoint =
         `lists/getByTitle('CollaborateurDuMois')/items` +
-        `?$select=${select}&$expand=Employee,Department` +
+        `?$select=${select}&$expand=Employee,Department,AttachmentFiles` +
         `&$filter=IsCurrent eq 1&$orderby=PeriodStart desc&$top=1`;
 
       const items = await this._get<IEmployeeOfMonth>(
@@ -513,8 +713,16 @@ export class DataService {
         endpoint,
         "employeeOfMonth"
       );
+      const normalized = (items || []).map((item) =>
+        DataService._normalizeAttachmentImageField(
+          item,
+          "Photo",
+          "CollaborateurDuMois",
+          this._context.pageContext.web.serverRelativeUrl
+        )
+      );
 
-      return items && items.length > 0 ? items[0] : Mocks.MOCK_EMPLOYEE;
+      return normalized && normalized.length > 0 ? normalized[0] : Mocks.MOCK_EMPLOYEE;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour collaborateur du mois:", e);
       return Mocks.MOCK_EMPLOYEE;
@@ -548,10 +756,19 @@ export class DataService {
       const endpoint =
         `lists/getByTitle('Histoire')/items` +
         `?$select=Id,Title,Year,Quarter,MilestoneDescription,MilestoneImage,IconName,Tag,TagColorClass,Side,Stat1Label,Stat1Value,Stat2Label,Stat2Value,SortOrder,Created,Modified` +
+        `&$expand=AttachmentFiles` +
         `&$orderby=SortOrder asc&$top=50`;
 
       const items = await this._get<IMilestone>(this._hubUrl, endpoint, "milestones", 30 * 60 * 1000);
-      return items && items.length > 0 ? items : Mocks.MOCK_MILESTONES;
+      const normalized = (items || []).map((item) =>
+        DataService._normalizeAttachmentImageField(
+          item,
+          "MilestoneImage",
+          "Histoire",
+          this._context.pageContext.web.serverRelativeUrl
+        )
+      );
+      return normalized && normalized.length > 0 ? normalized : Mocks.MOCK_MILESTONES;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour histoire:", e);
       return Mocks.MOCK_MILESTONES;

@@ -22,6 +22,11 @@ const CHROME_CSS = `
   }
   #sideNavBox,
   #spLeftNav,
+  #s4-leftpanel,
+  #s4-ribbonrow,
+  #s4-titlerow,
+  #suiteBarDelta,
+  .ms-compositeHeader,
   [data-automation-id="quickLaunch"],
   [data-automation-id="sideNav"],
   #DeltaTopNavigation,
