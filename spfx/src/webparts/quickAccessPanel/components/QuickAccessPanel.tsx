@@ -22,6 +22,15 @@ const EVENT_TAG_COLORS: Record<string, string> = {
   SecOps: "ika-bg-rose-100 ika-text-rose-700",
 };
 
+const ICON_FOR_DOCUMENT: Record<string, string> = {
+  "Charte Développement": "Code2",
+  "Architecture Patterns": "Layers",
+  "Templates de Projets": "FileEdit",
+  "Processus CI/CD": "GitBranch",
+  "Politique de Dépenses": "CreditCard",
+  "Guide Cybersécurité": "ShieldCheck",
+};
+
 const ICON_FOR_EXT: Record<string, string> = {
   pdf: "pdf",
   doc: "docx",
@@ -123,11 +132,16 @@ export const QuickAccessPanel: React.FC<IQuickAccessPanelProps> = (props) => {
                     className="ika-group ika-flex ika-h-32 ika-flex-col ika-justify-between ika-rounded-2xl ika-bg-slate-900 ika-p-4 ika-text-left ika-transition-all ika-duration-200 hover:-ika-translate-y-0.5 hover:ika-bg-slate-800 hover:ika-shadow-lg"
                   >
                     <Icon
-                      name={doc.DocIcon || ICON_FOR_EXT[ext] || "doc"}
+                      name={
+                        doc.DocIcon ||
+                        ICON_FOR_DOCUMENT[doc.Title] ||
+                        ICON_FOR_EXT[ext] ||
+                        "doc"
+                      }
                       className="ika-h-[26px] ika-w-[26px] ika-text-white ika-opacity-60 ika-transition-opacity group-hover:ika-opacity-100"
                     />
                     <span className="ika-mt-2 ika-text-sm ika-font-semibold ika-leading-tight ika-text-white">
-                      {doc.FileLeafRef}
+                      {doc.Title || doc.FileLeafRef}
                     </span>
                   </a>
                 );
@@ -189,10 +203,10 @@ export const QuickAccessPanel: React.FC<IQuickAccessPanelProps> = (props) => {
                     {/* Badge de date */}
                     <div className="ika-flex ika-w-14 ika-shrink-0 ika-flex-col ika-items-center ika-justify-center ika-bg-slate-900 ika-py-3 ika-text-white">
                       <span className="ika-text-[9px] ika-font-bold ika-uppercase ika-tracking-widest ika-opacity-60">
-                        {dayMonth.month}
+                        {event.DisplayMonth || dayMonth.month}
                       </span>
                       <span className="ika-text-2xl ika-font-extrabold ika-leading-tight">
-                        {dayMonth.day}
+                        {event.DisplayDay || dayMonth.day}
                       </span>
                     </div>
 
@@ -215,7 +229,7 @@ export const QuickAccessPanel: React.FC<IQuickAccessPanelProps> = (props) => {
                       </p>
                       <div className="ika-flex ika-items-center ika-gap-2">
                         <p className="ika-text-[11px] ika-text-slate-400">
-                          {formatEventDate(event.EventDate)}
+                          {event.DisplayDate || formatEventDate(event.EventDate)}
                         </p>
                         <span
                           className={cn(

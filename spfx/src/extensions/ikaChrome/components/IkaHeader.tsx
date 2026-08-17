@@ -204,7 +204,7 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
   );
 
   return (
-    <div className="ika-root">
+    <div className="ika-root" style={{ display: "contents" }}>
       <header className="ika-sticky ika-top-0 ika-z-50 ika-w-full ika-border-b ika-border-gray-200 ika-bg-white/80 ika-backdrop-blur-md">
         <div className="ika-mx-auto ika-max-w-7xl">
           {/* Barre supérieure : navigation secondaire */}

@@ -1,29 +1,29 @@
 ﻿Title,JobTitle,Email,Phone,OfficeLocation,Birthdate,HierarchyLevel,Division,IsActive,SortOrder
 YAYA Ouattara,Directeur Général,y.ouattara@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1989-06-14,1,Direction Générale,TRUE,1
-SERGE GEDEON OUE,Lead Software Engineer,s.gedeon@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1982-03-22,2,Engineering,TRUE,2
+SERGE GEDEON OUE,Développeur Full Stack,s.gedeon@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1982-03-22,2,Engineering,TRUE,2
 Daouda DAO,Développeur Front End,d.dao@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1994-11-05,3,Engineering,TRUE,3
 Sandrine Tiahoun KINI,Assistante de Direction,s.kini@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1991-08-30,2,Direction Générale,TRUE,4
 Tegawende Martin YAMEOGO,Développeur Junior,m.yameogo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1996-02-18,3,Engineering,TRUE,5
-Roukiatou OUEDRAOGO,Responsable Commerciale,r.ouedraogo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1988-09-12,2,Ventes & Marketing,TRUE,6
+Roukiatou OUEDRAOGO,Commerciale,r.ouedraogo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1988-09-12,2,Ventes & Marketing,TRUE,6
 Victorine BAZEMO,Assistante Commerciale,v.bazemo@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1993-04-27,3,Ventes & Marketing,TRUE,7
 Aminata HEMA,Compliance Officer,a.hema@ikasolution.com,+226 70 70 70 70,"Ouagadougou, Burkina Faso",1979-12-03,2,Comptabilité,TRUE,8
-Awa Kaboré,Responsable communication interne,awa.kabore@ika-solution.fr,+33 1 23 45 67 80,Paris (siège),,,Direction Générale,TRUE,9
-Mehdi Benali,Directeur Général,mehdi.benali@ika-solution.fr,+33 1 23 45 67 81,Paris (siège),,,Direction Générale,TRUE,10
-Sofia Lemaire,Directrice des Ressources Humaines,sofia.lemaire@ika-solution.fr,+33 1 23 45 67 82,Paris (siège),,,Administration,TRUE,11
-Nadia Cherif,Responsable comptable,nadia.cherif@ika-solution.fr,+33 1 23 45 67 90,Paris (siège),,,Comptabilité,TRUE,12
-Karim Saadi,Comptable fournisseurs,karim.saadi@ika-solution.fr,+33 1 23 45 67 91,,,,Comptabilité,TRUE,13
-Léa Fontaine,Gestionnaire paie,lea.fontaine@ika-solution.fr,+33 1 23 45 67 92,,,,Comptabilité,TRUE,14
-Thomas Roche,Contrôleur de gestion,thomas.roche@ika-solution.fr,+33 1 23 45 67 93,,,,Comptabilité,TRUE,15
-Yann Poliec,Chargé de recrutement,yann.poliec@ika-solution.fr,+33 1 23 45 67 83,,,,Administration,TRUE,16
-Inès Bakir,Gestionnaire RH & contrats,ines.bakir@ika-solution.fr,+33 1 23 45 67 84,,,,Administration,TRUE,17
-Paul Mercier,Juriste d'entreprise,paul.mercier@ika-solution.fr,+33 1 23 45 67 85,,,,Administration,TRUE,18
-Élodie Roy,Directrice commerciale,elodie.roy@ika-solution.fr,+33 1 23 45 67 70,Paris (siège),,,Ventes & Marketing,TRUE,19
-Marc Duval,Commercial Île-de-France,marc.duval@ika-solution.fr,+33 1 23 45 67 71,,,,Ventes & Marketing,TRUE,20
-Sarah Lemoine,Commercial Rhône-Alpes,sarah.lemoine@ika-solution.fr,+33 1 23 45 67 72,Lyon,,,Ventes & Marketing,TRUE,21
-Rachid Mansour,Avant-vente Cloud,rachid.mansour@ika-solution.fr,+33 1 23 45 67 73,,,,Ventes & Marketing,TRUE,22
-Camille Petit,Responsable grands comptes,camille.petit@ika-solution.fr,+33 1 23 45 67 74,,,,Ventes & Marketing,TRUE,23
-Julien Aubry,Responsable exploitation,julien.aubry@ika-solution.fr,+33 1 23 45 67 60,Paris (siège),,,Support Technique,TRUE,24
-Hugo Lefort,Technicien support N2,hugo.lefort@ika-solution.fr,+33 1 23 45 67 61,,,,Support Technique,TRUE,25
-Fatou Diallo,Technicienne infrastructure,fatou.diallo@ika-solution.fr,+33 1 23 45 67 62,,,,Support Technique,TRUE,26
-Antoine Garnier,Technicien intervention clients,antoine.garnier@ika-solution.fr,+33 1 23 45 67 63,Lyon,,,Support Technique,TRUE,27
-Mei Chen,Référente base de connaissance,mei.chen@ika-solution.fr,+33 1 23 45 67 64,,,,Support Technique,TRUE,28
+Awa Kaboré,Responsable communication interne,awa.kabore@ika-solution.fr,+33 1 23 45 67 80,Paris (siège),,,Direction Générale,FALSE,9
+Mehdi Benali,Directeur Général,mehdi.benali@ika-solution.fr,+33 1 23 45 67 81,Paris (siège),,,Direction Générale,FALSE,10
+Sofia Lemaire,Directrice des Ressources Humaines,sofia.lemaire@ika-solution.fr,+33 1 23 45 67 82,Paris (siège),,,Administration,FALSE,11
+Nadia Cherif,Responsable comptable,nadia.cherif@ika-solution.fr,+33 1 23 45 67 90,Paris (siège),,,Comptabilité,FALSE,12
+Karim Saadi,Comptable fournisseurs,karim.saadi@ika-solution.fr,+33 1 23 45 67 91,,,,Comptabilité,FALSE,13
+Léa Fontaine,Gestionnaire paie,lea.fontaine@ika-solution.fr,+33 1 23 45 67 92,,,,Comptabilité,FALSE,14
+Thomas Roche,Contrôleur de gestion,thomas.roche@ika-solution.fr,+33 1 23 45 67 93,,,,Comptabilité,FALSE,15
+Yann Poliec,Chargé de recrutement,yann.poliec@ika-solution.fr,+33 1 23 45 67 83,,,,Administration,FALSE,16
+Inès Bakir,Gestionnaire RH & contrats,ines.bakir@ika-solution.fr,+33 1 23 45 67 84,,,,Administration,FALSE,17
+Paul Mercier,Juriste d'entreprise,paul.mercier@ika-solution.fr,+33 1 23 45 67 85,,,,Administration,FALSE,18
+Élodie Roy,Directrice commerciale,elodie.roy@ika-solution.fr,+33 1 23 45 67 70,Paris (siège),,,Ventes & Marketing,FALSE,19
+Marc Duval,Commercial Île-de-France,marc.duval@ika-solution.fr,+33 1 23 45 67 71,,,,Ventes & Marketing,FALSE,20
+Sarah Lemoine,Commercial Rhône-Alpes,sarah.lemoine@ika-solution.fr,+33 1 23 45 67 72,Lyon,,,Ventes & Marketing,FALSE,21
+Rachid Mansour,Avant-vente Cloud,rachid.mansour@ika-solution.fr,+33 1 23 45 67 73,,,,Ventes & Marketing,FALSE,22
+Camille Petit,Responsable grands comptes,camille.petit@ika-solution.fr,+33 1 23 45 67 74,,,,Ventes & Marketing,FALSE,23
+Julien Aubry,Responsable exploitation,julien.aubry@ika-solution.fr,+33 1 23 45 67 60,Paris (siège),,,Support Technique,FALSE,24
+Hugo Lefort,Technicien support N2,hugo.lefort@ika-solution.fr,+33 1 23 45 67 61,,,,Support Technique,FALSE,25
+Fatou Diallo,Technicienne infrastructure,fatou.diallo@ika-solution.fr,+33 1 23 45 67 62,,,,Support Technique,FALSE,26
+Antoine Garnier,Technicien intervention clients,antoine.garnier@ika-solution.fr,+33 1 23 45 67 63,Lyon,,,Support Technique,FALSE,27
+Mei Chen,Référente base de connaissance,mei.chen@ika-solution.fr,+33 1 23 45 67 64,,,,Support Technique,FALSE,28

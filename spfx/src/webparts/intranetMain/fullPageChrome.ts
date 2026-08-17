@@ -20,6 +20,17 @@ const CHROME_CSS = `
   #DeltaSPPageContentArea {
     padding: 0 !important;
   }
+  [data-automation-id="Canvas"],
+  [data-automation-id="CanvasZone"],
+  [data-automation-id="CanvasSection"],
+  [data-automation-id="CanvasControl"],
+  .ControlZone {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
   #sideNavBox,
   #spLeftNav,
   #s4-leftpanel,
@@ -35,6 +46,7 @@ const CHROME_CSS = `
   .sp-pageLayout-spacer {
     display: none !important;
   }
+  [data-automation-id="pageHeader"],
   [data-automation-id="pageFooter"],
   #CommentsWrapper {
     display: none !important;

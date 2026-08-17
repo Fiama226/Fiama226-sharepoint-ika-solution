@@ -281,7 +281,7 @@ export const homeCollaborators: HomeCollaborator[] = [
     location: "Ouagadougou, Burkina Faso",
     email: "s.gedeon@ikasolution.com",
     phone: "+226 70 70 70 70",
-    avatar: "/assets/team/serge.jpg",
+    avatar: "/assets/team/Serge.jpg",
   },
   {
     id: 3,
@@ -292,7 +292,7 @@ export const homeCollaborators: HomeCollaborator[] = [
     location: "Ouagadougou, Burkina Faso",
     email: "d.dao@ikasolution.com",
     phone: "+226 70 70 70 70",
-    avatar: "/assets/team/daouda.jpg",
+    avatar: "/assets/team/Daouda.jpg",
   },
   {
     id: 4,
@@ -303,7 +303,7 @@ export const homeCollaborators: HomeCollaborator[] = [
     location: "Ouagadougou, Burkina Faso",
     email: "s.kini@ikasolution.com",
     phone: "+226 70 70 70 70",
-    avatar: "/assets/team/sandrine.jpg",
+    avatar: "/assets/team/SANDRINE.jpg",
   },
   {
     id: 5,
@@ -325,7 +325,7 @@ export const homeCollaborators: HomeCollaborator[] = [
     location: "Ouagadougou, Burkina Faso",
     email: "r.ouedraogo@ikasolution.com",
     phone: "+226 70 70 70 70",
-    avatar: "/assets/team/roukie.jpg",
+    avatar: "/assets/team/Roukie.jpg",
   },
   {
     id: 7,
@@ -336,7 +336,7 @@ export const homeCollaborators: HomeCollaborator[] = [
     location: "Ouagadougou, Burkina Faso",
     email: "v.bazemo@ikasolution.com",
     phone: "+226 70 70 70 70",
-    avatar: "/assets/team/victorine.jpg",
+    avatar: "/assets/team/Victorine.jpg",
   },
   {
     id: 8,

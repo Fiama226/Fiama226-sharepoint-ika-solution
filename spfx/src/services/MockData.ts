@@ -18,13 +18,6 @@ import {
   IMilestone
 } from "../models/IIkaModels";
 
-const GRAD_NAVY =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230A2540'/%3E%3Cstop offset='1' stop-color='%2306B6D4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23g)'/%3E%3C/svg%3E";
-const GRAD_CYAN =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2306B6D4'/%3E%3Cstop offset='1' stop-color='%230A2540'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23g)'/%3E%3C/svg%3E";
-const GRAD_EMERALD =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2310B981'/%3E%3Cstop offset='1' stop-color='%230A2540'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23g)'/%3E%3C/svg%3E";
-
 const IMG = (url: string): ISPImageField => ({ serverUrl: url });
 
 export const MOCK_NEWS: INewsItem[] = [
@@ -85,51 +78,75 @@ export const MOCK_NEWS: INewsItem[] = [
 export const MOCK_DOCUMENTS: IDocumentItem[] = [
   {
     Id: 1,
-    Title: "Charte informatique IKA Solution.pdf",
-    FileRef: "/sites/ikareview/Documents/Charte informatique IKA Solution.pdf",
-    FileLeafRef: "Charte informatique IKA Solution.pdf",
+    Title: "Charte Développement",
+    FileRef: "#techniciens",
+    FileLeafRef: "Charte Développement.pdf",
+    DocIcon: "Code2",
     DocCategory: "Procédure",
-    Confidentiality: "Public",
+    Confidentiality: "Interne",
     IsPinned: true,
     Modified: "2026-06-20",
-    Created: "2026-06-20",
-    Editor: { Id: 5, Title: "Direction Technique" }
+    Created: "2026-06-20"
   },
   {
     Id: 2,
-    Title: "Guide du nouvel arrivant.docx",
-    FileRef: "/sites/ikareview/Documents/Guide du nouvel arrivant.docx",
-    FileLeafRef: "Guide du nouvel arrivant.docx",
+    Title: "Architecture Patterns",
+    FileRef: "#techniciens",
+    FileLeafRef: "Architecture Patterns.pdf",
+    DocIcon: "Layers",
     DocCategory: "Guide",
     Confidentiality: "Interne",
     IsPinned: true,
-    Modified: "2026-06-05",
-    Created: "2026-06-05",
-    Editor: { Id: 6, Title: "RH" }
+    Modified: "2026-06-19",
+    Created: "2026-06-19"
   },
   {
     Id: 3,
-    Title: "Modele_Bordereau_Prix_2026.xlsx",
-    FileRef: "/sites/ikareview/Documents/Modele_Bordereau_Prix_2026.xlsx",
-    FileLeafRef: "Modele_Bordereau_Prix_2026.xlsx",
-    DocCategory: "Commercial",
+    Title: "Templates de Projets",
+    FileRef: "#techniciens",
+    FileLeafRef: "Templates de Projets.docx",
+    DocIcon: "FileEdit",
+    DocCategory: "Modèle",
     Confidentiality: "Interne",
-    IsPinned: false,
-    Modified: "2026-05-18",
-    Created: "2026-05-18",
-    Editor: { Id: 7, Title: "Direction Commerciale" }
+    IsPinned: true,
+    Modified: "2026-06-18",
+    Created: "2026-06-18"
   },
   {
     Id: 4,
-    Title: "Politique_Securite_SI.pdf",
-    FileRef: "/sites/ikareview/Documents/Politique_Securite_SI.pdf",
-    FileLeafRef: "Politique_Securite_SI.pdf",
-    DocCategory: "Cybersécurité",
-    Confidentiality: "Confidentiel",
-    IsPinned: false,
-    Modified: "2026-04-12",
-    Created: "2026-04-12",
-    Editor: { Id: 5, Title: "Direction Technique" }
+    Title: "Processus CI/CD",
+    FileRef: "#techniciens",
+    FileLeafRef: "Processus CI-CD.pdf",
+    DocIcon: "GitBranch",
+    DocCategory: "Procédure",
+    Confidentiality: "Interne",
+    IsPinned: true,
+    Modified: "2026-06-17",
+    Created: "2026-06-17"
+  },
+  {
+    Id: 5,
+    Title: "Politique de Dépenses",
+    FileRef: "#comptabilite",
+    FileLeafRef: "Politique de Dépenses.pdf",
+    DocIcon: "CreditCard",
+    DocCategory: "Politique",
+    Confidentiality: "Interne",
+    IsPinned: true,
+    Modified: "2026-06-16",
+    Created: "2026-06-16"
+  },
+  {
+    Id: 6,
+    Title: "Guide Cybersécurité",
+    FileRef: "#techniciens",
+    FileLeafRef: "Guide Cybersécurité.pdf",
+    DocIcon: "ShieldCheck",
+    DocCategory: "Guide",
+    Confidentiality: "Interne",
+    IsPinned: true,
+    Modified: "2026-06-15",
+    Created: "2026-06-15"
   }
 ];
 
@@ -229,7 +246,7 @@ export const MOCK_SLIDES: IHeroSlide[] = [
   {
     Id: 1,
     Title: "Construire le digital de demain",
-    FileRef: GRAD_NAVY,
+    FileRef: "/SiteAssets/team/12-Modifier.jpg",
     Caption: "Construire le digital de demain, aujourd'hui.",
     SubCaption: "Innovation · Agilité · Excellence",
     SortOrder: 1,
@@ -241,7 +258,7 @@ export const MOCK_SLIDES: IHeroSlide[] = [
   {
     Id: 2,
     Title: "Des équipes expertes",
-    FileRef: GRAD_CYAN,
+    FileRef: "/SiteAssets/team/13-Modifier.jpg",
     Caption: "Des équipes expertes au service de vos projets.",
     SubCaption: "Développement · Architecture · Data",
     SortOrder: 2,
@@ -253,7 +270,7 @@ export const MOCK_SLIDES: IHeroSlide[] = [
   {
     Id: 3,
     Title: "Ensemble, nous transformons",
-    FileRef: GRAD_EMERALD,
+    FileRef: "/SiteAssets/team/14-Modifier.jpg",
     Caption: "Ensemble, nous transformons les idées en solutions.",
     SubCaption: "Cloud · IA · Cybersécurité",
     SortOrder: 3,
@@ -336,7 +353,74 @@ export const MOCK_STATS: IIndicator[] = [
     IsActive: true,
     Created: "2026-01-01",
     Modified: "2026-01-01"
+  },
+  {
+    Id: 4,
+    Title: "Collaborateurs",
+    StatValue: "138",
+    IconName: "Users",
+    Placement: "Page histoire",
+    SortOrder: 1,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 5,
+    Title: "Pays",
+    StatValue: "4",
+    IconName: "Globe",
+    Placement: "Page histoire",
+    SortOrder: 2,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 6,
+    Title: "Projets livrés",
+    StatValue: "200+",
+    IconName: "Code2",
+    Placement: "Page histoire",
+    SortOrder: 3,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 7,
+    Title: "Satisfaction client",
+    StatValue: "98%",
+    IconName: "Star",
+    Placement: "Page histoire",
+    SortOrder: 4,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 8,
+    Title: "Années d'expérience",
+    StatValue: "9",
+    IconName: "Calendar",
+    Placement: "Page histoire",
+    SortOrder: 5,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 9,
+    Title: "Certifications",
+    StatValue: "12",
+    IconName: "Award",
+    Placement: "Page histoire",
+    SortOrder: 6,
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
   }
+
 ];
 
 export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
@@ -349,6 +433,7 @@ export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
     AnnouncementDate: "2026-08-15",
     DisplayUntil: "2026-08-31",
     Priority: "Haute",
+    SortOrder: 1,
     Created: "2026-08-01",
     Modified: "2026-08-01"
   },
@@ -361,6 +446,7 @@ export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
     AnnouncementDate: "2026-07-22",
     DisplayUntil: "2026-08-31",
     Priority: "Normale",
+    SortOrder: 2,
     Created: "2026-08-02",
     Modified: "2026-08-02"
   },
@@ -373,6 +459,7 @@ export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
     AnnouncementDate: "2026-09-02",
     DisplayUntil: "2026-09-30",
     Priority: "Normale",
+    SortOrder: 3,
     Created: "2026-08-03",
     Modified: "2026-08-03"
   },
@@ -385,6 +472,7 @@ export const MOCK_ANNOUNCEMENTS: IAnnouncement[] = [
     AnnouncementDate: "2026-07-10",
     DisplayUntil: "2026-07-31",
     Priority: "Normale",
+    SortOrder: 4,
     Created: "2026-08-04",
     Modified: "2026-08-04"
   }
@@ -395,6 +483,9 @@ export const MOCK_EVENTS: IEventItem[] = [
     Id: 1,
     Title: "All Hands Tech — Q2 Review",
     EventDate: "2026-06-10T10:00:00Z",
+    DisplayDate: "Mar, 10 Juin, 10:00",
+    DisplayMonth: "JUN",
+    DisplayDay: "10",
     EndDate: "2026-06-10T11:30:00Z",
     fAllDayEvent: false,
     Location: "Salle de réunion A",
@@ -408,6 +499,9 @@ export const MOCK_EVENTS: IEventItem[] = [
     Id: 2,
     Title: "Workshop Architecture Cloud",
     EventDate: "2026-06-18T14:00:00Z",
+    DisplayDate: "Mer, 18 Juin, 14:00",
+    DisplayMonth: "JUN",
+    DisplayDay: "18",
     EndDate: "2026-06-18T16:00:00Z",
     fAllDayEvent: false,
     Location: "Ouagadougou — Siège",
@@ -421,6 +515,9 @@ export const MOCK_EVENTS: IEventItem[] = [
     Id: 3,
     Title: "Demo Day — Projets IA",
     EventDate: "2026-06-25T09:00:00Z",
+    DisplayDate: "Mer, 25 Juin, 09:00",
+    DisplayMonth: "JUN",
+    DisplayDay: "25",
     EndDate: "2026-06-25T12:00:00Z",
     fAllDayEvent: false,
     Location: "Salle de réunion A",
@@ -434,6 +531,9 @@ export const MOCK_EVENTS: IEventItem[] = [
     Id: 4,
     Title: "Revue Cybersécurité S1",
     EventDate: "2026-07-03T11:00:00Z",
+    DisplayDate: "Jeu, 3 Juil, 11:00",
+    DisplayMonth: "JUL",
+    DisplayDay: "3",
     EndDate: "2026-07-03T12:00:00Z",
     fAllDayEvent: false,
     Location: "En ligne (Teams)",
@@ -700,6 +800,9 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
     JobTitle: "Directeur Général",
     Email: "y.ouattara@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1989-06-14",
+    Photo: IMG("/SiteAssets/team/DG.jpg"),
     HierarchyLevel: 1,
     Division: "Direction Générale",
     IsActive: true,
@@ -709,29 +812,35 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   },
   {
     Id: 2,
-    Title: "Sandrine T. KINI",
+    Title: "Sandrine Tiahoun KINI",
     JobTitle: "Assistante de Direction",
     Email: "s.kini@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1991-08-30",
+    Photo: IMG("/SiteAssets/team/SANDRINE.jpg"),
     HierarchyLevel: 2,
     Division: "Direction Générale",
     Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
-    SortOrder: 2,
+    SortOrder: 4,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   },
   {
     Id: 3,
     Title: "SERGE GEDEON OUE",
-    JobTitle: "Ingénieur Principal",
+    JobTitle: "Développeur Full Stack",
     Email: "s.gedeon@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1982-03-22",
+    Photo: IMG("/SiteAssets/team/Serge.jpg"),
     HierarchyLevel: 2,
     Division: "Engineering",
     Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
-    SortOrder: 3,
+    SortOrder: 2,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   },
@@ -741,20 +850,26 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
     JobTitle: "Développeur Front End",
     Email: "d.dao@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1994-11-05",
+    Photo: IMG("/SiteAssets/team/Daouda.jpg"),
     HierarchyLevel: 3,
     Division: "Engineering",
     Manager: { Id: 3, Title: "SERGE GEDEON OUE" },
     IsActive: true,
-    SortOrder: 4,
+    SortOrder: 3,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   },
   {
     Id: 5,
-    Title: "Tegawende M. YAMEOGO",
+    Title: "Tegawende Martin YAMEOGO",
     JobTitle: "Développeur Junior",
     Email: "m.yameogo@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1996-02-18",
+    Photo: IMG("/SiteAssets/team/Martin.jpg"),
     HierarchyLevel: 3,
     Division: "Engineering",
     Manager: { Id: 3, Title: "SERGE GEDEON OUE" },
@@ -766,28 +881,34 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
   {
     Id: 6,
     Title: "Aminata HEMA",
-    JobTitle: "Comptable",
+    JobTitle: "Compliance Officer",
     Email: "a.hema@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1979-12-03",
+    Photo: IMG("/SiteAssets/team/aminata.jpg"),
     HierarchyLevel: 2,
     Division: "Comptabilité",
     Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
-    SortOrder: 6,
+    SortOrder: 8,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   },
   {
     Id: 7,
     Title: "Roukiatou OUEDRAOGO",
-    JobTitle: "Responsable Commerciale",
+    JobTitle: "Commerciale",
     Email: "r.ouedraogo@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1988-09-12",
+    Photo: IMG("/SiteAssets/team/Roukie.jpg"),
     HierarchyLevel: 2,
     Division: "Ventes & Marketing",
     Manager: { Id: 1, Title: "YAYA Ouattara" },
     IsActive: true,
-    SortOrder: 7,
+    SortOrder: 6,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   },
@@ -797,11 +918,14 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
     JobTitle: "Assistante Commerciale",
     Email: "v.bazemo@ikasolution.com",
     Phone: "+226 70 70 70 70",
+    OfficeLocation: "Ouagadougou, Burkina Faso",
+    Birthdate: "1993-04-27",
+    Photo: IMG("/SiteAssets/team/Victorine.jpg"),
     HierarchyLevel: 3,
     Division: "Ventes & Marketing",
     Manager: { Id: 7, Title: "Roukiatou OUEDRAOGO" },
     IsActive: true,
-    SortOrder: 8,
+    SortOrder: 7,
     Created: "2026-01-01",
     Modified: "2026-01-01"
   }
@@ -809,29 +933,30 @@ export const MOCK_COLLABORATORS: ICollaborateur[] = [
 
 export const MOCK_EMPLOYEE: IEmployeeOfMonth = {
   Id: 1,
-  Title: "Collaborateur du mois — Août 2026",
-  Employee: { Id: 4, Title: "Daouda DAO" },
-  DisplayRole: "Développeur Front End",
-  Department: { Id: 4, Title: "Engineering" },
+  Title: "Collaborateur du mois — Juin 2026",
+  Employee: { Id: 3, Title: "SERGE GEDEON OUE" },
+  DisplayRole: "Lead Software Engineer",
+  Department: { Id: 4, Title: "Ingénierie" },
   Quote:
-    "Construire des interfaces fluides, intuitives et performantes pour nos collaborateurs et clients est ma plus grande fierté.",
-  NominatedBy: "SERGE GEDEON OUE",
-  PeriodStart: "2026-08-01",
+    "Il s'est distingué par son excellence technique et sa capacité à livrer des solutions cloud scalables dans des délais serrés. Son leadership sur le projet de migration microservices a permis de réduire les coûts d'infrastructure de 34%. Pour son engagement constant envers la qualité et l'innovation, il est désigné Collaborateur du mois de Juin.",
+  NominatedBy: "YAYA Ouattara, Directeur Général",
+  Photo: IMG("/SiteAssets/team/Serge.jpg"),
+  PeriodStart: "2026-06-01",
   IsCurrent: true,
-  Created: "2026-08-01",
-  Modified: "2026-08-01"
+  Created: "2026-06-01",
+  Modified: "2026-06-01"
 };
 
 export const MOCK_PROJECTS: IProject[] = [
   {
     Id: 1,
-    Title: "Portail Intranet SharePoint IKA",
-    ProjectLead: "SERGE GEDEON OUE",
-    Progress: 85,
+    Title: "Migration Microservices",
+    ProjectLead: "Cloud Team",
+    Progress: 78,
     ProjectStatus: "À l'heure",
-    DueDate: "2026-09-30",
-    TasksDone: 17,
-    TasksTotal: 20,
+    DueDate: "2026-06-30",
+    TasksDone: 14,
+    TasksTotal: 18,
     ShowOnHome: true,
     SortOrder: 1,
     Created: "2026-01-01",
@@ -839,12 +964,12 @@ export const MOCK_PROJECTS: IProject[] = [
   },
   {
     Id: 2,
-    Title: "Plateforme Fintech Régionale",
-    ProjectLead: "Daouda DAO",
-    Progress: 60,
-    ProjectStatus: "À l'heure",
-    DueDate: "2026-10-15",
-    TasksDone: 12,
+    Title: "Portail Client v3.0",
+    ProjectLead: "Frontend",
+    Progress: 45,
+    ProjectStatus: "À risque",
+    DueDate: "2026-07-15",
+    TasksDone: 9,
     TasksTotal: 20,
     ShowOnHome: true,
     SortOrder: 2,
@@ -853,13 +978,13 @@ export const MOCK_PROJECTS: IProject[] = [
   },
   {
     Id: 3,
-    Title: "Automatisation Bordereaux & Devis",
-    ProjectLead: "Roukiatou OUEDRAOGO",
-    Progress: 45,
-    ProjectStatus: "À risque",
-    DueDate: "2026-08-31",
-    TasksDone: 9,
-    TasksTotal: 20,
+    Title: "Pipeline Data IA",
+    ProjectLead: "Data Team",
+    Progress: 92,
+    ProjectStatus: "À l'heure",
+    DueDate: "2026-06-28",
+    TasksDone: 22,
+    TasksTotal: 24,
     ShowOnHome: true,
     SortOrder: 3,
     Created: "2026-01-01",
@@ -867,12 +992,12 @@ export const MOCK_PROJECTS: IProject[] = [
   },
   {
     Id: 4,
-    Title: "Certification ISO 27001 Audit 2026",
-    ProjectLead: "YAYA Ouattara",
-    Progress: 95,
-    ProjectStatus: "À l'heure",
-    DueDate: "2026-08-20",
-    TasksDone: 19,
+    Title: "Audit Cybersécurité",
+    ProjectLead: "SecOps",
+    Progress: 30,
+    ProjectStatus: "En retard",
+    DueDate: "2026-08-01",
+    TasksDone: 6,
     TasksTotal: 20,
     ShowOnHome: true,
     SortOrder: 4,

@@ -28,6 +28,7 @@ export interface IIntranetMainProps {
   slides: IHeroSlide[];
   missions: IMission[];
   stats: IIndicator[];
+  historyStats: IIndicator[];
   announcements: IAnnouncement[];
   news: INewsItem[];
   featuredDocs: IDocumentItem[];

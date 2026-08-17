@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import type {
   HomeHeroSlide,
@@ -26,7 +26,6 @@ export function HeroSlider({
   const [missionSlide, setMissionSlide] = useState(0);
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [prefersReduced, setPrefersReduced] = useState(false);
-  const pausedRef = useRef(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -43,7 +42,7 @@ export function HeroSlider({
     const timer = setInterval(() => {
       setCurrentTime(new Date());
       tick += 1;
-      if (prefersReduced || pausedRef.current) return;
+      if (prefersReduced) return;
       if (tick % SLIDE_TICKS === 0) {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
       }
@@ -74,13 +73,7 @@ export function HeroSlider({
     <section
       aria-roledescription="carousel"
       aria-label="Actualités de l'entreprise"
-      className="relative w-full h-screen overflow-hidden"
-      onMouseEnter={() => {
-        pausedRef.current = true;
-      }}
-      onMouseLeave={() => {
-        pausedRef.current = false;
-      }}
+      className="relative h-screen w-full overflow-hidden"
     >
       {/* Slides */}
       {slides.map((slide, i) => (

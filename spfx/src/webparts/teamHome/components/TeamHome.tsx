@@ -76,8 +76,25 @@ function personPhoto(person: ICollaborateur): string {
 }
 
 export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
-  const { title, description, members, loading, error, showSearch, showBirthdays } =
-    props;
+  const {
+    title,
+    description,
+    members: sourceMembers,
+    loading,
+    error,
+    showSearch,
+    showBirthdays,
+  } = props;
+
+  const members = React.useMemo<ICollaborateur[]>(
+    () =>
+      sourceMembers.map((member) => ({
+        ...member,
+        Division:
+          member.Division === "Direction Générale" ? "Direction" : member.Division,
+      })),
+    [sourceMembers]
+  );
 
   const [search, setSearch] = React.useState<string>("");
   const [activeDept, setActiveDept] = React.useState<string>("Tous");
@@ -140,7 +157,7 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
 
   if (loading) {
     return (
-      <div className="ika-root">
+      <div className="ika-root ika-w-full">
         <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
           <div className="ika-mx-auto ika-animate-pulse ika-max-w-7xl">
             <div className="ika-mb-6 ika-h-7 ika-w-48 ika-rounded ika-bg-slate-200" />
@@ -157,7 +174,7 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
 
   if (error) {
     return (
-      <div className="ika-root">
+      <div className="ika-root ika-w-full">
         <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
           <div
             role="alert"
@@ -171,7 +188,7 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
   }
 
   return (
-    <div className="ika-root">
+    <div className="ika-root ika-w-full">
       <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
         <div className="ika-mx-auto ika-max-w-7xl">
           <div className="ika-mb-2 ika-flex ika-flex-wrap ika-items-center ika-gap-3">

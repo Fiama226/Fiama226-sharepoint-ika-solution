@@ -102,6 +102,7 @@ const REGISTRY: Record<string, PathSet[]> = {
   FileEdit: [S("M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"), S("M18.5 2.5a2.1 2.1 0 0 1 3 3L15 12l-4 1 1-4Z")],
   GitBranch: [S("M6 3v12"), C(6, 18, 3), C(18, 6, 3), S("M18 9c0 4-6 3-6 9")],
   CreditCard: [R(2, 5, 20, 14, 2), S("M2 10h20")],
+  Shield: [S("M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3Z")],
   ShieldCheck: [S("M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3Z"), S("M9 12l2 2 4-4")],
   Users: [
     C(9, 8, 3.2),
@@ -178,6 +179,16 @@ const REGISTRY: Record<string, PathSet[]> = {
   ImageIcon: [R(3, 3, 18, 18, 2), C(9, 9, 2), S("m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21")],
 };
 
+const FA_VIEWBOX: Record<string, string> = {
+  "fa-bullhorn": "0 0 512 512",
+  "fa-calendar-day": "0 0 448 512",
+  "fa-arrow-right": "0 0 448 512",
+  "fa-star": "0 0 576 512",
+  "fa-fire": "0 0 448 512",
+  "fa-envelope": "0 0 512 512",
+  "fa-phone": "0 0 512 512",
+};
+
 const FA_PATH = (d: string): React.ReactElement =>
   React.createElement("path", { d });
 
@@ -191,7 +202,7 @@ export const Icon: React.FC<IIconProps> = (props) => {
       "svg",
       {
         className: className || "ika-h-5 ika-w-5",
-        viewBox: "0 0 512 512",
+        viewBox: FA_VIEWBOX[name] || "0 0 512 512",
         fill: "currentColor",
         role: title ? "img" : "presentation",
         "aria-hidden": title ? undefined : true,
@@ -213,7 +224,7 @@ export const Icon: React.FC<IIconProps> = (props) => {
       viewBox: "0 0 24 24",
       fill: "none",
       stroke: "currentColor",
-      strokeWidth: 1.8,
+      strokeWidth: 2,
       role: title ? "img" : "presentation",
       "aria-hidden": title ? undefined : true,
       "aria-label": title,

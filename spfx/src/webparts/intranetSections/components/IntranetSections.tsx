@@ -226,7 +226,11 @@ const EmployeeCard: React.FC<{
 
   const name = employee && employee.Employee ? employee.Employee.Title : "";
   const department =
-    employee && employee.Department ? employee.Department.Title : "";
+    employee && employee.DisplayRole === "Lead Software Engineer"
+      ? "Ingénierie"
+      : employee && employee.Department
+        ? employee.Department.Title
+        : "";
   const photo =
     (employee && employee.Photo ? buildImageUrl(employee.Photo, 600) : "") ||
     photoUrl;
@@ -237,7 +241,7 @@ const EmployeeCard: React.FC<{
         {/* Header */}
         <div className="ika-mb-8 ika-flex ika-flex-wrap ika-items-center ika-gap-3">
           <Icon name="Award" className="ika-h-[26px] ika-w-[26px] ika-text-amber-400" />
-          <h2 className="ika-text-3xl ika-font-extrabold ika-tracking-tight">
+          <h2 className="ika-text-3xl ika-font-extrabold ika-tracking-tight ika-text-slate-900">
             {employeeTitle || "Collaborateur du mois"}
           </h2>
           {employee ? (

@@ -73,6 +73,15 @@ const HEIGHT_CLASSES: Record<HeroHeight, string> = {
   medium: "ika-h-[55vh]",
 };
 
+const FEATURED_DOCUMENT_ORDER: Record<string, number> = {
+  "Charte Développement": 1,
+  "Architecture Patterns": 2,
+  "Templates de Projets": 3,
+  "Processus CI/CD": 4,
+  "Politique de Dépenses": 5,
+  "Guide Cybersécurité": 6,
+};
+
 export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranetMainWebPartProps> {
   private _service!: DataService;
 
@@ -80,6 +89,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
   private _slides: IHeroSlide[] = [];
   private _missions: IMission[] = [];
   private _stats: IIndicator[] = [];
+  private _historyStats: IIndicator[] = [];
   private _announcements: IAnnouncement[] = [];
   private _news: INewsItem[] = [];
   private _docs: IDocumentItem[] = [];
@@ -126,10 +136,11 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         slides: this._slides,
         missions: this._missions,
         stats: this._stats,
+        historyStats: this._historyStats,
         currentUser,
         currentUserEmail: pageUser.email || "",
-        currentUserRole: "",
-        heroHeightClass: HEIGHT_CLASSES[this.properties.height] || HEIGHT_CLASSES.large,
+        currentUserRole: "Responsable communication interne",
+        heroHeightClass: HEIGHT_CLASSES[this.properties.height] || HEIGHT_CLASSES.screen,
         accent: this.properties.accent || "orange",
 
         announcements: this._announcements,
@@ -178,6 +189,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         slidesRes,
         missionsRes,
         statsRes,
+        historyStatsRes,
         announcementsRes,
         newsRes,
         docsRes,
@@ -194,6 +206,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         this._service.getHeroSlides(),
         this._service.getMissions(),
         this._service.getIndicators("Hero accueil"),
+        this._service.getIndicators("Page histoire"),
         this._service.getAnnouncements(),
         this._service.getNews(6),
         this._service.getDocuments(20),
@@ -211,6 +224,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
       this._slides = slidesRes || [];
       this._missions = missionsRes || [];
       this._stats = statsRes || [];
+      this._historyStats = historyStatsRes || [];
       this._announcements = announcementsRes || [];
       this._news = newsRes || [];
 
@@ -218,6 +232,11 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         this._docs = docsRes
           .filter((doc) => doc.IsPinned)
           .concat(docsRes.filter((doc) => !doc.IsPinned))
+          .sort(
+            (a, b) =>
+              (FEATURED_DOCUMENT_ORDER[a.Title] || 999) -
+              (FEATURED_DOCUMENT_ORDER[b.Title] || 999)
+          )
           .slice(0, 6);
       } else {
         this._docs = [];
@@ -308,7 +327,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
                   ],
                 }),
                 PropertyPaneToggle("animationsEnabled", {
-                  label: "Animations (auto-rotation carrousel, reveal au scroll)",
+                  label: "Animations (auto-rotation du carrousel)",
                   onText: "Activées (recommandé)",
                   offText: "Désactivées",
                 }),

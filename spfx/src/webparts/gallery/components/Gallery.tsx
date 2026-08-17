@@ -88,7 +88,7 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
 
   if (loading) {
     return (
-      <div className="ika-root">
+      <div className="ika-root ika-w-full">
         <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-white ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
           <div className="ika-mx-auto ika-animate-pulse ika-max-w-7xl">
             <div className="ika-mb-6 ika-h-7 ika-w-40 ika-rounded ika-bg-slate-200" />
@@ -111,7 +111,7 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
 
   if (error) {
     return (
-      <div className="ika-root">
+      <div className="ika-root ika-w-full">
         <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-white ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
           <div
             role="alert"
@@ -125,7 +125,7 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
   }
 
   return (
-    <div className="ika-root">
+    <div className="ika-root ika-w-full">
       <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-white ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
         <div className="ika-mx-auto ika-max-w-7xl">
           <div className="ika-mb-2 ika-flex ika-flex-wrap ika-items-center ika-gap-3">

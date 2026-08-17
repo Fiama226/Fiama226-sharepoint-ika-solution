@@ -309,7 +309,7 @@ export class DataService {
         `lists/getByTitle('Actualites')/items` +
         `?$select=${select}&$expand=NewsAuthor,AttachmentFiles` +
         `&$filter=${scopeFilter}` +
-        `&$orderby=Highlighted desc,PublishDate desc&$top=${top}`;
+        `&$orderby=PublishDate desc&$top=${top}`;
 
       const items = await this._get<INewsItem>(this._webUrl, endpoint, `news.${scope}.${top}`);
       const normalized = (items || []).map((item) =>
@@ -361,12 +361,14 @@ export class DataService {
     if (this._useMocks) return Mocks.MOCK_EVENTS.slice(0, top);
 
     try {
-      const today = new Date().toISOString();
       const select = [
         "Id",
         "Title",
         "EventDate",
         "EndDate",
+        "DisplayDate",
+        "DisplayMonth",
+        "DisplayDay",
         "Location",
         "EventCategory",
         "fAllDayEvent",
@@ -377,7 +379,7 @@ export class DataService {
 
       const endpoint =
         `lists/getByTitle('Evenements')/items` +
-        `?$select=${select}&$expand=AttachmentFiles&$filter=EventDate ge datetime'${today}'` +
+        `?$select=${select}&$expand=AttachmentFiles` +
         `&$orderby=EventDate asc&$top=${top}`;
 
       const items = await this._get<IEventItem>(this._webUrl, endpoint, `events.${top}`);
@@ -400,12 +402,13 @@ export class DataService {
     if (this._useMocks) return Mocks.MOCK_QUICKLINKS;
 
     try {
+      const safeScope = scope.replace(/'/g, "''");
       const endpoint =
         `lists/getByTitle('LiensRapides')/items` +
-        `?$select=Id,Title,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive,Created,Modified` +
-        `&$filter=IsActive eq 1&$orderby=SortOrder asc&$top=50`;
+        `?$select=Id,Title,Scope,LinkUrl,LinkDescription,IconName,SortOrder,OpenInNewTab,LinkGroup,IsActive,Created,Modified` +
+        `&$filter=IsActive eq 1 and Scope eq '${safeScope}'&$orderby=SortOrder asc&$top=50`;
 
-      const items = await this._get<IQuickLink>(this._webUrl, endpoint, "quicklinks");
+      const items = await this._get<IQuickLink>(this._webUrl, endpoint, `quicklinks.${scope}`);
       return items && items.length > 0 ? items : Mocks.MOCK_QUICKLINKS;
     } catch (e) {
       console.warn("[DataService] Fallback mock pour liens rapides:", e);
@@ -439,12 +442,10 @@ export class DataService {
     if (this._useMocks) return Mocks.MOCK_ANNOUNCEMENTS;
 
     try {
-      const today = new Date().toISOString();
       const endpoint =
         `lists/getByTitle('Annonces')/items` +
-        `?$select=Id,Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,Created,Modified` +
-        `&$filter=DisplayUntil ge datetime'${today}'` +
-        `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
+        `?$select=Id,Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,SortOrder,Created,Modified` +
+        `&$orderby=SortOrder asc&$top=20`;
 
       const items = await this._get<IAnnouncement>(this._hubUrl, endpoint, "announcements");
       return items && items.length > 0 ? items : Mocks.MOCK_ANNOUNCEMENTS;
@@ -551,9 +552,12 @@ export class DataService {
 
   public async getCollaborateurs(division?: string): Promise<ICollaborateur[]> {
     if (this._useMocks) {
-      return division
+      const mockCollaborators = division
         ? Mocks.MOCK_COLLABORATORS.filter((c) => c.Division === division)
         : Mocks.MOCK_COLLABORATORS;
+      return [...mockCollaborators].sort(
+        (a, b) => (a.SortOrder ?? 999) - (b.SortOrder ?? 999)
+      );
     }
 
     try {
@@ -583,7 +587,7 @@ export class DataService {
         `lists/getByTitle('Collaborateurs')/items` +
         `?$select=${select}&$expand=Manager,Department,AttachmentFiles` +
         `&$filter=IsActive eq 1${divisionFilter}` +
-        `&$orderby=HierarchyLevel asc,SortOrder asc&$top=500`;
+        `&$orderby=SortOrder asc,Title asc&$top=500`;
 
       const items = await this._get<ICollaborateur>(
         this._hubUrl,

@@ -1,5 +1,5 @@
-﻿Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority
-Mariage de Koffi et Aïcha,Mariage,Félicitations à nos collègues du pôle Tech,💍,2026-08-15,2026-08-31,Haute
-Anniversaire de Souleymane,Anniversaire,Joyeux anniversaire au responsable QA,🎉,2026-07-22,2026-08-31,Normale
-Bienvenue à Bébé Inès,Naissance,Félicitations à l'équipe RH pour cette naissance,👶,2026-09-02,2026-09-30,Normale
-Soirée d'été IKA,Événement,Réservez votre place pour le 10 juillet,🌞,2026-07-10,2026-08-15,Haute
+﻿Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,SortOrder
+Mariage de Koffi et Aïcha,Mariage,Félicitations à nos collègues du pôle Tech,💍,2026-08-15,2026-08-31,Haute,1
+Anniversaire de Souleymane,Anniversaire,Joyeux anniversaire au responsable QA,🎉,2026-07-22,2026-08-31,Normale,2
+Bienvenue à Bébé Inès,Naissance,Félicitations à l'équipe RH pour cette naissance,👶,2026-09-02,2026-09-30,Normale,3
+Soirée d'été IKA,Événement,Réservez votre place pour le 10 juillet,🌞,2026-07-10,2026-08-15,Haute,4

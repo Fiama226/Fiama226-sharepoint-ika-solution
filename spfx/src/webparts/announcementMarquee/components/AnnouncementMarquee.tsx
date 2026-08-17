@@ -36,10 +36,10 @@ const ACCENT_VARIANTS = [
 
 const getPriorityIcon = (index: number): React.ReactElement => {
   if (index === 0)
-    return <Icon name="fa-fire" className="ika-h-4 ika-w-4 ika-text-orange-500" />;
+    return <Icon name="fa-fire" className="ika-h-3.5 ika-w-3.5 ika-text-orange-500" />;
   if (index === 1)
-    return <Icon name="fa-star" className="ika-h-4 ika-w-4 ika-text-yellow-500" />;
-  return <Icon name="fa-bullhorn" className="ika-h-4 ika-w-4 ika-text-slate-400" />;
+    return <Icon name="fa-star" className="ika-h-3.5 ika-w-3.5 ika-text-yellow-500" />;
+  return <Icon name="fa-bullhorn" className="ika-h-3.5 ika-w-3.5 ika-text-slate-400" />;
 };
 
 export const AnnouncementMarquee: React.FC<IAnnouncementMarqueeProps> = (
