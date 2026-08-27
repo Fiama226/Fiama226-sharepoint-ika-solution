@@ -8,4 +8,5 @@ export interface ITeamHomeProps {
   error?: string;
   showSearch: boolean;
   showBirthdays: boolean;
+  compact?: boolean;
 }

@@ -1,6 +1,7 @@
 import {
   ISPImageField,
   INewsItem,
+  IComment,
   IDocumentItem,
   IEventItem,
   IQuickLink,
@@ -15,7 +16,13 @@ import {
   IAnnouncement,
   IEmployeeOfMonth,
   IGalleryImage,
-  IMilestone
+  IMilestone,
+  ISearchResult,
+  ICalendarEntry,
+  ITeamMemberBusy,
+  IListColumn,
+  IListRow,
+  IListTableData
 } from "../models/IIkaModels";
 
 const GRAD_NAVY =
@@ -33,12 +40,17 @@ export const MOCK_NEWS: INewsItem[] = [
     Title: "Nouvelle plateforme DevOps disponible",
     Excerpt:
       "La nouvelle chaîne CI/CD est désormais accessible pour tous les projets internes afin d'accélérer les déploiements et renforcer la qualité logicielle.",
+    Body:
+      "<p>La nouvelle chaîne CI/CD est désormais accessible pour tous les projets internes afin d'accélérer les déploiements et renforcer la qualité logicielle.</p>" +
+      "<p>Elle intègre des pipelines de build, de tests automatisés et de déploiement continu, avec des environnements de staging isolés par équipe. " +
+      "Chaque projet peut désormais livrer en production plusieurs fois par jour, avec des rollbacks automatiques en cas d'échec des tests.</p>" +
+      "<p>Une session de formation sera organisée la semaine prochaine pour accompagner les équipes dans la migration de leurs pipelines existants.</p>",
     Category: "DevOps",
     PublishDate: "2026-06-18",
     Highlighted: true,
     HeaderImage: IMG("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80"),
     Created: "2026-06-18",
-    Modified: "2026-06-18",
+    Modified: "2026-06-20",
     NewsAuthor: { Id: 1, Title: "YAYA Ouattara", EMail: "y.ouattara@ikasolution.com" }
   },
   {
@@ -82,12 +94,69 @@ export const MOCK_NEWS: INewsItem[] = [
   }
 ];
 
+export const MOCK_COMMENTS: IComment[] = [
+  {
+    Id: 1001,
+    Title: "Excellente nouvelle, merci pour le partage !",
+    CommentText: "Excellente nouvelle, merci pour le partage !",
+    Created: "2026-06-18T14:12:00Z",
+    Modified: "2026-06-18T14:12:00Z",
+    NewsItem: { Id: 1, Title: "Nouvelle plateforme DevOps disponible" },
+    Author: { Id: 10, Title: "Fatou Ky", EMail: "f.ky@ikasolution.com" }
+  },
+  {
+    Id: 1002,
+    Title: "La formation de la semaine prochaine tombe à pic.",
+    CommentText: "La formation de la semaine prochaine tombe à pic, on en avait besoin sur mon projet.",
+    Created: "2026-06-19T09:03:00Z",
+    Modified: "2026-06-19T09:03:00Z",
+    NewsItem: { Id: 1, Title: "Nouvelle plateforme DevOps disponible" },
+    Author: { Id: 11, Title: "Boubacar Sanou", EMail: "b.sanou@ikasolution.com" }
+  },
+  {
+    Id: 1003,
+    Title: "Je me suis déjà inscrit au parcours AWS.",
+    CommentText: "Je me suis déjà inscrit au parcours AWS, hâte de commencer !",
+    Created: "2026-06-13T16:40:00Z",
+    Modified: "2026-06-13T16:40:00Z",
+    NewsItem: { Id: 2, Title: "Lancement du programme de certification Cloud" },
+    Author: { Id: 12, Title: "Aïcha Traoré", EMail: "a.traore@ikasolution.com" }
+  }
+];
+
 export const MOCK_DOCUMENTS: IDocumentItem[] = [
+  {
+    Id: 100,
+    Title: "Procédures",
+    FileRef: "/sites/ikareview/Documents/Procedures",
+    FileLeafRef: "Procedures",
+    FSObjType: 1,
+    DocCategory: "Procédure",
+    Confidentiality: "Interne",
+    IsPinned: false,
+    Modified: "2026-06-18",
+    Created: "2025-01-10",
+    Editor: { Id: 5, Title: "Direction Technique" }
+  },
+  {
+    Id: 101,
+    Title: "RH",
+    FileRef: "/sites/ikareview/Documents/RH",
+    FileLeafRef: "RH",
+    FSObjType: 1,
+    DocCategory: "Guide",
+    Confidentiality: "Interne",
+    IsPinned: false,
+    Modified: "2026-06-01",
+    Created: "2025-01-10",
+    Editor: { Id: 6, Title: "RH" }
+  },
   {
     Id: 1,
     Title: "Charte informatique IKA Solution.pdf",
     FileRef: "/sites/ikareview/Documents/Charte informatique IKA Solution.pdf",
     FileLeafRef: "Charte informatique IKA Solution.pdf",
+    FSObjType: 0,
     DocCategory: "Procédure",
     Confidentiality: "Public",
     IsPinned: true,
@@ -144,7 +213,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Vos documents financiers, rapports et échéances fiscales au même endroit.",
     Accent: "navy",
     IconName: "finance",
-    SiteUrl: { Url: "#documents", Description: "Comptabilité" },
+    SiteUrl: { Url: "/sites/ika-comptabilite", Description: "Comptabilité" },
     AccentClasses: "bg-brand-navy text-white",
     BadgeClasses: "bg-blue-100 text-blue-800",
     MemberCount: 12,
@@ -162,7 +231,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Gestion administrative, RH, contrats et démarches internes.",
     Accent: "cyan",
     IconName: "admin",
-    SiteUrl: { Url: "#documents", Description: "Administration" },
+    SiteUrl: { Url: "/sites/ika-administration", Description: "Administration" },
     AccentClasses: "bg-brand-cyan text-white",
     BadgeClasses: "bg-cyan-100 text-cyan-800",
     MemberCount: 8,
@@ -180,7 +249,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Bordereaux de prix, offres et relations clients.",
     Accent: "navy",
     IconName: "Users",
-    SiteUrl: { Url: "#bordereau", Description: "Commerciaux" },
+    SiteUrl: { Url: "/sites/ika-commerciaux", Description: "Commerciaux" },
     AccentClasses: "bg-amber-600 text-white",
     BadgeClasses: "bg-amber-100 text-amber-800",
     MemberCount: 15,
@@ -198,7 +267,7 @@ export const MOCK_DEPARTEMENTS: IDepartement[] = [
     HeroSubtitle: "Architecture logicielle, cloud et déploiements.",
     Accent: "cyan",
     IconName: "Settings",
-    SiteUrl: { Url: "#organigramme", Description: "Techniciens" },
+    SiteUrl: { Url: "/sites/ika-techniciens", Description: "Techniciens" },
     AccentClasses: "bg-blue-600 text-white",
     BadgeClasses: "bg-blue-100 text-blue-800",
     MemberCount: 35,
@@ -570,6 +639,32 @@ export const MOCK_QUICKLINKS: IQuickLink[] = [
     LinkDescription: "Politique de déplacements",
     IconName: "Plane",
     SortOrder: 10,
+    OpenInNewTab: false,
+    LinkGroup: "Ressources",
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 11,
+    Title: "Fournisseurs",
+    LinkUrl: { Url: "#fournisseurs", Description: "Fournisseurs" },
+    LinkDescription: "Répertoire des fournisseurs référencés",
+    IconName: "Briefcase",
+    SortOrder: 11,
+    OpenInNewTab: false,
+    LinkGroup: "Ressources",
+    IsActive: true,
+    Created: "2026-01-01",
+    Modified: "2026-01-01"
+  },
+  {
+    Id: 12,
+    Title: "Équipements",
+    LinkUrl: { Url: "#equipements", Description: "Équipements" },
+    LinkDescription: "Parc d'équipements de l'entreprise",
+    IconName: "Wrench",
+    SortOrder: 12,
     OpenInNewTab: false,
     LinkGroup: "Ressources",
     IsActive: true,
@@ -1033,3 +1128,325 @@ export const MOCK_FAQ: IFaqItem[] = [
     Modified: "2026-01-01"
   }
 ];
+
+/**
+ * Jeu de résultats factices pour la recherche globale.
+ *
+ * Indispensable : le Workbench tourne sur localhost, donc `SearchService`
+ * bascule en mode mock — sans ces entrées la barre de recherche serait
+ * inerte pendant tout le développement. On couvre les cinq verticales
+ * (dont e-mails et messages Teams) pour pouvoir vérifier les onglets sans
+ * dépendre d'une approbation d'administrateur.
+ *
+ * Les `summary` contiennent volontairement des `<mark>` : ils imitent le
+ * surlignage déjà converti et assaini par `SearchService`.
+ */
+export const MOCK_SEARCH_RESULTS: ISearchResult[] = [
+  {
+    id: "/sites/ika/Documents/Budget-previsionnel-2026.xlsx",
+    kind: "file",
+    title: "Budget prévisionnel 2026.xlsx",
+    url: "/sites/ika/Documents/Budget-previsionnel-2026.xlsx",
+    summary:
+      "Répartition du <mark>budget</mark> par département pour l'exercice 2026, validée en comité de direction.",
+    author: "Awa Kaboré",
+    modified: "2026-08-21T09:12:00Z",
+    siteTitle: "Comptabilité",
+    fileExtension: "xlsx",
+    sizeBytes: 184320
+  },
+  {
+    id: "/sites/ika/Documents/Budgets",
+    kind: "folder",
+    title: "Budgets",
+    url: "/sites/ika/Documents/Budgets",
+    summary: "Dossier — archives des <mark>budget</mark>s annuels depuis 2019.",
+    modified: "2026-07-30T16:45:00Z",
+    siteTitle: "Comptabilité"
+  },
+  {
+    id: "/sites/ika/SitePages/Revision-budgetaire-T3.aspx",
+    kind: "news",
+    title: "Révision budgétaire du troisième trimestre",
+    url: "/sites/ika/SitePages/Revision-budgetaire-T3.aspx",
+    summary:
+      "La direction financière annonce une révision du <mark>budget</mark> de fonctionnement à compter de septembre.",
+    author: "Direction financière",
+    modified: "2026-08-18T11:00:00Z",
+    siteTitle: "Actualités"
+  },
+  {
+    id: "/sites/ika/Documents/Procedure-achats.docx",
+    kind: "file",
+    title: "Procédure achats et engagements.docx",
+    url: "/sites/ika/Documents/Procedure-achats.docx",
+    summary:
+      "Circuit de validation des engagements de dépense au-delà du seuil <mark>budget</mark>aire de 500 000 XOF.",
+    author: "Ibrahim Traoré",
+    modified: "2026-06-04T08:30:00Z",
+    siteTitle: "Administration",
+    fileExtension: "docx",
+    sizeBytes: 47104
+  },
+  {
+    id: "/sites/ika/Lists/Projets/12",
+    kind: "listItem",
+    title: "Refonte du portail intranet",
+    url: "/sites/ika/Lists/Projets/DispForm.aspx?ID=12",
+    summary:
+      "Projet en cours — enveloppe <mark>budget</mark>aire allouée, livraison prévue au quatrième trimestre.",
+    author: "Landry Kaboré",
+    modified: "2026-08-25T14:20:00Z",
+    siteTitle: "Projets"
+  },
+  {
+    id: "awa.kabore@ikasolution.com",
+    kind: "person",
+    title: "Awa Kaboré",
+    url: "#",
+    author: "Responsable comptabilité · Comptabilité",
+    siteTitle: "awa.kabore@ikasolution.com"
+  },
+  {
+    id: "ibrahim.traore@ikasolution.com",
+    kind: "person",
+    title: "Ibrahim Traoré",
+    url: "#",
+    author: "Directeur administratif · Administration",
+    siteTitle: "ibrahim.traore@ikasolution.com"
+  },
+  {
+    id: "mock-email-1",
+    kind: "email",
+    title: "Validation du budget prévisionnel 2026",
+    url: "#",
+    summary:
+      "Bonjour, merci de me retourner vos arbitrages sur le <mark>budget</mark> avant vendredi.",
+    author: "Awa Kaboré",
+    modified: "2026-08-22T07:41:00Z"
+  },
+  {
+    id: "mock-email-2",
+    kind: "email",
+    title: "RE : Engagements de dépense — seuil de validation",
+    url: "#",
+    summary:
+      "Le seuil reste inchangé pour ce cycle <mark>budget</mark>aire, voir la procédure jointe.",
+    author: "Ibrahim Traoré",
+    modified: "2026-08-19T15:08:00Z"
+  },
+  {
+    id: "mock-chat-1",
+    kind: "chat",
+    title: "Message Teams",
+    url: "#",
+    summary:
+      "@Landry le fichier <mark>budget</mark> est à jour dans la bibliothèque Comptabilité 👍",
+    author: "Awa Kaboré",
+    modified: "2026-08-25T10:03:00Z"
+  },
+  {
+    id: "mock-chat-2",
+    kind: "chat",
+    title: "Message Teams",
+    url: "#",
+    summary:
+      "On cale le point <mark>budget</mark> mardi 10h ? J'invite la direction financière.",
+    author: "Fatou Sanogo",
+    modified: "2026-08-24T17:26:00Z"
+  },
+  {
+    id: "/sites/ika",
+    kind: "site",
+    title: "IKA Solution — Intranet",
+    url: "/sites/ika",
+    summary: "Site racine du portail collaboratif IKA Solution.",
+    siteTitle: "IKA Solution"
+  }
+];
+
+/* ------------------------------------------------------------------ */
+/* Agenda — calendrier personnel & disponibilité équipe                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Les rendez-vous sont calés sur la date du jour : sans cela, le Workbench
+ * afficherait un agenda vide dès que les dates codées en dur sont dépassées.
+ */
+function atDay(offsetDays: number, hour: number, minutes: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  date.setHours(hour, minutes, 0, 0);
+  return date.toISOString();
+}
+
+export const MOCK_MY_CALENDAR: ICalendarEntry[] = [
+  {
+    Id: "me-1",
+    Title: "Point hebdomadaire — Pôle Engineering",
+    Start: atDay(0, 9, 30),
+    End: atDay(0, 10, 30),
+    IsAllDay: false,
+    Location: "Teams",
+    Organizer: "SERGE GEDEON OUE",
+    Source: "outlook"
+  },
+  {
+    Id: "me-2",
+    Title: "Revue de code — module facturation",
+    Start: atDay(0, 14, 0),
+    End: atDay(0, 15, 0),
+    IsAllDay: false,
+    Location: "Salle B",
+    Organizer: "Sandrine T. KINI",
+    Source: "outlook"
+  },
+  {
+    Id: "me-3",
+    Title: "Entretien candidat — développeur SPFx",
+    Start: atDay(1, 11, 0),
+    End: atDay(1, 12, 0),
+    IsAllDay: false,
+    Location: "Ouagadougou — Siège",
+    Organizer: "YAYA Ouattara",
+    Source: "outlook"
+  },
+  {
+    Id: "me-4",
+    Title: "Congé posé",
+    Start: atDay(3, 0, 0),
+    End: atDay(4, 0, 0),
+    IsAllDay: true,
+    Source: "outlook"
+  },
+  {
+    Id: "me-5",
+    Title: "Atelier client — cadrage besoins",
+    Start: atDay(5, 10, 0),
+    End: atDay(5, 12, 30),
+    IsAllDay: false,
+    Location: "Visioconférence",
+    Organizer: "SERGE GEDEON OUE",
+    Source: "outlook"
+  }
+];
+
+export const MOCK_TEAM_BUSY: ITeamMemberBusy[] = [
+  {
+    Email: "y.ouattara@ikasolution.com",
+    DisplayName: "YAYA Ouattara",
+    Slots: [
+      { Start: atDay(0, 9, 0), End: atDay(0, 11, 0), Status: "busy" },
+      { Start: atDay(0, 15, 0), End: atDay(0, 16, 0), Status: "tentative" }
+    ]
+  },
+  {
+    Email: "s.kini@ikasolution.com",
+    DisplayName: "Sandrine T. KINI",
+    Slots: [
+      { Start: atDay(0, 14, 0), End: atDay(0, 15, 0), Status: "busy" },
+      { Start: atDay(1, 9, 30), End: atDay(1, 12, 0), Status: "busy" }
+    ]
+  },
+  {
+    Email: "s.oue@ikasolution.com",
+    DisplayName: "SERGE GEDEON OUE",
+    Slots: [
+      { Start: atDay(0, 9, 30), End: atDay(0, 10, 30), Status: "busy" },
+      { Start: atDay(0, 13, 0), End: atDay(0, 17, 0), Status: "oof" }
+    ]
+  },
+  {
+    Email: "a.kabore@ikasolution.com",
+    DisplayName: "Awa Kaboré",
+    Slots: []
+  }
+];
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * Listes génériques (Fournisseurs, Équipements)
+ *
+ * Le Workbench local force `_useMocks` sans échappatoire (`DataService`), donc
+ * la détection réelle de schéma y est inaccessible : ces jeux de démonstration
+ * sont le seul moyen de développer et de relire la vue sans site SharePoint.
+ * Ils sont toujours restitués avec `isDemo: true`, jamais comme repli d'erreur.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+export const MOCK_FOURNISSEURS_COLUMNS: IListColumn[] = [
+  { internalName: "Title", displayName: "Fournisseur", kind: "text", spType: "Text", numeric: false },
+  { internalName: "Categorie", displayName: "Catégorie", kind: "choice", spType: "Choice", numeric: false },
+  { internalName: "Contact", displayName: "Contact", kind: "text", spType: "Text", numeric: false },
+  { internalName: "Telephone", displayName: "Téléphone", kind: "text", spType: "Text", numeric: false },
+  { internalName: "MontantContrat", displayName: "Montant du contrat", kind: "currency", spType: "Currency", numeric: true, currencyCode: "XOF" },
+  { internalName: "DateContrat", displayName: "Date du contrat", kind: "date", spType: "DateTime", numeric: false },
+  { internalName: "Actif", displayName: "Actif", kind: "boolean", spType: "Boolean", numeric: false }
+];
+
+export const MOCK_FOURNISSEURS_ROWS: IListRow[] = [
+  { Id: 1, Title: "Sahel Informatique SARL", Categorie: "Matériel", Contact: "Boubacar Traoré", Telephone: "+226 25 30 12 40", MontantContrat: 18500000, DateContrat: "2026-01-15", Actif: true },
+  { Id: 2, Title: "Faso Energie", Categorie: "Énergie", Contact: "Aminata Ouédraogo", Telephone: "+226 25 31 88 02", MontantContrat: 7200000, DateContrat: "2025-11-03", Actif: true },
+  { Id: 3, Title: "Cabinet Zongo & Associés", Categorie: "Conseil", Contact: "Idrissa Zongo", Telephone: "+226 25 36 44 17", MontantContrat: 4300000, DateContrat: "2026-02-28", Actif: true },
+  { Id: 4, Title: "TransOuest Logistique", Categorie: "Transport", Contact: "Salif Compaoré", Telephone: "+226 25 39 21 76", MontantContrat: 2650000, DateContrat: "2025-08-19", Actif: false },
+  { Id: 5, Title: "NetSecure Afrique", Categorie: "Services", Contact: "Fatoumata Diallo", Telephone: "+226 25 33 57 90", MontantContrat: 11900000, DateContrat: "2026-03-10", Actif: true },
+  { Id: 6, Title: "Papeterie du Centre", Categorie: "Fournitures", Contact: "Rasmané Kaboré", Telephone: "+226 25 30 74 55", MontantContrat: 890000, DateContrat: "2025-06-02", Actif: true }
+];
+
+export const MOCK_EQUIPEMENTS_COLUMNS: IListColumn[] = [
+  { internalName: "Title", displayName: "Équipement", kind: "text", spType: "Text", numeric: false },
+  { internalName: "NumeroSerie", displayName: "N° de série", kind: "text", spType: "Text", numeric: false },
+  { internalName: "TypeEquipement", displayName: "Type", kind: "choice", spType: "Choice", numeric: false },
+  { internalName: "Localisation", displayName: "Localisation", kind: "text", spType: "Text", numeric: false },
+  { internalName: "Attribue", displayName: "Attribué à", kind: "user", spType: "User", numeric: false },
+  { internalName: "DateAchat", displayName: "Date d'achat", kind: "date", spType: "DateTime", numeric: false },
+  { internalName: "Valeur", displayName: "Valeur", kind: "currency", spType: "Currency", numeric: true, currencyCode: "XOF" },
+  { internalName: "SousGarantie", displayName: "Sous garantie", kind: "boolean", spType: "Boolean", numeric: false }
+];
+
+export const MOCK_EQUIPEMENTS_ROWS: IListRow[] = [
+  { Id: 1, Title: "Dell Latitude 5540", NumeroSerie: "DL5540-0231", TypeEquipement: "Ordinateur portable", Localisation: "Siège — 2e étage", Attribue: { Id: 3, Title: "Awa Kaboré", EMail: "awa.kabore@ikasolution.com" }, DateAchat: "2026-01-08", Valeur: 780000, SousGarantie: true },
+  { Id: 2, Title: "HP LaserJet M480", NumeroSerie: "HPM480-1187", TypeEquipement: "Imprimante", Localisation: "Siège — Accueil", Attribue: undefined, DateAchat: "2025-04-22", Valeur: 495000, SousGarantie: false },
+  { Id: 3, Title: "Cisco Catalyst 9200", NumeroSerie: "C9200-0044", TypeEquipement: "Réseau", Localisation: "Salle serveurs", Attribue: undefined, DateAchat: "2025-09-30", Valeur: 2350000, SousGarantie: true },
+  { Id: 4, Title: "Onduleur APC 3000VA", NumeroSerie: "APC3000-0876", TypeEquipement: "Énergie", Localisation: "Salle serveurs", Attribue: undefined, DateAchat: "2024-12-11", Valeur: 1120000, SousGarantie: false },
+  { Id: 5, Title: "MacBook Pro 14", NumeroSerie: "MBP14-0509", TypeEquipement: "Ordinateur portable", Localisation: "Siège — 3e étage", Attribue: { Id: 7, Title: "Idrissa Sawadogo", EMail: "idrissa.sawadogo@ikasolution.com" }, DateAchat: "2026-02-17", Valeur: 1450000, SousGarantie: true },
+  { Id: 6, Title: "Vidéoprojecteur Epson EB-L200", NumeroSerie: "EBL200-0312", TypeEquipement: "Audiovisuel", Localisation: "Salle de réunion A", Attribue: undefined, DateAchat: "2025-07-05", Valeur: 640000, SousGarantie: true }
+];
+
+const MOCK_GENERIC_COLUMNS: IListColumn[] = [
+  { internalName: "Title", displayName: "Titre", kind: "text", spType: "Text", numeric: false },
+  { internalName: "Modified", displayName: "Modifié le", kind: "date", spType: "DateTime", numeric: false }
+];
+
+const MOCK_GENERIC_ROWS: IListRow[] = [
+  { Id: 1, Title: "Premier élément", Modified: "2026-03-01" },
+  { Id: 2, Title: "Deuxième élément", Modified: "2026-02-14" },
+  { Id: 3, Title: "Troisième élément", Modified: "2026-01-27" }
+];
+
+/**
+ * Jeu de démonstration pour la vue tableau générique. Un titre inconnu renvoie
+ * un tableau générique à deux colonnes plutôt qu'un écran vide : dans le
+ * Workbench, un écran vide se confond avec un bug.
+ */
+export function mockListTable(listTitle: string): IListTableData {
+  const key = (listTitle || "").trim().toLowerCase();
+
+  let columns = MOCK_GENERIC_COLUMNS;
+  let rows = MOCK_GENERIC_ROWS;
+
+  if (key.indexOf("fournisseur") === 0) {
+    columns = MOCK_FOURNISSEURS_COLUMNS;
+    rows = MOCK_FOURNISSEURS_ROWS;
+  } else if (key.indexOf("equipement") === 0 || key.indexOf("équipement") === 0) {
+    columns = MOCK_EQUIPEMENTS_COLUMNS;
+    rows = MOCK_EQUIPEMENTS_ROWS;
+  }
+
+  return {
+    listTitle,
+    columns,
+    rows,
+    isDemo: true,
+    truncated: false,
+    totalColumns: columns.length
+  };
+}

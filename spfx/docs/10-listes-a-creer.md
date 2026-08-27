@@ -58,6 +58,19 @@ Légende « Requis » : **Oui** = obligatoire · **Non** = facultatif.
 Choix `Category` : `Entreprise` · `RH` · `Projet` · `Finance` · `Administration` ·
 `Commercial` · `Technique` · `Événement` · `DevOps` · `Formation` · `Cybersécurité` · `Innovation`
 
+### A1bis. `Commentaires` — Commentaires sur les actualités · *Liste (100)*
+
+Versioning **désactivé**, approbation de contenu **désactivée** (inverse
+d'`Actualites` : un commentaire doit être visible immédiatement).
+
+| Affichage | Interne | Type | Requis |
+|---|---|---|---|
+| Titre | `Title` | Texte | Oui (rempli par le code, jamais saisi) |
+| Actualité | `NewsItem` | Recherche → `Actualites` | Oui |
+| Commentaire | `CommentText` | Note | Oui |
+
+Auteur/date = champs système `Author`/`Created`, pas de colonne à créer.
+
 ### A2. `Documents` 🏠 — Bibliothèque documentaire · *Bibliothèque (101)*
 
 | Affichage | Interne | Type | Requis |
@@ -375,6 +388,7 @@ Choix `FiscalQuarter` : `T1` · `T2` · `T3` · `T4`
 | Liste | Emplacement | Type | Web Part(s) consommatrice(s) |
 |---|---|---|---|
 | `Actualites` 🏠 | locale | Liste | Actualités (grille accueil), Liste actualités |
+| `Commentaires` | locale | Liste | Page de détail actualité |
 | `Documents` 🏠 | locale | Bibliothèque | Documents, Accès rapide |
 | `Evenements` 🏠 | locale | Calendrier | Événements, Accès rapide |
 | `LiensRapides` 🏠 | locale | Liste | Liens rapides, Accès rapide |

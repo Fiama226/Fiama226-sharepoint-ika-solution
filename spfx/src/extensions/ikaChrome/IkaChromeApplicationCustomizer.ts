@@ -15,14 +15,16 @@ import {
   IIkaChromeProperties,
   INavNode,
 } from "../../models/IChromeModels";
-import { ICompanyInfo } from "../../models/IIkaModels";
+import { ICompanyInfo, IDepartement } from "../../models/IIkaModels";
 import {
   NavigationService,
   STATIC_PRIMARY_NAV,
   STATIC_SECONDARY_NAV,
 } from "../../services/NavigationService";
 import { DataService } from "../../services/DataService";
-import { buildUserPhotoUrl } from "../../common/utils/spUtils";
+import { SearchService } from "../../services/SearchService";
+import { ISearchResponse } from "../../models/IIkaModels";
+import { buildUserPhotoUrl, resolveUrl } from "../../common/utils/spUtils";
 
 const LOG_SOURCE = "IkaChrome";
 
@@ -37,7 +39,20 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
 
   private _primaryNav: INavNode[] = STATIC_PRIMARY_NAV;
   private _company: ICompanyInfo | undefined = undefined;
+  private _departments: IDepartement[] = [];
   private _hydrated: boolean = false;
+  private _searchService: SearchService | undefined = undefined;
+
+  /**
+   * Lié une fois : `_renderHeader()` est rappelé après hydratation, et une
+   * nouvelle identité de fonction relancerait la temporisation côté React.
+   */
+  private readonly _suggestFn = (term: string): Promise<ISearchResponse> => {
+    if (!this._searchService) {
+      this._searchService = new SearchService(this.context, this._hubUrl);
+    }
+    return this._searchService.suggest(term);
+  };
 
   @override
   public onInit(): Promise<void> {
@@ -95,13 +110,37 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
   }
 
   private _documentsNav(): INavNode[] {
+    // Source de vérité : la liste `Departements` (colonne SiteUrl), qui
+    // pointe vers le vrai site SharePoint de chaque département et donc
+    // vers sa propre liste `Documents` — pas une supposition dérivée de
+    // la navigation primaire (qui, en repli statique, vaut "#documents"
+    // pour les 4 départements à la fois, et ne mène nulle part de réel).
+    if (this._departments.length > 0) {
+      return this._departments
+        .map((dept) => {
+          const siteUrl = resolveUrl(dept.SiteUrl).replace(/\/$/, "");
+          const usable = siteUrl && !siteUrl.startsWith("#");
+          return {
+            key: `${dept.Slug}-docs`,
+            label: dept.Title,
+            url: usable ? `${siteUrl}/Documents` : "",
+            iconName: dept.IconName,
+          };
+        })
+        .filter((node) => node.url !== "");
+    }
+
+    // Repli tant que `Departements` n'a pas encore répondu : on ne garde
+    // que les entrées qui ont déjà une vraie URL de site (navigation hub
+    // chargée), jamais les fragments "#..." du repli statique, qui ne
+    // désignent aucun référentiel réel.
     const homePath = this.context.pageContext.web.serverRelativeUrl;
     return this._primaryNav
-      .filter((node) => node.url !== homePath)
+      .filter((node) => node.url !== homePath && !node.url.startsWith("#"))
       .map((node) => ({
         key: `${node.key}-docs`,
         label: node.label,
-        url: `${node.url}/Documents%20partages`,
+        url: `${node.url.replace(/\/$/, "")}/Documents`,
         iconName: node.iconName,
       }));
   }
@@ -124,16 +163,30 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
       );
     }
 
-    if (this.properties.showFooter !== false) {
+    if (this.properties.showFooter !== false || this.properties.showDocumentsMenu !== false) {
       const dataService = new DataService(this.context, this._hubUrl);
-      tasks.push(
-        dataService
-          .getCompanyInfo()
-          .then((info) => {
-            this._company = info;
-          })
-          .catch(() => undefined)
-      );
+
+      if (this.properties.showFooter !== false) {
+        tasks.push(
+          dataService
+            .getCompanyInfo()
+            .then((info) => {
+              this._company = info;
+            })
+            .catch(() => undefined)
+        );
+      }
+
+      if (this.properties.showDocumentsMenu !== false) {
+        tasks.push(
+          dataService
+            .getDepartements()
+            .then((depts) => {
+              this._departments = depts;
+            })
+            .catch(() => undefined)
+        );
+      }
     }
 
     await Promise.all(tasks);
@@ -163,6 +216,11 @@ export default class IkaChromeApplicationCustomizer extends BaseApplicationCusto
         showSearch: this.properties.showSearch !== false,
         showDocumentsMenu: this.properties.showDocumentsMenu !== false,
         documentsNav: this._documentsNav(),
+        // Suggestions disponibles aussi hors du portail plein écran. Sans
+        // `onNavigate`, valider bascule toujours vers la recherche native
+        // SharePoint : le menu déroulant enrichit ce parcours, il ne le
+        // remplace pas.
+        onSearch: this._suggestFn,
       }),
       this._topPlaceholder.domElement
     );

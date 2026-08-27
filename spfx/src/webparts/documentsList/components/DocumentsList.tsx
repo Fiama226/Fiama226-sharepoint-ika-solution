@@ -130,10 +130,19 @@ export const DocumentsList: React.FC<IDocumentsListProps> = (props) => {
       );
     }
 
+    // Dossiers d'abord, puis fichiers — chacun triés par date déjà via le
+    // $orderby côté serveur (Modified desc).
+    const sorted = [...documents].sort((a, b) => {
+      const aFolder = a.FSObjType === 1 ? 0 : 1;
+      const bFolder = b.FSObjType === 1 ? 0 : 1;
+      return aFolder - bFolder;
+    });
+
     return (
       <ul className="ika-divide-y ika-divide-brand-line ika-overflow-hidden ika-rounded-3xl ika-border ika-border-brand-navy/10 ika-bg-white ika-shadow-sm">
-        {documents.map((doc) => {
-          const ext = getFileExtension(doc.FileLeafRef);
+        {sorted.map((doc) => {
+          const isFolder = doc.FSObjType === 1;
+          const ext = isFolder ? "" : getFileExtension(doc.FileLeafRef);
           const displayName = doc.Title || doc.FileLeafRef;
           const size = doc.FileSizeDisplay ? doc.FileSizeDisplay : "";
 
@@ -147,10 +156,15 @@ export const DocumentsList: React.FC<IDocumentsListProps> = (props) => {
                 <div
                   className={cn(
                     "ika-rounded-xl ika-p-2.5",
-                    iconColor(ext)
+                    isFolder
+                      ? "ika-text-amber-600 ika-bg-amber-50"
+                      : iconColor(ext)
                   )}
                 >
-                  <Icon name={fileIcon(ext)} className="ika-h-5 ika-w-5" />
+                  <Icon
+                    name={isFolder ? "FolderOpen" : fileIcon(ext)}
+                    className="ika-h-5 ika-w-5"
+                  />
                 </div>
 
                 <div className="ika-min-w-0 ika-flex-1">
@@ -158,7 +172,9 @@ export const DocumentsList: React.FC<IDocumentsListProps> = (props) => {
                     {displayName}
                   </p>
                   <p className="ika-text-sm ika-text-brand-muted">
-                    {size || (ext ? ext.toUpperCase() : "Fichier")}
+                    {isFolder
+                      ? "Dossier"
+                      : size || (ext ? ext.toUpperCase() : "Fichier")}
                     {doc.DocCategory ? ` · ${doc.DocCategory}` : ""}
                   </p>
                 </div>
@@ -176,8 +192,11 @@ export const DocumentsList: React.FC<IDocumentsListProps> = (props) => {
                 ) : null}
 
                 <span className="ika-hidden ika-shrink-0 ika-items-center ika-gap-1 ika-rounded-full ika-bg-brand-surface ika-px-3 ika-py-1 ika-text-xs ika-font-medium ika-text-brand-muted sm:ika-flex">
-                  <Icon name="Download" className="ika-h-3.5 ika-w-3.5" />
-                  Ouvrir
+                  <Icon
+                    name={isFolder ? "ChevronRight" : "Download"}
+                    className="ika-h-3.5 ika-w-3.5"
+                  />
+                  {isFolder ? "Ouvrir le dossier" : "Ouvrir"}
                 </span>
               </a>
             </li>

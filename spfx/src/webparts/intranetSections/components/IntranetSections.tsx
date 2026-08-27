@@ -230,6 +230,13 @@ const EmployeeCard: React.FC<{
   const photo =
     (employee && employee.Photo ? buildImageUrl(employee.Photo, 600) : "") ||
     photoUrl;
+  const initials = name
+    .split(" ")
+    .filter((part) => part.length > 0)
+    .map((part) => part.charAt(0))
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
 
   return (
     <section className="ika-w-full ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
@@ -257,7 +264,14 @@ const EmployeeCard: React.FC<{
                 alt={name}
                 className="ika-h-full ika-w-full ika-object-cover ika-object-top"
               />
-            ) : null}
+            ) : (
+              <div
+                aria-hidden="true"
+                className="ika-flex ika-h-full ika-w-full ika-items-center ika-justify-center ika-bg-white/10 ika-text-3xl ika-font-bold ika-text-white/60"
+              >
+                {initials || "IK"}
+              </div>
+            )}
             <div className="ika-absolute ika-inset-0 ika-bg-gradient-to-t ika-from-black/60 ika-via-transparent ika-to-transparent" />
             <div className="ika-absolute ika-left-4 ika-top-4 ika-flex ika-items-center ika-gap-1 ika-rounded-full ika-bg-amber-500 ika-px-3 ika-py-1 ika-text-[10px] ika-font-bold ika-uppercase ika-tracking-widest ika-text-white">
               <Icon name="Award" className="ika-h-[11px] ika-w-[11px]" />

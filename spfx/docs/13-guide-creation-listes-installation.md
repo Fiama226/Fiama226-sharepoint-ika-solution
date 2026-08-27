@@ -36,6 +36,7 @@ Voici les listes, **avec l'emplacement exact** où la Web Part va les chercher :
 | 13 | `Indicateurs` | Liste | hub | ✅ |
 | 14 | `Histoire` | Liste | hub | ✅ (frise) |
 | 15 | `FAQ` | Liste | hub | ✅ |
+| 16 | `Commentaires` | Liste | site courant | ✅ (page de détail actualité) |
 
 > ⚠️ **Cas "démarrage rapide" (recommandé)** : créez **TOUTES** les listes sur
 > le **même site** que la page (site courant = hub). La Web Part retombe alors
@@ -92,6 +93,24 @@ Voici les listes, **avec l'emplacement exact** où la Web Part va les chercher :
 | `Highlighted` | Oui/Non | À la une |
 | `ExternalLink` | Lien | Facultatif |
 | `SortOrder` | Nombre | Ordre |
+
+### 2.2 Colonnes pour `Commentaires` (Liste)
+
+> Désactiver **versioning** et **approbation de contenu** sur cette liste
+> (paramètres de la liste → Paramètres avancés) — l'inverse d'`Actualites` :
+> un commentaire doit s'afficher immédiatement.
+
+1. **Contenu du site → Nouveau → Liste → Liste vide**, nom : `Commentaires`.
+2. `Title` (déjà présent) : laisser tel quel, rempli automatiquement par le
+   code — ne rien saisir manuellement dessus.
+3. `CommentText` : **+ Ajouter une colonne → Plusieurs lignes de texte (Note)**.
+4. `NewsItem` : **+ Ajouter une colonne → Plus... → Recherche**, puis :
+   - Liste source : `Actualites`
+   - Colonne à afficher : `Title`
+   - Cocher **Obligatoire**, puis **Indexer cette colonne** (paramètres de la
+     colonne, en bas) — la Web Part filtre les commentaires par article.
+5. Ne **rien** créer pour l'auteur ou la date : ce sont les champs système
+   `Author`/`Created`, remplis automatiquement par SharePoint à chaque ajout.
 
 ---
 

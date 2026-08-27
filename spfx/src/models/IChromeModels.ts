@@ -1,4 +1,4 @@
-import { ICompanyInfo } from "./IIkaModels";
+import { ICompanyInfo, ISearchResponse } from "./IIkaModels";
 
 export interface INavNode {
   key: string;
@@ -31,6 +31,15 @@ export interface IIkaHeaderProps {
   showSearch: boolean;
   showDocumentsMenu: boolean;
   documentsNav: INavNode[];
+  /**
+   * Fournit les suggestions du menu déroulant de recherche.
+   *
+   * OPTIONNEL : sans ce callback l'en-tête conserve son comportement
+   * historique — soumettre redirige vers la recherche native SharePoint.
+   * C'est ce qui permet de brancher le menu déroulant sur le portail sans
+   * toucher aux pages où l'en-tête est injecté par l'extension.
+   */
+  onSearch?: (term: string) => Promise<ISearchResponse>;
 }
 
 export interface IIkaFooterProps {

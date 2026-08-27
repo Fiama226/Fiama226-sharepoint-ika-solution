@@ -87,6 +87,36 @@ Source : `data/news.ts` → interface `News` + `HomeNewsItem`
 
 ---
 
+## A1bis. `Commentaires` — Commentaires sur les actualités
+
+- **Nom interne de liste** : `Commentaires`
+- **URL** : `Lists/Commentaires`
+- **Template** : 100 (Liste générique)
+- **Versioning** : **désactivé**
+- **Approbation de contenu** : **désactivée** — un commentaire doit apparaître
+  immédiatement. Volontairement l'inverse d'`Actualites` : écrire un
+  commentaire dans une colonne d'`Actualites` renverrait l'article entier en
+  attente d'approbation.
+
+| Nom affiché | Nom interne | Type | Requis | Indexé | Détail |
+|---|---|---|---|---|---|
+| Titre | `Title` | Text | Oui | Non | Rempli automatiquement par le code (début du commentaire), jamais saisi |
+| Actualité | `NewsItem` | Lookup → `Actualites`.Title | Oui | **Oui** | Article commenté |
+| Commentaire | `CommentText` | Note | Oui | Non | Texte du commentaire |
+
+> Auteur et date ne sont **pas** des colonnes à créer : ce sont les champs
+> système SharePoint `Author` (créateur de l'élément) et `Created`, remplis
+> automatiquement à chaque ajout — comme pour `NewsAuthor` sur `Actualites`,
+> `Author` ne peut pas être redéfini, on le lit tel quel via `$expand=Author`.
+
+**Permissions** : héritées du site (pas de permissions cassées) — tout
+collaborateur pouvant lire `Actualites` doit pouvoir écrire dans
+`Commentaires`. Modération : pas d'interface dédiée dans le web part v1, un
+administrateur supprime un commentaire directement depuis cette liste dans
+SharePoint.
+
+---
+
 ## A2. `Documents` — Bibliothèque documentaire
 
 Source : `data/documents.ts` → interface `DocumentItem`

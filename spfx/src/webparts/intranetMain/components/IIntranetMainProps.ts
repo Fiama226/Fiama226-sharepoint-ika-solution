@@ -1,6 +1,8 @@
 import {
+  IAgendaPayload,
   IAnnouncement,
   ICollaborateur,
+  IComment,
   IDepartement,
   IDocumentItem,
   IEmployeeOfMonth,
@@ -14,6 +16,9 @@ import {
   INewsItem,
   IProject,
   IQuickLink,
+  IListTableData,
+  ISearchResponse,
+  SearchVertical,
 } from "../../../models/IIkaModels";
 
 /**
@@ -77,4 +82,44 @@ export interface IIntranetMainProps {
 
   // —— Callbacks / options d'animation —————————————————————
   animationsEnabled: boolean;
+
+  // —— Actualités : page de détail + commentaires ———————————
+  getNewsDetail: (id: number) => Promise<INewsItem | undefined>;
+  getComments: (newsId: number) => Promise<IComment[]>;
+  postComment: (newsId: number, text: string) => Promise<IComment>;
+
+  // —— Recherche globale ————————————————————————————————————
+  /**
+   * Exécute une verticale de recherche. Optionnel : sans ce callback, la
+   * barre de l'en-tête retombe sur la recherche native SharePoint et la
+   * route `recherche` affiche un message d'indisponibilité.
+   */
+  search?: (
+    term: string,
+    vertical: SearchVertical,
+    page: number
+  ) => Promise<ISearchResponse>;
+  /** Suggestions du menu déroulant (SharePoint uniquement, temporisées). */
+  suggest?: (term: string) => Promise<ISearchResponse>;
+
+  // —— Agenda ———————————————————————————————————————————————
+  /**
+   * Charge le calendrier Outlook de l'utilisateur et la disponibilité de ses
+   * collègues, fusionnés avec les événements d'entreprise. Optionnel : sans
+   * ce callback — ou s'il échoue — la route `agenda` affiche les seuls
+   * événements de la liste `Evenements`, sans erreur visible.
+   */
+  agenda?: (rangeDays: number) => Promise<IAgendaPayload>;
+
+  // —— Listes génériques (Fournisseurs, Équipements) —————————
+  /** Titres SharePoint exacts, réglables depuis le volet de propriétés. */
+  fournisseursListTitle: string;
+  equipementsListTitle: string;
+  /**
+   * Charge une liste quelconque sous forme de tableau, colonnes découvertes à
+   * l'exécution. Requis — contrairement à `search`/`agenda`, c'est un simple
+   * appel `DataService` qui ne dépend d'aucun consentement Graph. Appelé par la
+   * vue elle-même : rien n'est chargé tant que la route n'est pas ouverte.
+   */
+  getListTable: (listTitle: string) => Promise<IListTableData>;
 }

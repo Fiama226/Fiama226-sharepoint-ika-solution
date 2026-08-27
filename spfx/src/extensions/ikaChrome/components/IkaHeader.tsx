@@ -3,9 +3,12 @@ import "../../../styles/tailwind.css";
 import * as React from "react";
 
 import { IIkaHeaderProps, INavNode } from "../../../models/IChromeModels";
+import { ISearchResult } from "../../../models/IIkaModels";
 import { Icon } from "../../../common/utils/Icon";
 import { useClickOutside } from "../../../common/hooks/useClickOutside";
+import { useSearchSuggest } from "../../../common/hooks/useSearchSuggest";
 import { cn } from "../../../common/utils/spUtils";
+import { SearchSuggest } from "./SearchSuggest";
 
 /**
  * IkaHeader — port 1:1 du header de la maquette Next.js
@@ -123,6 +126,7 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
     documentsNav,
     activeRoute,
     onNavigate,
+    onSearch,
   } = props;
 
   const [menuOpen, setMenuOpen] = React.useState<boolean>(false);
@@ -130,6 +134,10 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
   const [docsOpen, setDocsOpen] = React.useState<boolean>(false);
   const [query, setQuery] = React.useState<string>("");
   const [photoFailed, setPhotoFailed] = React.useState<boolean>(false);
+  const [suggestOpen, setSuggestOpen] = React.useState<boolean>(false);
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1);
+
+  const desktopInputRef = React.useRef<HTMLInputElement>(null);
 
   const profileRef = useClickOutside<HTMLDivElement>(
     () => setProfileOpen(false),
@@ -139,21 +147,127 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
     () => setDocsOpen(false),
     docsOpen
   );
+  // Fermeture au clic extérieur — volontairement PAS `useClickOutside`, qui
+  // ne surveille qu'un seul conteneur. La recherche en a deux (bureau et
+  // mobile) : avec un seul `ref`, un clic sur une suggestion mobile serait vu
+  // comme « extérieur », le panneau serait démonté au `mousedown` et le
+  // `click` de la suggestion n'arriverait jamais.
+  React.useEffect(() => {
+    if (!suggestOpen) return undefined;
 
-  const runSearch = (): void => {
-    const term = query.trim();
-    if (!term) return;
+    const onMouseDown = (event: MouseEvent): void => {
+      const target = event.target as HTMLElement | null;
+      if (target && typeof target.closest === "function") {
+        if (target.closest("[data-ika-search]")) return;
+      }
+      setSuggestOpen(false);
+    };
+
+    document.addEventListener("mousedown", onMouseDown);
+    return () => document.removeEventListener("mousedown", onMouseDown);
+  }, [suggestOpen]);
+
+  const suggest = useSearchSuggest(query, suggestOpen, onSearch);
+
+  // Le nombre de suggestions change à chaque réponse : un index qui pointait
+  // au-delà de la nouvelle liste sélectionnerait un élément inexistant.
+  React.useEffect(() => {
+    setActiveIndex(-1);
+  }, [suggest.results]);
+
+  // Active le badge ⌘K, jusqu'ici purement décoratif (cf. docs/05-extensions.md).
+  React.useEffect(() => {
+    if (!showSearch) return undefined;
+
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        (event.key || "").toLowerCase() === "k"
+      ) {
+        event.preventDefault();
+        desktopInputRef.current?.focus();
+        desktopInputRef.current?.select();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [showSearch]);
+
+  const runSearch = (term?: string): void => {
+    const value = (term !== undefined ? term : query).trim();
+    if (!value) return;
+
+    setSuggestOpen(false);
+    setMenuOpen(false);
+
     if (onNavigate) {
-      onNavigate(`actualites?q=${encodeURIComponent(term)}`);
+      onNavigate(`recherche?q=${encodeURIComponent(value)}`);
     } else {
-      window.location.href = `${context.hubUrl}/_layouts/15/search.aspx/siteall?q=${encodeURIComponent(term)}`;
+      window.location.href = `${context.hubUrl}/_layouts/15/search.aspx/siteall?q=${encodeURIComponent(value)}`;
     }
+  };
+
+  const openResult = (result: ISearchResult): void => {
+    setSuggestOpen(false);
+    setMenuOpen(false);
+    if (!result.url || result.url === "#") return;
+    window.open(result.url, "_blank", "noopener,noreferrer");
   };
 
   const submitSearch = (event: React.FormEvent): void => {
     event.preventDefault();
+    // Entrée sur une suggestion surlignée ouvre CETTE suggestion ; sinon on
+    // bascule sur la page de résultats complète.
+    if (activeIndex >= 0 && suggest.results[activeIndex]) {
+      openResult(suggest.results[activeIndex]);
+      return;
+    }
     runSearch();
   };
+
+  const onSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ): void => {
+    const count = suggest.results.length;
+
+    if (event.key === "Escape") {
+      setSuggestOpen(false);
+      setActiveIndex(-1);
+      return;
+    }
+
+    if (event.key === "ArrowDown" && count > 0) {
+      event.preventDefault();
+      setSuggestOpen(true);
+      setActiveIndex((prev) => (prev + 1) % count);
+      return;
+    }
+
+    if (event.key === "ArrowUp" && count > 0) {
+      event.preventDefault();
+      setActiveIndex((prev) => (prev <= 0 ? count - 1 : prev - 1));
+    }
+  };
+
+  /**
+   * Le formulaire bureau reste dans le DOM sur petit écran (masqué en CSS via
+   * `ika-hidden md:ika-flex`) : les deux champs coexistent donc réellement.
+   * Les identifiants ARIA doivent être distincts par variante, sinon
+   * `aria-activedescendant` pointerait vers un `id` dupliqué.
+   */
+  const searchA11yFor = (
+    variant: "desktop" | "mobile"
+  ): Record<string, string | boolean | undefined> => ({
+    role: "combobox",
+    "aria-expanded": suggestOpen && suggest.results.length > 0,
+    "aria-controls": `ika-search-listbox-${variant}`,
+    "aria-autocomplete": "list",
+    "aria-activedescendant":
+      activeIndex >= 0
+        ? `ika-search-option-${variant}-${activeIndex}`
+        : undefined,
+  });
 
   const navigateTo = (route: string): void => {
     const clean = route.replace(/^#\/?(page-)?/, "") || "accueil";
@@ -266,6 +380,7 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
               {/* Barre de recherche */}
               {showSearch ? (
                 <form
+                  data-ika-search=""
                   onSubmit={submitSearch}
                   role="search"
                   className="ika-group ika-relative ika-hidden ika-items-center md:ika-flex"
@@ -274,16 +389,37 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
                     <Icon name="Search" className="ika-h-4 ika-w-4" />
                   </span>
                   <input
+                    ref={desktopInputRef}
                     type="text"
                     placeholder="Rechercher..."
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setSuggestOpen(true);
+                    }}
+                    onFocus={() => setSuggestOpen(true)}
+                    onKeyDown={onSearchKeyDown}
                     aria-label="Rechercher"
+                    {...(onSearch ? searchA11yFor("desktop") : {})}
                     className="ika-w-56 ika-rounded-full ika-border ika-border-transparent ika-bg-gray-100 ika-py-2 ika-pl-9 ika-pr-8 ika-text-sm ika-outline-none ika-transition-all focus:ika-border-blue-500 focus:ika-bg-white focus:ika-ring-2 focus:ika-ring-blue-500/20 lg:ika-w-64"
                   />
                   <kbd className="ika-absolute ika-right-3 ika-hidden ika-rounded ika-border ika-border-gray-300 ika-bg-gray-200 ika-px-1.5 ika-py-0.5 ika-text-[10px] ika-font-semibold ika-text-gray-400 lg:ika-inline-block">
                     ⌘K
                   </kbd>
+
+                  {onSearch && suggestOpen ? (
+                    <SearchSuggest
+                      query={query}
+                      results={suggest.results}
+                      total={suggest.total}
+                      loading={suggest.loading}
+                      activeIndex={activeIndex}
+                      onHover={setActiveIndex}
+                      onPick={openResult}
+                      onSeeAll={() => runSearch()}
+                      variant="desktop"
+                    />
+                  ) : null}
                 </form>
               ) : null}
 
@@ -469,23 +605,51 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
             <div className="ika-absolute ika-left-0 ika-right-0 ika-top-16 ika-max-h-[calc(100vh-4rem)] ika-overflow-y-auto ika-border-b ika-border-gray-200 ika-bg-white ika-shadow-xl ika-z-40 lg:ika-hidden">
               <div className="ika-space-y-4 ika-p-4">
                 {/* Recherche mobile */}
-                <div className="ika-relative">
-                  <span className="ika-absolute ika-left-3 ika-top-1/2 ika--translate-y-1/2 ika-text-gray-400">
-                    <Icon name="Search" className="ika-h-4 ika-w-4" />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Rechercher..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        runSearch();
-                      }
-                    }}
-                    className="ika-w-full ika-rounded-lg ika-border-transparent ika-bg-gray-100 ika-py-2.5 ika-pl-9 ika-pr-4 ika-text-sm ika-outline-none focus:ika-ring-2 focus:ika-ring-blue-500"
-                  />
+                <div data-ika-search="">
+                  <div className="ika-relative">
+                    <span className="ika-absolute ika-left-3 ika-top-1/2 ika--translate-y-1/2 ika-text-gray-400">
+                      <Icon name="Search" className="ika-h-4 ika-w-4" />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Rechercher..."
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setSuggestOpen(true);
+                      }}
+                      onFocus={() => setSuggestOpen(true)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (activeIndex >= 0 && suggest.results[activeIndex]) {
+                            openResult(suggest.results[activeIndex]);
+                          } else {
+                            runSearch();
+                          }
+                          return;
+                        }
+                        onSearchKeyDown(e);
+                      }}
+                      aria-label="Rechercher"
+                      {...(onSearch ? searchA11yFor("mobile") : {})}
+                      className="ika-w-full ika-rounded-lg ika-border-transparent ika-bg-gray-100 ika-py-2.5 ika-pl-9 ika-pr-4 ika-text-sm ika-outline-none focus:ika-ring-2 focus:ika-ring-blue-500"
+                    />
+                  </div>
+
+                  {onSearch && suggestOpen ? (
+                    <SearchSuggest
+                      query={query}
+                      results={suggest.results}
+                      total={suggest.total}
+                      loading={suggest.loading}
+                      activeIndex={activeIndex}
+                      onHover={setActiveIndex}
+                      onPick={openResult}
+                      onSeeAll={() => runSearch()}
+                      variant="mobile"
+                    />
+                  ) : null}
                 </div>
 
                 {/* Navigation principale */}

@@ -298,8 +298,8 @@ sans cela, chaque navigation fuit de la mémoire.
 | Badge « 119 documents » | **Supprimé** | Compteur inventé, coûterait 5 requêtes |
 | Compteurs par département | **Supprimés** | Idem |
 | Bouton « Déconnexion » | **Supprimé** | Géré par le shell M365 |
-| `⌘K` sur la recherche | **Supprimé** | Raccourci non implémenté dans la maquette |
-| Recherche locale (état) | Redirige vers la **recherche SharePoint** | Fonctionnelle immédiatement |
+| `⌘K` sur la recherche | **Implémenté** | Met le focus sur le champ de recherche (`IkaHeader`) |
+| Recherche locale (état) | **Recherche réelle** | Menu déroulant de suggestions + route `#recherche` (voir `docs/16-recherche-globale.md`). Sans callback `onSearch`, repli sur la recherche native SharePoint |
 | Utilisateur « Landry » en dur | `pageContext.user` | Utilisateur réel |
 | Liens `/services`, `/blog` | **Supprimés** | Jamais implémentés (`AGENTS.md` §8) |
 | `/profile` | Delve (`delve.office.com`) | Profil M365 réel |

@@ -12,14 +12,50 @@ import { cn, buildImageUrl } from "../../../common/utils/spUtils";
  * clavier (Échap / flèches) et piège de focus.
  */
 
-const CATEGORIES = ["Tous", "Événements", "Formation", "Projets"];
+// Les catégories étaient auparavant figées en dur
+// (« Tous / Événements / Formation / Projets ») : toute autre valeur de
+// `GalleryCategory` saisie dans SharePoint restait invisible et non
+// filtrable. On les dérive désormais des données, comme TeamHome le fait
+// déjà pour les départements.
+function buildCategories(images: IGalleryImage[]): string[] {
+  const found = images
+    .map((img) => img.GalleryCategory)
+    .filter((c): c is string => !!c);
+  return ["Tous", ...Array.from(new Set(found))];
+}
 
 export const Gallery: React.FC<IGalleryProps> = (props) => {
-  const { title, description, images, loading, error, showFilters, mosaicLayout } =
-    props;
+  const {
+    title,
+    description,
+    images,
+    loading,
+    error,
+    showFilters,
+    mosaicLayout,
+    compact,
+  } = props;
+
+  // En mode `compact`, la Galerie occupe une demi-colonne aux côtés de
+  // « Notre équipe » : hauteur pleine, pas de filet horizontal propre.
+  // NB : `cn` est un simple `join`, pas un tailwind-merge — deux classes
+  // conflictuelles (`bg-white` + `bg-slate-50`) coexisteraient et l'ordre du
+  // CSS généré trancherait. On n'émet donc qu'une seule classe de fond.
+  const sectionClass = cn(
+    "ika-w-full ika-border-slate-200 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8",
+    compact
+      ? "ika-flex ika-h-full ika-flex-col ika-bg-slate-50"
+      : "ika-border-t ika-bg-white"
+  );
+  const shellClass = cn(
+    "ika-mx-auto ika-w-full ika-max-w-7xl",
+    compact && "ika-flex ika-min-h-0 ika-flex-1 ika-flex-col"
+  );
 
   const [activeCategory, setActiveCategory] = React.useState<string>("Tous");
   const [lightbox, setLightbox] = React.useState<IGalleryImage | null>(null);
+
+  const categories = React.useMemo(() => buildCategories(images), [images]);
 
   const filtered =
     activeCategory === "Tous"
@@ -88,11 +124,16 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
 
   if (loading) {
     return (
-      <div className="ika-root">
-        <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-white ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
-          <div className="ika-mx-auto ika-animate-pulse ika-max-w-7xl">
+      <div className={cn("ika-root", compact && "ika-h-full")}>
+        <section className={sectionClass}>
+          <div className={cn(shellClass, "ika-animate-pulse")}>
             <div className="ika-mb-6 ika-h-7 ika-w-40 ika-rounded ika-bg-slate-200" />
-            <div className="ika-grid ika-grid-cols-2 ika-gap-3 md:ika-grid-cols-4">
+            <div
+              className={cn(
+                "ika-grid ika-grid-cols-2 ika-gap-3",
+                !compact && "md:ika-grid-cols-4"
+              )}
+            >
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
@@ -111,11 +152,14 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
 
   if (error) {
     return (
-      <div className="ika-root">
-        <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-white ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
+      <div className={cn("ika-root", compact && "ika-h-full")}>
+        <section className={sectionClass}>
           <div
             role="alert"
-            className="ika-mx-auto ika-max-w-7xl ika-rounded-2xl ika-border ika-border-red-200 ika-bg-red-50 ika-p-6"
+            className={cn(
+              shellClass,
+              "ika-rounded-2xl ika-border ika-border-red-200 ika-bg-red-50 ika-p-6"
+            )}
           >
             <p className="ika-text-sm ika-font-medium ika-text-red-800">{error}</p>
           </div>
@@ -125,9 +169,9 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
   }
 
   return (
-    <div className="ika-root">
-      <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-white ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
-        <div className="ika-mx-auto ika-max-w-7xl">
+    <div className={cn("ika-root", compact && "ika-h-full")}>
+      <section className={sectionClass}>
+        <div className={shellClass}>
           <div className="ika-mb-2 ika-flex ika-flex-wrap ika-items-center ika-gap-3">
             <div className="ika-flex ika-items-center ika-gap-2">
               <span
@@ -148,7 +192,7 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
 
           {showFilters ? (
             <div className="ika-mb-8 ika-flex ika-flex-wrap ika-gap-2">
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -168,8 +212,28 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
             </div>
           ) : null}
 
-          <div className="ika-grid ika-grid-cols-2 ika-gap-3 md:ika-grid-cols-4">
-            {filtered.map((img, i) => (
+          {/* En `compact` la grille passe de 4 à 2 colonnes. La règle mosaïque
+              d'origine (`i % 5 === 0` → col-span-2) produisait alors une tuile
+              PLEINE LARGEUR toutes les 5 images, ce qui cassait la mosaïque :
+              sur 2 colonnes, seule la première image reste mise en avant. */}
+          <div
+            className={cn(
+              "ika-grid ika-min-w-0 ika-grid-cols-2 ika-gap-3",
+              compact
+                ? "ika-min-h-0 ika-flex-1 ika-auto-rows-min ika-overflow-y-auto ika-pr-1"
+                : "md:ika-grid-cols-4"
+            )}
+            tabIndex={compact ? 0 : undefined}
+            role={compact ? "group" : undefined}
+            aria-label={
+              compact
+                ? `Galerie photos (${filtered.length}), défilement vertical`
+                : undefined
+            }
+          >
+            {filtered.map((img, i) => {
+              const featured = mosaicLayout && (compact ? i === 0 : i % 5 === 0);
+              return (
               <div
                 key={img.Id}
                 role="button"
@@ -181,12 +245,14 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
                 }}
                 className={cn(
                   "ika-group ika-relative ika-cursor-pointer ika-overflow-hidden ika-rounded-2xl ika-shadow-sm",
-                  mosaicLayout && i % 5 === 0
-                    ? "md:ika-col-span-2 md:ika-row-span-2"
+                  featured
+                    ? compact
+                      ? "ika-col-span-2"
+                      : "md:ika-col-span-2 md:ika-row-span-2"
                     : ""
                 )}
                 style={{
-                  minHeight: mosaicLayout && i % 5 === 0 ? "260px" : "130px",
+                  minHeight: featured ? "260px" : "130px",
                 }}
               >
                 <img
@@ -206,7 +272,8 @@ export const Gallery: React.FC<IGalleryProps> = (props) => {
                   </span>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

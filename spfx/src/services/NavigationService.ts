@@ -42,6 +42,8 @@ const ICON_BY_SLUG: Record<string, string> = {
   "evenements": "calendar",
   "agenda": "calendar",
   "faq": "help",
+  "fournisseurs": "Briefcase",
+  "equipements": "Wrench",
 };
 
 /**
@@ -60,8 +62,10 @@ export const STATIC_PRIMARY_NAV: INavNode[] = [
 
 export const STATIC_SECONDARY_NAV: INavNode[] = [
   { key: "organigramme", label: "Organigramme", url: "#organigramme", iconName: "GitBranch" },
-  { key: "agenda", label: "Agenda", url: "#evenements", iconName: "calendar" },
+  { key: "agenda", label: "Agenda", url: "#agenda", iconName: "calendar" },
   { key: "histoire", label: "Histoire", url: "#histoire", iconName: "book" },
+  { key: "fournisseurs", label: "Fournisseurs", url: "#fournisseurs", iconName: "Briefcase" },
+  { key: "equipements", label: "Équipements", url: "#equipements", iconName: "Wrench" },
 ];
 
 export class NavigationService {

@@ -130,15 +130,17 @@ export const NewsCards: React.FC<INewsCardsProps> = (props) => {
             </>
           );
 
+          const detailHash = `#actualite/${item.Id}`;
+
           return (
             <a
               key={item.Id}
-              href={href || "#actualites"}
+              href={href || detailHash}
               data-interception="propagate"
               onClick={(e) => {
                 if (!href) {
                   e.preventDefault();
-                  window.location.hash = "#actualites";
+                  window.location.hash = detailHash;
                 }
               }}
               className={cn(

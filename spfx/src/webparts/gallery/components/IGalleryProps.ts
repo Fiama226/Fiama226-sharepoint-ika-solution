@@ -8,4 +8,5 @@ export interface IGalleryProps {
   error?: string;
   showFilters: boolean;
   mosaicLayout: boolean;
+  compact?: boolean;
 }

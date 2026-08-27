@@ -38,6 +38,20 @@ const FALLBACK_DEPT = {
   icon: "Users",
 };
 
+// Grille en mode `compact` (section mi-largeur partagée avec la Galerie).
+//
+// À partir de `lg`, la bande « Équipe | Galerie » fait exactement un écran
+// (cf. IntranetMain) : les rangées se partagent alors la hauteur disponible
+// pour qu'il y en ait TOUJOURS 3 visibles, soit 6 collaborateurs sur 2
+// colonnes. `(100% - 2rem) / 3` = hauteur du conteneur moins les 2
+// gouttières `gap-4`, divisée en 3. Le `max(14rem, …)` est un plancher : sur
+// un écran très bas les cartes cessent de rétrécir et la grille défile.
+//
+// En dessous de `lg` les deux blocs s'empilent en hauteur naturelle : on
+// retombe sur un plafond fixe de 50rem (~3 rangées de cartes `h-36`).
+const COMPACT_ROW_HEIGHT = "lg:ika-auto-rows-[max(14rem,calc((100%-2rem)/3))]";
+const COMPACT_STACKED_MAX_HEIGHT = "ika-max-h-[50rem] lg:ika-max-h-none";
+
 function formatBirthdate(dateStr: string | undefined): string {
   if (!dateStr) return "";
   const date = new Date(dateStr);
@@ -76,8 +90,28 @@ function personPhoto(person: ICollaborateur): string {
 }
 
 export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
-  const { title, description, members, loading, error, showSearch, showBirthdays } =
-    props;
+  const {
+    title,
+    description,
+    members,
+    loading,
+    error,
+    showSearch,
+    showBirthdays,
+    compact,
+  } = props;
+
+  // En mode `compact` la section est une colonne de hauteur pleine (elle
+  // partage une rangée flex avec la Galerie) : pas de filet horizontal en
+  // haut — c'est le conteneur parent qui porte la bordure de bande.
+  const sectionClass = cn(
+    "ika-w-full ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8",
+    compact ? "ika-flex ika-h-full ika-flex-col" : "ika-border-t"
+  );
+  const shellClass = cn(
+    "ika-mx-auto ika-w-full ika-max-w-7xl",
+    compact && "ika-flex ika-min-h-0 ika-flex-1 ika-flex-col"
+  );
 
   const [search, setSearch] = React.useState<string>("");
   const [activeDept, setActiveDept] = React.useState<string>("Tous");
@@ -140,13 +174,26 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
 
   if (loading) {
     return (
-      <div className="ika-root">
-        <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
-          <div className="ika-mx-auto ika-animate-pulse ika-max-w-7xl">
+      <div className={cn("ika-root", compact && "ika-h-full")}>
+        <section className={sectionClass}>
+          <div className={cn(shellClass, "ika-animate-pulse")}>
             <div className="ika-mb-6 ika-h-7 ika-w-48 ika-rounded ika-bg-slate-200" />
-            <div className="ika-grid ika-grid-cols-1 ika-gap-4 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4">
+            <div
+              className={cn(
+                "ika-grid ika-gap-4",
+                compact
+                  ? "ika-grid-cols-2"
+                  : "ika-grid-cols-1 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4"
+              )}
+            >
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="ika-h-72 ika-rounded-2xl ika-bg-slate-100" />
+                <div
+                  key={i}
+                  className={cn(
+                    "ika-rounded-2xl ika-bg-slate-100",
+                    compact ? "ika-h-60" : "ika-h-72"
+                  )}
+                />
               ))}
             </div>
           </div>
@@ -157,11 +204,14 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
 
   if (error) {
     return (
-      <div className="ika-root">
-        <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
+      <div className={cn("ika-root", compact && "ika-h-full")}>
+        <section className={sectionClass}>
           <div
             role="alert"
-            className="ika-mx-auto ika-max-w-7xl ika-rounded-2xl ika-border ika-border-red-200 ika-bg-red-50 ika-p-6"
+            className={cn(
+              shellClass,
+              "ika-rounded-2xl ika-border ika-border-red-200 ika-bg-red-50 ika-p-6"
+            )}
           >
             <p className="ika-text-sm ika-font-medium ika-text-red-800">{error}</p>
           </div>
@@ -171,9 +221,9 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
   }
 
   return (
-    <div className="ika-root">
-      <section className="ika-w-full ika-border-t ika-border-slate-200 ika-bg-slate-50 ika-px-4 ika-py-12 sm:ika-px-6 lg:ika-px-8">
-        <div className="ika-mx-auto ika-max-w-7xl">
+    <div className={cn("ika-root", compact && "ika-h-full")}>
+      <section className={sectionClass}>
+        <div className={shellClass}>
           <div className="ika-mb-2 ika-flex ika-flex-wrap ika-items-center ika-gap-3">
             <div className="ika-flex ika-items-center ika-gap-2">
               <span
@@ -225,7 +275,40 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
             </div>
           ) : null}
 
-          <div className="ika-grid ika-grid-cols-1 ika-gap-4 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4">
+          {/* `flex-1` seulement s'il y a des résultats : sinon la grille vide
+              absorberait toute la hauteur et repousserait l'état vide hors vue. */}
+          <div
+            className={cn(
+              "ika-relative",
+              compact && filtered.length > 0 && "ika-min-h-0 ika-flex-1"
+            )}
+          >
+            <div
+              // `min-w-0` : sans lui, une grille imbriquée dans un item flex
+              // refuse de descendre sous la largeur intrinsèque de son contenu
+              // et déborde de la demi-colonne.
+              className={cn(
+                "ika-grid ika-min-w-0 ika-gap-4",
+                compact
+                  ? // pt-1 : marge de survol (les cartes se soulèvent de 4px)
+                    // pr-1 : réserve la gouttière de l'ascenseur.
+                    cn(
+                      "ika-grid-cols-2 ika-overflow-y-auto ika-pr-1 ika-pt-1",
+                      COMPACT_STACKED_MAX_HEIGHT,
+                      COMPACT_ROW_HEIGHT
+                    )
+                  : "ika-grid-cols-1 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4"
+              )}
+              // La zone défilante doit être atteignable au clavier, sinon les
+              // collaborateurs hors des 6 premiers sont inaccessibles.
+              tabIndex={compact ? 0 : undefined}
+              role={compact ? "group" : undefined}
+              aria-label={
+                compact
+                  ? `Liste des collaborateurs (${filtered.length}), défilement vertical`
+                  : undefined
+              }
+            >
             {filtered.map((person) => {
               const cfg = DEPT_COLORS[person.Division] || FALLBACK_DEPT;
               const birthdaySoon = showBirthdays && isBirthdaySoon(person.Birthdate);
@@ -241,9 +324,22 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") setSelected(person);
                   }}
-                  className="ika-group ika-cursor-pointer ika-overflow-hidden ika-rounded-2xl ika-border ika-border-slate-200 ika-bg-white ika-shadow-sm ika-transition-all ika-duration-200 hover:-ika-translate-y-1 hover:ika-shadow-lg"
+                  className={cn(
+                    "ika-group ika-cursor-pointer ika-overflow-hidden ika-rounded-2xl ika-border ika-border-slate-200 ika-bg-white ika-shadow-sm ika-transition-all ika-duration-200 hover:-ika-translate-y-1 hover:ika-shadow-lg",
+                    // En bande « un écran », la carte occupe toute la hauteur
+                    // de sa rangée : c'est la PHOTO qui encaisse la variation
+                    // (flex-1), le bloc texte gardant sa hauteur naturelle.
+                    compact && "lg:ika-flex lg:ika-h-full lg:ika-flex-col"
+                  )}
                 >
-                  <div className="ika-relative ika-h-48 ika-overflow-hidden">
+                  <div
+                    className={cn(
+                      "ika-relative ika-overflow-hidden",
+                      compact
+                        ? "ika-h-36 lg:ika-h-auto lg:ika-min-h-0 lg:ika-flex-1"
+                        : "ika-h-48"
+                    )}
+                  >
                     <img
                       src={personPhoto(person)}
                       alt={person.Title}
@@ -292,6 +388,16 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
                 </div>
               );
             })}
+            </div>
+            {/* Dégradé de bas de zone : signale qu'il reste des collaborateurs
+                sous la ligne de flottaison (l'ascenseur seul est trop discret
+                sous Windows/Edge). Purement décoratif → aria-hidden. */}
+            {compact && filtered.length > 6 ? (
+              <div
+                aria-hidden="true"
+                className="ika-pointer-events-none ika-absolute ika-inset-x-0 ika-bottom-0 ika-h-12 ika-bg-gradient-to-t ika-from-slate-50 ika-to-transparent"
+              />
+            ) : null}
           </div>
 
           {filtered.length === 0 && (

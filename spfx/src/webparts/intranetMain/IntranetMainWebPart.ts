@@ -15,17 +15,22 @@ import {
   PropertyPaneToggle,
   PropertyPaneDropdown,
   PropertyPaneLabel,
+  PropertyPaneTextField,
 } from "@microsoft/sp-property-pane";
 
 import { IntranetMain } from "./components/IntranetMain";
 import { IIntranetMainProps } from "./components/IIntranetMainProps";
 import {
+  ensureFullPageHost,
+  exitEditModeIfNeeded,
   installFullPageChrome,
-  isWorkbench,
   removeFullPageChrome,
 } from "./fullPageChrome";
 import { DataService } from "../../services/DataService";
+import { SearchService } from "../../services/SearchService";
+import { CalendarService } from "../../services/CalendarService";
 import {
+  IAgendaPayload,
   IAnnouncement,
   ICollaborateur,
   IDepartement,
@@ -41,11 +46,17 @@ import {
   INewsItem,
   IProject,
   IQuickLink,
+  IListTableData,
+  ISearchResponse,
+  SearchVertical,
 } from "../../models/IIkaModels";
 import {
   buildImageUrl,
   buildUserPhotoUrl,
 } from "../../common/utils/spUtils";
+
+/** Au-delà, la frise de disponibilité devient illisible et l'appel très long. */
+const MAX_TEAM_MEMBERS = 12;
 
 export type HeroHeight = "screen" | "large" | "medium";
 export type AccentColor = "orange" | "emerald" | "sky" | "indigo" | "rose" | "amber";
@@ -65,6 +76,8 @@ export interface IIntranetMainWebPartProps {
   showEmployee: boolean;
   showProjects: boolean;
   defaultView?: string;
+  fournisseursListTitle?: string;
+  equipementsListTitle?: string;
 }
 
 const HEIGHT_CLASSES: Record<HeroHeight, string> = {
@@ -75,6 +88,43 @@ const HEIGHT_CLASSES: Record<HeroHeight, string> = {
 
 export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranetMainWebPartProps> {
   private _service!: DataService;
+  private _search!: SearchService;
+  private _calendar!: CalendarService;
+
+  /**
+   * Callbacks de recherche liés UNE SEULE FOIS à l'instance.
+   *
+   * `render()` est rappelé à chaque chargement de données ; recréer ces
+   * fonctions à chaque rendu changerait leur identité, ce qui relancerait le
+   * `useEffect` de `useSearchSuggest` (et donc une requête réseau) à chaque
+   * re-rendu du web part. Les champs de classe fléchés sont créés une fois.
+   */
+  private readonly _suggestFn = (term: string): Promise<ISearchResponse> =>
+    this._search.suggest(term);
+
+  private readonly _searchFn = (
+    term: string,
+    vertical: SearchVertical,
+    page: number
+  ): Promise<ISearchResponse> => this._search.search(term, vertical, page);
+
+  /**
+   * Charge l'agenda pour la période demandée. Même raison qu'au-dessus de
+   * lier la fonction une seule fois : `AgendaView` la surveille dans un
+   * `useEffect`, une nouvelle identité relancerait les appels Graph.
+   */
+  private readonly _agendaFn = (
+    rangeDays: number
+  ): Promise<IAgendaPayload> => this._loadAgenda(rangeDays);
+
+  /**
+   * Charge une liste générique. Lié une seule fois pour la même raison que
+   * les callbacks ci-dessus : `ListTable` surveille cette fonction dans un
+   * `useEffect`, une nouvelle identité relancerait la requête à chaque rendu.
+   */
+  private readonly _listTableFn = (
+    listTitle: string
+  ): Promise<IListTableData> => this._service.getListTable(listTitle);
 
   // Données chargées en parallèle avec fallback garanti
   private _slides: IHeroSlide[] = [];
@@ -99,13 +149,15 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
   private _loaded: boolean = false;
 
   protected async onInit(): Promise<void> {
+    // Mode « app » façon Coris : si la page est ouverte en édition, on en
+    // sort tout de suite (redirection déjà lancée) plutôt que d'initialiser
+    // un rendu qui va être immédiatement remplacé.
+    if (exitEditModeIfNeeded()) return;
+
     await super.onInit();
     this._service = new DataService(this.context);
-
-    // Plein écran type « Coris » sur une page SharePoint (mode lecture)
-    if (!isWorkbench()) {
-      installFullPageChrome();
-    }
+    this._search = new SearchService(this.context);
+    this._calendar = new CalendarService(this.context);
   }
 
   public render(): void {
@@ -163,10 +215,34 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         showHeader: true,
         showFooter: true,
         initialView: this.properties.defaultView || "accueil",
+
+        getNewsDetail: (id: number) => this._service.getNewsById(id),
+        getComments: (newsId: number) => this._service.getComments(newsId),
+        postComment: (newsId: number, text: string) =>
+          this._service.postComment(newsId, text),
+
+        search: this._searchFn,
+        suggest: this._suggestFn,
+        agenda: this._agendaFn,
+
+        fournisseursListTitle:
+          this.properties.fournisseursListTitle || "Fournisseurs",
+        equipementsListTitle:
+          this.properties.equipementsListTitle || "Equipements",
+        getListTable: this._listTableFn,
       }
     );
 
-    ReactDom.render(element, this.domElement);
+    // On rend dans un conteneur monté sur <body>, PAS dans `this.domElement` :
+    // à l'intérieur du canvas SharePoint, le contenu reste soumis aux
+    // contraintes de ses ancêtres (largeur max, overflow, et transform/contain
+    // qui piègent un `position: fixed`). Voir fullPageChrome.ts.
+    ReactDom.render(element, ensureFullPageHost());
+
+    // Plein écran type « Coris » : occupe tout le viewport, sur une page
+    // SharePoint réelle comme dans le Workbench de test (voir
+    // fullPageChrome.ts pour le détail de la technique).
+    installFullPageChrome(this.domElement);
   }
 
   /**
@@ -223,7 +299,10 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         this._docs = [];
       }
 
-      this._links = (linksRes || []).slice(0, 10);
+      // 12 et non 10 : les 10 places etaient deja saturees, et les liens
+      // « Fournisseurs » / « Equipements » (SortOrder 11-12) seraient sinon
+      // ecartes en silence. 12 = 6 rangees pleines dans la grille a 2 colonnes.
+      this._links = (linksRes || []).slice(0, 12);
       this._events = (eventsRes || []).slice(0, 6);
       this._gallery = galleryRes || [];
       this._collaborators = collaboratorsRes || [];
@@ -251,6 +330,77 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
     }
   }
 
+  /**
+   * Assemble l'agenda : événements d'entreprise (liste SharePoint) toujours,
+   * calendrier Outlook et disponibilité de l'équipe seulement si Graph
+   * répond. Aucun échec Graph n'est propagé — la vue doit rester utile même
+   * sans le consentement `Calendars.Read.Shared`.
+   */
+  private async _loadAgenda(rangeDays: number): Promise<IAgendaPayload> {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start.getTime());
+    end.setDate(end.getDate() + Math.max(rangeDays, 1));
+
+    // La frise de disponibilité ne couvre que la journée en cours : demander
+    // trente jours de créneaux à `getSchedule` serait long et inexploitable.
+    const dayEnd = new Date(start.getTime());
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const startIso = start.toISOString();
+    const endIso = end.toISOString();
+
+    const members = await this._resolveTeamMembers();
+
+    const [mine, team] = await Promise.all([
+      this._calendar.getMyEvents(startIso, endIso),
+      members.length > 0
+        ? this._calendar.getTeamSchedule(
+            members,
+            startIso,
+            dayEnd.toISOString()
+          )
+        : Promise.resolve<undefined>(undefined),
+    ]);
+
+    const inRange = this._events.filter((evt) => {
+      const when = new Date(evt.EventDate).getTime();
+      return when >= start.getTime() && when < end.getTime();
+    });
+
+    return {
+      entries: CalendarService.merge(inRange, mine),
+      team: team || [],
+      personalConnected: !!mine,
+    };
+  }
+
+  /**
+   * Membres de l'équipe pour la frise de disponibilité. On privilégie le
+   * groupe « Membres » du site (reflet du groupe Microsoft 365) et l'on se
+   * rabat sur la liste `Collaborateurs`, car sur un site connecté à un
+   * groupe ce groupe SharePoint ne contient souvent qu'un principal de
+   * sécurité et non les personnes une à une.
+   */
+  private async _resolveTeamMembers(): Promise<
+    { Email: string; DisplayName: string }[]
+  > {
+    const me = (this.context.pageContext.user.email || "").toLowerCase();
+
+    let members = await this._calendar.getSiteMembers();
+
+    if (members.length === 0) {
+      members = this._collaborators
+        .filter((c) => !!c.Email)
+        .map((c) => ({ Email: c.Email, DisplayName: c.Title }));
+    }
+
+    return members
+      .filter((m) => m.Email.toLowerCase() !== me)
+      .slice(0, MAX_TEAM_MEMBERS);
+  }
+
   private async _resolveEmployeePhoto(employee: IEmployeeOfMonth): Promise<string> {
     if (employee.Photo) return buildImageUrl(employee.Photo, 600);
     if (!employee.Employee) return "";
@@ -268,6 +418,9 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
   }
 
   protected onDispose(): void {
+    // Démonter AVANT `removeFullPageChrome()`, qui retire le host du DOM :
+    // l'inverse laisserait l'arbre React monté sur un nœud détaché (fuite).
+    ReactDom.unmountComponentAtNode(ensureFullPageHost());
     ReactDom.unmountComponentAtNode(this.domElement);
     removeFullPageChrome();
   }
@@ -366,6 +519,25 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
                   label: "Tableau de bord Projets",
                   onText: "Afficher",
                   offText: "Masquer",
+                }),
+              ],
+            },
+            {
+              groupName: "Listes personnalisées",
+              groupFields: [
+                PropertyPaneLabel("listesHint", {
+                  text:
+                    "Titres exacts des listes SharePoint affichées par les routes " +
+                    "#fournisseurs et #equipements. Les colonnes sont détectées " +
+                    "automatiquement depuis la vue par défaut.",
+                }),
+                PropertyPaneTextField("fournisseursListTitle", {
+                  label: "Liste « Fournisseurs »",
+                  description: "Laisser vide pour utiliser « Fournisseurs ».",
+                }),
+                PropertyPaneTextField("equipementsListTitle", {
+                  label: "Liste « Équipements »",
+                  description: "Laisser vide pour utiliser « Equipements ».",
                 }),
               ],
             },

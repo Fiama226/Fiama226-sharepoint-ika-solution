@@ -22,6 +22,35 @@ module.exports = {
   },
   theme: {
     extend: {
+      // ATTENTION — tokens de largeur RÉDÉFINIS pour le mode pleine page.
+      //
+      // Le portail est déployé en Web Part unique plein écran (voir
+      // `fullPageChrome.ts` : position fixed / 100vw). Les ~20 conteneurs de
+      // section écrits en `ika-mx-auto ika-max-w-7xl` (et `6xl`) rendaient
+      // donc une colonne de 1280 px centrée dans un viewport pleine largeur.
+      //
+      // On élargit ici les DEUX tokens de shell plutôt que de réécrire les
+      // 20 sites d'appel : un seul point de contrôle, réversible en une
+      // ligne, et surtout SANS toucher aux tokens étroits (`max-w-md`,
+      // `xl`, `2xl`, `4xl`) qui servent volontairement à centrer les
+      // cartes d'état vide, le texte du hero et la FAQ (confort de lecture).
+      //
+      // `6xl` et `7xl` ne signifient donc plus 72rem/80rem dans ce projet :
+      // ce sont les largeurs de shell pleine page.
+      // TODO(IKA) — comportement sur très grands écrans (> 1920 px).
+      //
+      // Valeur actuelle `100%` = bord à bord absolu : sur un écran 2560 px,
+      // le contenu s'arrête à 32 px du bord (`lg:ika-px-8`) et les cartes
+      // d'une rangée `lg:grid-cols-4` font ~630 px chacune.
+      //
+      // Alternative : mettre une borne en pixels (ex. "1800px"). Le
+      // `ika-mx-auto` déjà présent sur chaque shell reprend alors son rôle
+      // et recentre le contenu au-delà de cette borne — plein écran sur tout
+      // moniteur normal, marges de respiration uniquement en ultra-large.
+      maxWidth: {
+        "6xl": "100%",
+        "7xl": "100%",
+      },
       colors: {
         brand: {
           navy: "#0A2540",

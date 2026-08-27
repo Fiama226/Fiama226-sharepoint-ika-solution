@@ -1,10 +1,15 @@
-import { SPHttpClient, SPHttpClientResponse } from "@microsoft/sp-http";
+import {
+  MSGraphClientV3,
+  SPHttpClient,
+  SPHttpClientResponse,
+} from "@microsoft/sp-http";
 
 import {
   IAnnouncement,
   ICollaborateur,
   ICompanyInfo,
   IDepartement,
+  IComment,
   IDocumentItem,
   IEmployeeOfMonth,
   IEventItem,
@@ -20,6 +25,10 @@ import {
   IProject,
   IQuickLink,
   ISiteSetting,
+  IListColumn,
+  IListRow,
+  IListTableData,
+  ISPFieldSchema,
 } from "../models/IIkaModels";
 
 import * as Mocks from "./MockData";
@@ -32,6 +41,24 @@ interface ICacheEntry<T> {
   payload: T;
 }
 
+/**
+ * Erreur de requête SharePoint portant le code HTTP. Le message reste identique
+ * à celui d'avant pour ne rien casser côté journalisation ; seul `status`
+ * s'ajoute, indispensable pour distinguer « liste absente » (404) de « droits
+ * insuffisants » (403) dans un message utilisateur.
+ */
+export class SPRequestError extends Error {
+  public readonly status: number;
+
+  public constructor(status: number, endpoint: string) {
+    super(`Requête SharePoint échouée (${status}) sur ${endpoint}`);
+    this.status = status;
+    // Chaîne de prototype à restaurer : TypeScript cible ES5, où `extends Error`
+    // casse `instanceof` sans cette ligne.
+    Object.setPrototypeOf(this, SPRequestError.prototype);
+  }
+}
+
 export interface ISPRequestContext {
   spHttpClient: SPHttpClient;
   pageContext: {
@@ -40,6 +67,15 @@ export interface ISPRequestContext {
     legacyPageContext?: unknown;
   };
   host?: { hostType?: string };
+  /**
+   * OPTIONNEL à dessein. `WebPartContext` et `ApplicationCustomizerContext`
+   * l'exposent tous les deux, mais le rendre obligatoire casserait les 19
+   * points de construction existants ainsi que le stub de typecheck rapide.
+   * Seul `SearchService` s'en sert (verticales e-mails / messages Teams).
+   */
+  msGraphClientFactory?: {
+    getClient(version: "3"): Promise<MSGraphClientV3>;
+  };
 }
 
 export class DataService {
@@ -135,9 +171,7 @@ export class DataService {
       });
 
     if (!response.ok) {
-      throw new Error(
-        `Requête SharePoint échouée (${response.status}) sur ${endpoint}`
-      );
+      throw new SPRequestError(response.status, endpoint);
     }
 
     const json = (await response.json()) as { value: T[] };
@@ -145,6 +179,22 @@ export class DataService {
 
     if (cacheKey) this._writeCache(cacheKey, value, ttl);
     return value;
+  }
+
+  /** Comme `_get`, mais pour un endpoint qui renvoie UN item (`items(id)`),
+   * dont la forme de réponse est l'objet lui-même, pas `{ value: T[] }`. */
+  private async _getOne<T>(siteUrl: string, endpoint: string): Promise<T | undefined> {
+    const url = `${siteUrl}/_api/web/${endpoint}`;
+    const response: SPHttpClientResponse =
+      await this._context.spHttpClient.get(url, SPHttpClient.configurations.v1, {
+        headers: { Accept: "application/json;odata=nometadata" },
+      });
+
+    if (!response.ok) {
+      throw new SPRequestError(response.status, endpoint);
+    }
+
+    return (await response.json()) as T;
   }
 
   private static _getFirstAttachmentUrl(item: any): string | undefined {
@@ -327,6 +377,134 @@ export class DataService {
     }
   }
 
+  /** Article complet (avec `Body`, absent du $select de `getNews`, réservé à la page de détail). */
+  public async getNewsById(id: number): Promise<INewsItem | undefined> {
+    if (this._useMocks) return Mocks.MOCK_NEWS.find((n) => n.Id === id);
+
+    try {
+      const select = [
+        "Id",
+        "Title",
+        "Excerpt",
+        "Body",
+        "Category",
+        "PublishDate",
+        "Highlighted",
+        "HeaderImage",
+        "ExternalLink",
+        "SortOrder",
+        "Created",
+        "Modified",
+        "NewsAuthor/Title",
+        "NewsAuthor/EMail",
+      ].join(",");
+
+      const endpoint =
+        `lists/getByTitle('Actualites')/items(${id})` +
+        `?$select=${select}&$expand=NewsAuthor,AttachmentFiles`;
+
+      const item = await this._getOne<INewsItem>(this._webUrl, endpoint);
+      if (!item) return Mocks.MOCK_NEWS.find((n) => n.Id === id);
+
+      return DataService._normalizeAttachmentImageField(
+        item,
+        "HeaderImage",
+        "Actualites",
+        this._context.pageContext.web.serverRelativeUrl
+      );
+    } catch (e) {
+      console.warn("[DataService] Fallback mock pour l'article :", e);
+      return Mocks.MOCK_NEWS.find((n) => n.Id === id);
+    }
+  }
+
+  /** Commentaires d'un article, du plus ancien au plus récent. */
+  public async getComments(newsId: number): Promise<IComment[]> {
+    if (this._useMocks) {
+      return Mocks.MOCK_COMMENTS.filter((c) => c.NewsItem.Id === newsId);
+    }
+
+    try {
+      const select = [
+        "Id",
+        "Title",
+        "CommentText",
+        "Created",
+        "Modified",
+        "Author/Id",
+        "Author/Title",
+        "Author/EMail",
+        "NewsItem/Id",
+      ].join(",");
+
+      const endpoint =
+        `lists/getByTitle('Commentaires')/items` +
+        `?$select=${select}&$expand=Author,NewsItem` +
+        `&$filter=NewsItemId eq ${newsId}` +
+        `&$orderby=Created asc`;
+
+      // Pas de cacheKey : un commentaire qui vient d'être posté doit
+      // apparaître immédiatement, jamais lu depuis un cache obsolète.
+      return await this._get<IComment>(this._webUrl, endpoint);
+    } catch (e) {
+      // Volontairement PAS de repli sur des commentaires factices ici :
+      // afficher de faux commentaires attribués à de faux collègues sur une
+      // vraie erreur serait trompeur, contrairement au repli habituel sur
+      // des données de démonstration pour du contenu éditorial.
+      console.warn("[DataService] Erreur chargement des commentaires :", e);
+      return [];
+    }
+  }
+
+  /** Poste un commentaire sur un article. Auteur + date sont posés par
+   * SharePoint lui-même (champs système Author/Created), aucune saisie
+   * manuelle nécessaire côté appelant. */
+  public async postComment(newsId: number, text: string): Promise<IComment> {
+    if (this._useMocks) {
+      const fake: IComment = {
+        Id: Date.now(),
+        Title: text.slice(0, 80),
+        Created: new Date().toISOString(),
+        Modified: new Date().toISOString(),
+        CommentText: text,
+        NewsItem: { Id: newsId, Title: "" },
+        Author: {
+          Id: 0,
+          Title: this._context.pageContext.user.displayName || "Vous",
+          EMail: this._context.pageContext.user.email,
+        },
+      };
+      return fake;
+    }
+
+    const listTitle = "Commentaires";
+    const url = `${this._webUrl}/_api/web/lists/getByTitle('${listTitle}')/items`;
+    const body = {
+      __metadata: { type: "SP.Data.CommentairesListItem" },
+      Title: text.slice(0, 80),
+      CommentText: text,
+      NewsItemId: newsId,
+    };
+
+    const response: SPHttpClientResponse = await this._context.spHttpClient.post(
+      url,
+      SPHttpClient.configurations.v1,
+      {
+        headers: {
+          Accept: "application/json;odata=nometadata",
+          "Content-Type": "application/json;odata=verbose",
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Échec de l'envoi du commentaire (${response.status})`);
+    }
+
+    return (await response.json()) as IComment;
+  }
+
   public async getDocuments(top: number = 10, listTitle: string = "Documents"): Promise<IDocumentItem[]> {
     if (this._useMocks) return Mocks.MOCK_DOCUMENTS.slice(0, top);
 
@@ -336,6 +514,7 @@ export class DataService {
         "Title",
         "FileLeafRef",
         "FileRef",
+        "FSObjType",
         "DocCategory",
         "Confidentiality",
         "IsPinned",
@@ -344,13 +523,18 @@ export class DataService {
         "Editor/Title",
       ].join(",");
 
+      // Pas de filtre sur FSObjType : on veut tout le contenu (fichiers ET
+      // dossiers), pas seulement les fichiers (FSObjType eq 0 les excluait).
       const endpoint =
         `lists/getByTitle('${listTitle}')/items` +
         `?$select=${select}&$expand=Editor` +
-        `&$filter=FSObjType eq 0&$orderby=Modified desc&$top=${top}`;
+        `&$orderby=Modified desc&$top=${top}`;
 
       const items = await this._get<IDocumentItem>(this._webUrl, endpoint, `docs.${listTitle}.${top}`);
-      return items && items.length > 0 ? items : Mocks.MOCK_DOCUMENTS.slice(0, top);
+      // "Forms" est le dossier système SharePoint qui héberge les formulaires
+      // d'affichage/édition de la bibliothèque : jamais pertinent à afficher.
+      const filtered = (items || []).filter((item) => item.FileLeafRef !== "Forms");
+      return filtered.length > 0 ? filtered : Mocks.MOCK_DOCUMENTS.slice(0, top);
     } catch (e) {
       console.warn("[DataService] Fallback mock pour documents:", e);
       return Mocks.MOCK_DOCUMENTS.slice(0, top);
@@ -845,6 +1029,399 @@ export class DataService {
       };
     } catch {
       return Mocks.MOCK_COMPANY;
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+   * Vue tableau générique (Fournisseurs, Équipements)
+   *
+   * Aucun modèle métier n'est figé ici : les colonnes sont découvertes à
+   * l'exécution depuis la vue par défaut de la liste, puis complétées par le
+   * catalogue de champs. Ajouter une colonne dans SharePoint suffit donc à la
+   * voir apparaître, sans recompiler ni redéployer le paquet.
+   * ──────────────────────────────────────────────────────────────────────── */
+
+  /** Au-delà, l'URL du `$select` approche la limite de longueur des proxys. */
+  private static readonly MAX_COLUMNS = 20;
+  /** SharePoint refuse au-delà de 12 lookups projetés ; on garde de la marge. */
+  private static readonly MAX_EXPANDS = 8;
+
+  /**
+   * Noms « calculés » de la vue par défaut à rediriger vers la vraie colonne.
+   * `LinkTitle` est le libellé cliquable, pas un champ stockable.
+   */
+  private static readonly VIEW_FIELD_ALIASES: { [key: string]: string } = {
+    LinkTitle: "Title",
+    LinkTitleNoMenu: "Title",
+    LinkTitle2: "Title",
+    LinkFilename: "FileLeafRef",
+    LinkFilenameNoMenu: "FileLeafRef",
+  };
+
+  /**
+   * Champs à ne jamais projeter : soit ils ne sont pas sélectionnables et font
+   * échouer TOUTE la requête en 400, soit ils n'ont pas de rendu tabulaire utile.
+   */
+  private static readonly EXCLUDED_FIELDS: { [key: string]: true } = {
+    ID: true,
+    Id: true,
+    DocIcon: true,
+    Edit: true,
+    SelectTitle: true,
+    ItemChildCount: true,
+    FolderChildCount: true,
+    Attachments: true,
+    ContentType: true,
+    ContentTypeId: true,
+    File: true,
+    FileDirRef: true,
+    Recurrence: true,
+    Geolocation: true,
+    WorkflowStatus: true,
+    CrossProjectLink: true,
+    AppAuthor: true,
+    AppEditor: true,
+    Invalid: true,
+    Error: true,
+    GUID: true,
+    Order: true,
+    PermMask: true,
+  };
+
+  private static readonly CURRENCY_BY_LCID: { [lcid: number]: string } = {
+    1033: "USD",
+    2057: "GBP",
+    1036: "EUR",
+    3084: "CAD",
+  };
+
+  /**
+   * Échappement d'un titre de liste pour `getByTitle('…')`.
+   * L'ordre compte : échappement OData d'abord (une apostrophe se double),
+   * encodage URL ensuite — `encodeURIComponent` ne touche pas à l'apostrophe,
+   * donc les délimiteurs survivent, et un titre accentué passe en `%C3%89`.
+   */
+  private static _escapeListTitle(listTitle: string): string {
+    return encodeURIComponent(listTitle.replace(/'/g, "''"));
+  }
+
+  /**
+   * Traduit un champ SharePoint en descripteur de colonne, ou `undefined` si la
+   * colonne doit être ignorée.
+   */
+  private static _mapFieldToColumn(
+    field: ISPFieldSchema
+  ): IListColumn | undefined {
+    const name = field.InternalName;
+    if (!name) return undefined;
+    if (name.charAt(0) === "_") return undefined;
+    if (DataService.EXCLUDED_FIELDS[name]) return undefined;
+
+    const type = field.TypeAsString || "Text";
+    const multiple = field.AllowMultipleValues === true;
+
+    let kind: IListColumn["kind"];
+    let numeric = false;
+    let currencyCode: string | undefined;
+
+    switch (type) {
+      case "Text":
+        kind = "text";
+        break;
+      case "Note":
+        kind = "note";
+        break;
+      case "Number":
+        kind = field.ShowAsPercentage === true ? "percent" : "number";
+        numeric = true;
+        break;
+      case "Currency":
+        kind = "currency";
+        numeric = true;
+        currencyCode =
+          DataService.CURRENCY_BY_LCID[field.CurrencyLocaleId || 0] || "XOF";
+        break;
+      case "DateTime":
+        kind = field.DisplayFormat === 1 ? "datetime" : "date";
+        break;
+      case "Boolean":
+        kind = "boolean";
+        break;
+      case "Choice":
+        kind = "choice";
+        break;
+      case "MultiChoice":
+        kind = "multichoice";
+        break;
+      case "Lookup":
+        kind = multiple ? "lookupmulti" : "lookup";
+        break;
+      case "LookupMulti":
+        kind = "lookupmulti";
+        break;
+      case "User":
+        kind = multiple ? "usermulti" : "user";
+        break;
+      case "UserMulti":
+        kind = "usermulti";
+        break;
+      case "URL":
+        kind = "url";
+        break;
+      case "Thumbnail":
+      case "Image":
+        kind = "image";
+        break;
+      case "TaxonomyFieldType":
+      case "TaxonomyFieldTypeMulti":
+        kind = "taxonomy";
+        break;
+      case "Calculated":
+        kind = "calculated";
+        break;
+      case "Counter":
+      case "Computed":
+      case "Attachments":
+      case "ContentTypeId":
+        // Non projetables : les inclure ferait échouer toute la requête.
+        return undefined;
+      default:
+        kind = "text";
+        break;
+    }
+
+    return {
+      internalName: name,
+      displayName: field.Title || name,
+      kind,
+      spType: type,
+      lookupField: field.LookupField || undefined,
+      numeric,
+      currencyCode,
+    };
+  }
+
+  /**
+   * Construit `$select` et `$expand`. Les lookups et les personnes ne peuvent
+   * pas être sélectionnés directement : il faut projeter une sous-propriété
+   * (`Contact/Title`) ET expandre le champ, sinon SharePoint répond 400.
+   */
+  private static _buildQueryParts(columns: IListColumn[]): {
+    select: string;
+    expand: string;
+  } {
+    const select: string[] = ["Id"];
+    const expand: string[] = [];
+
+    columns.forEach((column) => {
+      const name = column.internalName;
+      switch (column.kind) {
+        case "lookup":
+        case "lookupmulti": {
+          if (expand.length >= DataService.MAX_EXPANDS) return;
+          const projected = column.lookupField || "Title";
+          select.push(name + "/Id", name + "/" + projected);
+          expand.push(name);
+          break;
+        }
+        case "user":
+        case "usermulti": {
+          if (expand.length >= DataService.MAX_EXPANDS) return;
+          select.push(name + "/Id", name + "/Title", name + "/EMail");
+          expand.push(name);
+          break;
+        }
+        default:
+          select.push(name);
+          break;
+      }
+    });
+
+    return { select: select.join(","), expand: expand.join(",") };
+  }
+
+  /**
+   * Découvre les colonnes : catalogue de champs + ordre de la vue par défaut.
+   *
+   * L'appel `/fields` est volontairement SANS `$select` — la collection est
+   * hétérogène (`SP.FieldLookup`, `SP.FieldCurrency`…) et demander une propriété
+   * de sous-type y répond 400. On filtre sur `Hidden` seul : ajouter
+   * `ReadOnlyField eq false` écarterait les colonnes calculées, qu'on veut.
+   */
+  private async _getListSchema(
+    listTitle: string
+  ): Promise<{ columns: IListColumn[]; totalColumns: number }> {
+    const cacheKey = "listtable.schema." + listTitle;
+    const cached = this._readCache<{
+      columns: IListColumn[];
+      totalColumns: number;
+    }>(cacheKey);
+    if (cached) return cached;
+
+    const esc = DataService._escapeListTitle(listTitle);
+
+    const fieldsPromise = this._get<ISPFieldSchema>(
+      this._webUrl,
+      "lists/getByTitle('" + esc + "')/fields?$filter=Hidden eq false&$top=500"
+    );
+
+    // Une vue inaccessible (403) ou sans champs exploitables ne doit pas faire
+    // échouer la vue entière : on retombe alors sur l'ordre du catalogue.
+    const viewPromise = this._getOne<{
+      Items?: string[] | { results?: string[] };
+    }>(
+      this._webUrl,
+      "lists/getByTitle('" + esc + "')/DefaultView/ViewFields"
+    ).catch(() => undefined);
+
+    const [fields, view] = await Promise.all([fieldsPromise, viewPromise]);
+
+    const byName: { [name: string]: IListColumn } = {};
+    const catalogue: IListColumn[] = [];
+    (fields || []).forEach((field) => {
+      const column = DataService._mapFieldToColumn(field);
+      if (!column) return;
+      byName[column.internalName] = column;
+      catalogue.push(column);
+    });
+
+    // `Items` est une collection de primitives : `nometadata` l'aplatit en
+    // tableau, les formes héritées de `verbose` l'enveloppent dans `results`.
+    const rawItems = view ? view.Items : undefined;
+    const viewFields: string[] = Array.isArray(rawItems)
+      ? rawItems
+      : (rawItems && rawItems.results) || [];
+
+    let ordered: IListColumn[] = [];
+    const seen: { [name: string]: true } = {};
+
+    viewFields.forEach((raw) => {
+      const name = DataService.VIEW_FIELD_ALIASES[raw] || raw;
+      const column = byName[name];
+      if (!column || seen[name]) return;
+      seen[name] = true;
+      ordered.push(column);
+    });
+
+    if (ordered.length === 0) ordered = catalogue;
+
+    const result = {
+      columns: ordered.slice(0, DataService.MAX_COLUMNS),
+      totalColumns: ordered.length,
+    };
+
+    this._writeCache(cacheKey, result, 30 * 60 * 1000);
+    return result;
+  }
+
+  /**
+   * Charge une liste SharePoint quelconque sous forme de tableau.
+   *
+   * Contrairement aux autres accesseurs, aucun repli sur des données factices
+   * en cas d'erreur : des fournisseurs, des contacts et des montants inventés
+   * seraient trompeurs (même raisonnement que `getComments` et
+   * `getFinanceData`), et le schéma factice ne pourrait de toute façon pas
+   * correspondre au vrai — on afficherait des colonnes inexistantes. Le mode
+   * démonstration reste possible, mais il s'annonce via `isDemo`.
+   */
+  public async getListTable(
+    listTitle: string,
+    top: number = 200
+  ): Promise<IListTableData> {
+    if (this._useMocks) return Mocks.mockListTable(listTitle);
+
+    let select = "";
+    let expand = "";
+
+    try {
+      const schema = await this._getListSchema(listTitle);
+
+      if (schema.columns.length === 0) {
+        return {
+          listTitle,
+          columns: [],
+          rows: [],
+          isDemo: false,
+          truncated: false,
+          totalColumns: 0,
+          error:
+            "Aucune colonne exploitable n'a été trouvée dans la liste « " +
+            listTitle +
+            " ».",
+        };
+      }
+
+      const parts = DataService._buildQueryParts(schema.columns);
+      select = parts.select;
+      expand = parts.expand;
+
+      const esc = DataService._escapeListTitle(listTitle);
+      // Pas de `$orderby` : un tri non indexé dépasse le seuil d'affichage au-delà
+      // de 5 000 éléments. On charge une page et on trie côté client.
+      const endpoint =
+        "lists/getByTitle('" +
+        esc +
+        "')/items?$select=" +
+        encodeURIComponent(select) +
+        (expand ? "&$expand=" + encodeURIComponent(expand) : "") +
+        "&$top=" +
+        String(top);
+
+      const rows = await this._get<IListRow>(
+        this._webUrl,
+        endpoint,
+        "listtable.items." + listTitle + "." + String(top)
+      );
+
+      return {
+        listTitle,
+        columns: schema.columns,
+        rows: rows || [],
+        isDemo: false,
+        truncated: (rows || []).length >= top,
+        totalColumns: schema.totalColumns,
+      };
+    } catch (e) {
+      // Sans cette trace, un 400 dû à une colonne mal projetée est indébuggable
+      // en production : le `$select` généré est la seule piste utile.
+      console.warn(
+        "[DataService] Échec du chargement de la liste « " + listTitle + " ».",
+        { select, expand },
+        e
+      );
+
+      const status = e instanceof SPRequestError ? e.status : 0;
+      let message: string;
+      if (status === 404) {
+        message =
+          "La liste « " +
+          listTitle +
+          " » est introuvable sur ce site. Vérifiez son nom exact dans Contenus du site.";
+      } else if (status === 401 || status === 403) {
+        message =
+          "Vous n'avez pas l'autorisation de consulter la liste « " +
+          listTitle +
+          " ».";
+      } else if (status > 0) {
+        message =
+          "Impossible de charger la liste « " +
+          listTitle +
+          " » (erreur " +
+          String(status) +
+          ").";
+      } else {
+        message = "Impossible de charger la liste « " + listTitle + " ».";
+      }
+
+      return {
+        listTitle,
+        columns: [],
+        rows: [],
+        isDemo: false,
+        truncated: false,
+        totalColumns: 0,
+        error: message,
+      };
     }
   }
 

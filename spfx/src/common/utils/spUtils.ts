@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify";
+
 import { ISPImageField, ISPUrlField } from "../../models/IIkaModels";
 
 const PERSON_PLACEHOLDER = "/_layouts/15/images/person.gif";
@@ -150,4 +152,19 @@ export function truncate(text: string | undefined, max: number): string {
 export function stripHtml(html: string | undefined): string {
   if (!html) return "";
   return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+}
+
+/**
+ * Nettoyage d'un champ HTML riche (ex: `Actualites.Body`) avant
+ * `dangerouslySetInnerHTML`. Délégué à DOMPurify plutôt qu'à un nettoyage
+ * artisanal : les vecteurs XSS via SVG/MathML, attributs porteurs d'URL
+ * autres que href/src (formaction, poster, srcdoc...) ou espaces de noms
+ * (xlink:href) sont un terrain glissant qu'une bibliothèque activement
+ * maintenue contre les nouvelles techniques de contournement couvre bien
+ * mieux qu'un filtre par sélecteur/attribut écrit à la main.
+ */
+export function sanitizeHtml(html: string | undefined): string {
+  if (!html) return "";
+  if (typeof window === "undefined") return "";
+  return DOMPurify.sanitize(html);
 }

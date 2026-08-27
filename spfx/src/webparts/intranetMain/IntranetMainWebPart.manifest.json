@@ -9,11 +9,6 @@
   "supportedHosts": ["SharePointWebPart", "SharePointFullPage", "TeamsPersonalApp", "TeamsTab"],
   "supportsThemeVariants": true,
   "supportsFullBleed": true,
-  "flexibleLayoutSizing": {
-    "supportsDynamicResizing": true,
-    "defaultRowHeight": 18,
-    "defaultColumnWidth": 12
-  },
   "preconfiguredEntries": [
     {
       "groupId": "6f2b1c48-0d3a-4e7b-9a15-000000000000",

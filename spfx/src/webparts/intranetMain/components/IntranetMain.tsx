@@ -5,11 +5,13 @@ import * as React from "react";
 import { IIntranetMainProps } from "./IIntranetMainProps";
 import { DataService } from "../../../services/DataService";
 import { IOrgNode } from "../../../models/IIkaModels";
+import { cn, resolveUrl } from "../../../common/utils/spUtils";
 
 // Sub-components (pure React components ported from Next.js)
 import { HeroSlider } from "../../heroSlider/components/HeroSlider";
 import { AnnouncementMarquee } from "../../announcementMarquee/components/AnnouncementMarquee";
 import { NewsCards } from "../../newsCards/components/NewsCards";
+import { NewsDetail } from "../../newsCards/components/NewsDetail";
 import { QuickAccessPanel } from "../../quickAccessPanel/components/QuickAccessPanel";
 import { Gallery } from "../../gallery/components/Gallery";
 import { TeamHome } from "../../teamHome/components/TeamHome";
@@ -19,8 +21,10 @@ import { PriceSheet } from "../../priceSheet/components/PriceSheet";
 import { Timeline } from "../../timeline/components/Timeline";
 import { OrgChart } from "../../orgChart/components/OrgChart";
 import { DocumentsList } from "../../documentsList/components/DocumentsList";
-import { EventsCalendar } from "../../eventsCalendar/components/EventsCalendar";
+import { SearchResults } from "../../searchResults/components/SearchResults";
+import { AgendaView } from "../../groupCalendar/components/AgendaView";
 import { FaqList } from "../../faqList/components/FaqList";
+import { ListTable } from "../../listTable/components/ListTable";
 
 // Header & Footer
 import { IkaHeader } from "../../../extensions/ikaChrome/components/IkaHeader";
@@ -31,12 +35,34 @@ import {
   STATIC_SECONDARY_NAV,
 } from "../../../services/NavigationService";
 
-function parseHashRoute(): string {
-  if (typeof window === "undefined") return "accueil";
+interface IParsedHashRoute {
+  route: string;
+  id?: string;
+  /** Terme de recherche (`#recherche?q=…`), casse d'origine préservée. */
+  query?: string;
+}
+
+function parseHashRoute(): IParsedHashRoute {
+  if (typeof window === "undefined") return { route: "accueil" };
   const hash = window.location.hash || "";
-  const cleaned = hash.replace(/^#\/?(page-)?/, "").toLowerCase().trim();
-  const routeName = cleaned.split("?")[0].split("/")[0];
-  return routeName || "accueil";
+  const raw = hash.replace(/^#\/?(page-)?/, "").trim();
+
+  // La chaîne de requête est découpée sur le hash BRUT, avant le passage en
+  // minuscules appliqué au nom de route : `q` doit conserver sa casse pour
+  // être réaffiché tel que l'utilisateur l'a saisi.
+  const separator = raw.indexOf("?");
+  const routePart = separator === -1 ? raw : raw.substring(0, separator);
+  const queryPart = separator === -1 ? "" : raw.substring(separator + 1);
+
+  const [routeName, id] = routePart.toLowerCase().split("/");
+
+  let query: string | undefined;
+  if (queryPart) {
+    const params = new URLSearchParams(queryPart);
+    query = params.get("q") || undefined;
+  }
+
+  return { route: routeName || "accueil", id, query };
 }
 
 interface IRevealState {
@@ -156,14 +182,22 @@ const IntranetMainSkeleton: React.FC<{ heroHeightClass: string }> = (props) => (
 
 export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
   const [currentRoute, setCurrentRoute] = React.useState<string>(() => {
-    return parseHashRoute() || props.initialView || "accueil";
+    return parseHashRoute().route || props.initialView || "accueil";
+  });
+  const [currentNewsId, setCurrentNewsId] = React.useState<string | undefined>(() => {
+    return parseHashRoute().id;
+  });
+  const [searchQuery, setSearchQuery] = React.useState<string | undefined>(() => {
+    return parseHashRoute().query;
   });
 
   // Écoute des changements de hash dans l'URL pour la navigation SPA (comme Coris)
   React.useEffect(() => {
     const handleHashChange = (): void => {
-      const nextRoute = parseHashRoute();
-      setCurrentRoute(nextRoute);
+      const parsed = parseHashRoute();
+      setCurrentRoute(parsed.route);
+      setCurrentNewsId(parsed.id);
+      setSearchQuery(parsed.query);
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -173,7 +207,20 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
 
   const handleNavigate = (route: string): void => {
     const cleanRoute = route.replace(/^#\/?(page-)?/, "") || "accueil";
-    setCurrentRoute(cleanRoute);
+
+    // `cleanRoute` peut porter une chaîne de requête (`recherche?q=budget`) :
+    // on la met dans le hash mais on ne la garde PAS dans `currentRoute`,
+    // sinon le `switch` du routeur ne reconnaîtrait plus le nom de la vue.
+    const separator = cleanRoute.indexOf("?");
+    const routeName =
+      separator === -1 ? cleanRoute : cleanRoute.substring(0, separator);
+    const queryPart =
+      separator === -1 ? "" : cleanRoute.substring(separator + 1);
+
+    setCurrentRoute(routeName.toLowerCase());
+    setSearchQuery(
+      queryPart ? new URLSearchParams(queryPart).get("q") || undefined : undefined
+    );
     window.location.hash = `#${cleanRoute}`;
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -212,18 +259,26 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
     };
   }, [props.currentUser, props.currentUserEmail, props.logoUrl]);
 
+  // Chaque département a son propre site (et donc sa propre liste
+  // `Documents`) : on lie vers `SiteUrl` + "/Documents", pas vers la vue
+  // interne "#documents" (qui n'affiche que la liste du site courant et
+  // serait identique pour les 4 départements).
   const documentsNav: INavNode[] = React.useMemo(() => {
-    return props.departments.map((dept, idx) => {
-      const iconFallback =
-        ["Calculator", "ShieldCheck", "Users", "Wrench", "Building2"][idx] ||
-        "FolderOpen";
-      return {
-        key: `doc-${dept.Id || idx}`,
-        label: dept.Title,
-        url: `#documents`,
-        iconName: dept.IconName || iconFallback,
-      };
-    });
+    return props.departments
+      .map((dept, idx) => {
+        const iconFallback =
+          ["Calculator", "ShieldCheck", "Users", "Wrench", "Building2"][idx] ||
+          "FolderOpen";
+        const siteUrl = resolveUrl(dept.SiteUrl).replace(/\/$/, "");
+        const usable = siteUrl && !siteUrl.startsWith("#");
+        return {
+          key: `doc-${dept.Id || idx}`,
+          label: dept.Title,
+          url: usable ? `${siteUrl}/Documents` : "",
+          iconName: dept.IconName || iconFallback,
+        };
+      })
+      .filter((node) => node.url !== "");
   }, [props.departments]);
 
   // Navigation primaire alignée sur la maquette Next.js : les départements
@@ -354,6 +409,17 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
           </div>
         );
 
+      case "recherche":
+        return props.search ? (
+          <SearchResults query={searchQuery || ""} onSearch={props.search} />
+        ) : (
+          <div className="ika-mx-auto ika-max-w-7xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
+            <div className="ika-rounded-3xl ika-border ika-border-brand-navy/10 ika-bg-white ika-p-10 ika-text-center ika-text-brand-muted">
+              La recherche n&apos;est pas disponible dans ce contexte.
+            </div>
+          </div>
+        );
+
       case "actualites":
       case "news":
         return (
@@ -368,6 +434,22 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
             />
           </div>
         );
+
+      case "actualite": {
+        const newsId = currentNewsId ? parseInt(currentNewsId, 10) : undefined;
+        return (
+          <div className="ika-mx-auto ika-max-w-4xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
+            <NewsDetail
+              newsId={newsId}
+              news={props.news}
+              currentUserEmail={props.currentUserEmail}
+              getNewsDetail={props.getNewsDetail}
+              getComments={props.getComments}
+              postComment={props.postComment}
+            />
+          </div>
+        );
+      }
 
       case "equipe":
         return (
@@ -387,11 +469,13 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
       case "agenda":
         return (
           <div className="ika-mx-auto ika-max-w-7xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
-            <EventsCalendar
-              title="Agenda & Événements"
+            <AgendaView
+              title="Agenda de l'équipe"
+              description="Vos rendez-vous Outlook et les événements d'IKA Solution, réunis jour par jour."
               events={props.events}
-              loading={false}
-              showLocation={true}
+              agenda={props.agenda}
+              showTeamAvailability={true}
+              defaultRangeDays={7}
             />
           </div>
         );
@@ -406,6 +490,42 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
               columns={2}
               groupByCategory={true}
               allowMultipleOpen={true}
+            />
+          </div>
+        );
+
+      // Les noms de route restent en ASCII : le navigateur encode « #équipements »
+      // en « %C3%A9quipements », que `parseHashRoute` passe en minuscules sans
+      // le décoder — aucun `case` ne correspondrait. « Équipements » n'est
+      // qu'un libellé d'affichage.
+      case "fournisseurs":
+      case "fournisseur":
+        return (
+          <div className="ika-mx-auto ika-max-w-7xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
+            <ListTable
+              title="Fournisseurs"
+              description="Répertoire des fournisseurs référencés d'IKA Solution."
+              listTitle={props.fournisseursListTitle}
+              iconName="Briefcase"
+              getListTable={props.getListTable}
+              showSearch={true}
+              showExport={true}
+            />
+          </div>
+        );
+
+      case "equipements":
+      case "equipement":
+        return (
+          <div className="ika-mx-auto ika-max-w-7xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
+            <ListTable
+              title="Équipements"
+              description="Parc d'équipements de l'entreprise et affectations."
+              listTitle={props.equipementsListTitle}
+              iconName="Wrench"
+              getListTable={props.getListTable}
+              showSearch={true}
+              showExport={true}
             />
           </div>
         );
@@ -475,26 +595,76 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
               {/* 5. NOTRE ÉQUIPE + GALERIE PHOTOS (côte à côte comme Next.js) */}
               {props.showTeam || props.showGallery ? (
                 <RevealSection enabled={animate}>
-                  <div className="ika-flex ika-flex-col lg:ika-flex-row">
+                  {/* Bande « Équipe | Galerie » en deux colonnes égales.
+                      - `items-stretch` : les deux colonnes adoptent la hauteur
+                        de la plus haute (bord inférieur droit).
+                      - `lg:w-1/2` + `lg:min-w-0` : sans `min-w-0`, un item flex
+                        garde `min-width:auto` et refuse de descendre sous la
+                        largeur intrinsèque de sa grille → le 50/50 sautait.
+                      - `border-t` porté ici (et non par chaque composant, qui
+                        en mode `compact` n'en pose plus) : un seul filet de
+                        bande, plus un séparateur vertical entre les colonnes. */}
+                  <div
+                    className={cn(
+                      "ika-flex ika-flex-col ika-items-stretch lg:ika-flex-row",
+                      // Filet de bande porté par le conteneur UNIQUEMENT en mode
+                      // deux colonnes : si un seul des deux blocs est activé, il
+                      // rend en pleine largeur et pose lui-même son `border-t`.
+                      props.showTeam &&
+                        props.showGallery &&
+                        // Hauteur « un écran », à partir de `lg` seulement (en
+                        // dessous les deux blocs s'empilent et reprennent leur
+                        // hauteur naturelle — sinon la bande ferait 200vh sur
+                        // mobile). `100vh` est corrigé de la suite bar
+                        // SharePoint (cf. --ika-suitebar dans fullPageChrome)
+                        // et des 4rem du header sticky `IkaHeader`.
+                        //
+                        // PAS d'`overflow-hidden` ici : `RevealSection` pose un
+                        // `translate-y-*` (donc un `transform`) sur son
+                        // conteneur, ce qui en fait le bloc conteneur des
+                        // descendants `position: fixed` — la fiche profil et la
+                        // lightbox seraient rognées. Les colonnes se contiennent
+                        // déjà seules (`flex-1` + `min-h-0` + grilles en
+                        // `overflow-y-auto`).
+                        "ika-border-t ika-border-slate-200 lg:ika-h-[calc(100vh-var(--ika-suitebar,0px)-4rem)]"
+                    )}
+                  >
                     {props.showTeam ? (
-                      <TeamHome
-                        title="Notre équipe"
-                        description="Les talents qui font avancer l'ingénierie digitale"
-                        members={props.collaborators}
-                        loading={false}
-                        showSearch
-                        showBirthdays
-                      />
+                      <div
+                        className={cn(
+                          "ika-w-full",
+                          props.showGallery && "lg:ika-w-1/2 lg:ika-min-w-0"
+                        )}
+                      >
+                        <TeamHome
+                          title="Notre équipe"
+                          description="Les talents qui font avancer l'ingénierie digitale"
+                          members={props.collaborators}
+                          loading={false}
+                          showSearch
+                          showBirthdays
+                          compact={props.showGallery}
+                        />
+                      </div>
                     ) : null}
                     {props.showGallery ? (
-                      <Gallery
-                        title="Galerie"
-                        description="Moments forts de la vie de l'entreprise"
-                        images={props.galleryImages}
-                        loading={false}
-                        showFilters
-                        mosaicLayout
-                      />
+                      <div
+                        className={cn(
+                          "ika-w-full",
+                          props.showTeam &&
+                            "ika-border-t ika-border-slate-200 lg:ika-w-1/2 lg:ika-min-w-0 lg:ika-border-l lg:ika-border-t-0"
+                        )}
+                      >
+                        <Gallery
+                          title="Galerie"
+                          description="Moments forts de la vie de l'entreprise"
+                          images={props.galleryImages}
+                          loading={false}
+                          showFilters
+                          mosaicLayout
+                          compact={props.showTeam}
+                        />
+                      </div>
                     ) : null}
                   </div>
                 </RevealSection>
@@ -536,6 +706,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
             documentsNav={documentsNav}
             activeRoute={currentRoute}
             onNavigate={handleNavigate}
+            onSearch={props.suggest}
           />
         ) : null}
 
