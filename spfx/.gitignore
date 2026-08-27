@@ -52,3 +52,11 @@ coverage/
 
 # Workbench generated files
 workbench/
+
+# Artefacts d'outillage agent
+receipts/
+review-receipts/
+.claude/
+
+# Captures d'écran de travail
+Capture d'écran*.png
