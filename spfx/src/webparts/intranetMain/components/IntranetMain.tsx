@@ -431,7 +431,13 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
               description="Retrouvez toutes les actualités, annonces de projets et innovations d'IKA Solution."
               items={props.news}
               loading={false}
-              ctaLabel="Voir toutes les actualités"
+              /* Vue complète : recherche + filtre par catégorie, 6 par page.
+                 `ctaLabel=""` retire le bouton « Voir toutes les actualités »
+                 qui, sur cette page, pointerait vers elle-même — la
+                 pagination prend sa place. */
+              showFilters={true}
+              pageSize={6}
+              ctaLabel=""
             />
           </div>
         );
