@@ -72,6 +72,8 @@ export interface IIntranetMainProps {
   showTeam: boolean;
   showEmployee: boolean;
   showProjects: boolean;
+  /** Dernière bande : FAQ · Documents récents · Compte à rebours. */
+  showHighlights: boolean;
 
   // —— Navigation / Router SPA —————————————————————————————
   initialView?: string;

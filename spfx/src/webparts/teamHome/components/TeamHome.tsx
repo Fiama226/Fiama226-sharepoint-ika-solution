@@ -40,17 +40,16 @@ const FALLBACK_DEPT = {
 
 // Grille en mode `compact` (section mi-largeur partagée avec la Galerie).
 //
-// À partir de `lg`, la bande « Équipe | Galerie » fait exactement un écran
-// (cf. IntranetMain) : les rangées se partagent alors la hauteur disponible
-// pour qu'il y en ait TOUJOURS 3 visibles, soit 6 collaborateurs sur 2
-// colonnes. `(100% - 2rem) / 3` = hauteur du conteneur moins les 2
-// gouttières `gap-4`, divisée en 3. Le `max(14rem, …)` est un plancher : sur
-// un écran très bas les cartes cessent de rétrécir et la grille défile.
+// La carte horizontale a une hauteur intrinsèque fixe (~62 px) : contrairement
+// à l'ancienne carte verticale, dont la photo absorbait la hauteur de rangée
+// via `flex-1`, elle ne doit PAS s'étirer — une rangée haute donnerait une
+// grande carte presque vide. `auto-rows-min` laisse donc chaque rangée à la
+// hauteur naturelle des cartes, et c'est la grille qui défile.
 //
 // En dessous de `lg` les deux blocs s'empilent en hauteur naturelle : on
-// retombe sur un plafond fixe de 50rem (~3 rangées de cartes `h-36`).
-const COMPACT_ROW_HEIGHT = "lg:ika-auto-rows-[max(14rem,calc((100%-2rem)/3))]";
-const COMPACT_STACKED_MAX_HEIGHT = "ika-max-h-[50rem] lg:ika-max-h-none";
+// retombe sur un plafond fixe de 22rem (~5 rangées de cartes).
+const COMPACT_ROW_HEIGHT = "lg:ika-auto-rows-min";
+const COMPACT_STACKED_MAX_HEIGHT = "ika-max-h-[22rem] lg:ika-max-h-none";
 
 function formatBirthdate(dateStr: string | undefined): string {
   if (!dateStr) return "";
@@ -183,7 +182,7 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
                 "ika-grid ika-gap-4",
                 compact
                   ? "ika-grid-cols-2"
-                  : "ika-grid-cols-1 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4"
+                  : "ika-grid-cols-1 sm:ika-grid-cols-2 lg:ika-grid-cols-3 xl:ika-grid-cols-4"
               )}
             >
               {[0, 1, 2, 3].map((i) => (
@@ -191,7 +190,7 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
                   key={i}
                   className={cn(
                     "ika-rounded-2xl ika-bg-slate-100",
-                    compact ? "ika-h-60" : "ika-h-72"
+                    compact ? "ika-h-16" : "ika-h-16"
                   )}
                 />
               ))}
@@ -293,11 +292,17 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
                   ? // pt-1 : marge de survol (les cartes se soulèvent de 4px)
                     // pr-1 : réserve la gouttière de l'ascenseur.
                     cn(
-                      "ika-grid-cols-2 ika-overflow-y-auto ika-pr-1 ika-pt-1",
+                      // `lg:h-full` : sans hauteur definie, `overflow-y-auto`
+                      // n'a aucun effet — la grille grandit a la taille de son
+                      // contenu et deborde de la bande. Le parent `relative`
+                      // porte deja `flex-1 min-h-0`, donc sa hauteur est bornee ;
+                      // `h-full` la transmet. Effet de bord indispensable : le
+                      // `100%` de `COMPACT_ROW_HEIGHT` devient calculable.
+                      "ika-grid-cols-2 ika-overflow-y-auto ika-pr-1 ika-pt-1 lg:ika-h-full",
                       COMPACT_STACKED_MAX_HEIGHT,
                       COMPACT_ROW_HEIGHT
                     )
-                  : "ika-grid-cols-1 sm:ika-grid-cols-2 md:ika-grid-cols-3 lg:ika-grid-cols-4"
+                  : "ika-grid-cols-1 sm:ika-grid-cols-2 lg:ika-grid-cols-3 xl:ika-grid-cols-4"
               )}
               // La zone défilante doit être atteignable au clavier, sinon les
               // collaborateurs hors des 6 premiers sont inaccessibles.
@@ -312,7 +317,6 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
             {filtered.map((person) => {
               const cfg = DEPT_COLORS[person.Division] || FALLBACK_DEPT;
               const birthdaySoon = showBirthdays && isBirthdaySoon(person.Birthdate);
-              const age = getAge(person.Birthdate);
 
               return (
                 <div
@@ -324,67 +328,55 @@ export const TeamHome: React.FC<ITeamHomeProps> = (props) => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") setSelected(person);
                   }}
-                  className={cn(
-                    "ika-group ika-cursor-pointer ika-overflow-hidden ika-rounded-2xl ika-border ika-border-slate-200 ika-bg-white ika-shadow-sm ika-transition-all ika-duration-200 hover:-ika-translate-y-1 hover:ika-shadow-lg",
-                    // En bande « un écran », la carte occupe toute la hauteur
-                    // de sa rangée : c'est la PHOTO qui encaisse la variation
-                    // (flex-1), le bloc texte gardant sa hauteur naturelle.
-                    compact && "lg:ika-flex lg:ika-h-full lg:ika-flex-col"
-                  )}
+                  // Carte horizontale calquée sur le composant « Personnes » de
+                  // SharePoint : avatar rond à gauche, identité à droite. ~62 px,
+                  // contre ~300 px pour l'ancienne carte à photo panoramique.
+                  // L'identité visuelle est conservée — couleurs de département,
+                  // coins arrondis, soulèvement au survol, fiche profil au clic.
+                  className="ika-group ika-flex ika-cursor-pointer ika-items-center ika-gap-3 ika-rounded-2xl ika-border ika-border-slate-200 ika-bg-white ika-p-2.5 ika-shadow-sm ika-transition-all ika-duration-200 hover:-ika-translate-y-1 hover:ika-shadow-lg"
                 >
-                  <div
-                    className={cn(
-                      "ika-relative ika-overflow-hidden",
-                      compact
-                        ? "ika-h-36 lg:ika-h-auto lg:ika-min-h-0 lg:ika-flex-1"
-                        : "ika-h-48"
-                    )}
-                  >
+                  <div className="ika-relative ika-shrink-0">
                     <img
                       src={personPhoto(person)}
                       alt={person.Title}
                       loading="lazy"
-                      className="ika-h-full ika-w-full ika-object-cover ika-object-top ika-transition-transform ika-duration-500 group-hover:ika-scale-105"
+                      className="ika-h-10 ika-w-10 ika-rounded-full ika-object-cover ika-object-top ika-transition-transform ika-duration-300 group-hover:ika-scale-105"
                     />
+                    {/* Anniversaire proche : pastille en médaillon sur l'avatar
+                        plutôt qu'en bandeau. Elle n'ajoute aucune hauteur à la
+                        carte, ce qui était tout l'enjeu du format horizontal. */}
                     {birthdaySoon && (
-                      <div className="ika-absolute ika-right-3 ika-top-3 ika-flex ika-items-center ika-gap-1 ika-rounded-full ika-bg-amber-400 ika-px-2 ika-py-0.5 ika-text-[10px] ika-font-bold ika-text-white">
-                        <Icon name="Cake" className="ika-h-2.5 ika-w-2.5" />
-                        Bientôt !
-                      </div>
-                    )}
-                    <div className="ika-absolute ika-inset-0 ika-bg-gradient-to-t ika-from-black/50 ika-to-transparent" />
-                    <div className="ika-absolute ika-bottom-3 ika-left-3">
                       <span
-                        className={cn(
-                          "ika-flex ika-items-center ika-gap-1 ika-rounded-full ika-px-2 ika-py-0.5 ika-text-[10px] ika-font-bold",
-                          cfg.bg,
-                          cfg.color
-                        )}
+                        title="Anniversaire bientôt"
+                        className="ika-absolute -ika-bottom-0.5 -ika-right-0.5 ika-flex ika-h-4 ika-w-4 ika-items-center ika-justify-center ika-rounded-full ika-bg-amber-400 ika-text-white ika-ring-2 ika-ring-white"
                       >
-                        <Icon name={cfg.icon} className="ika-h-[9px] ika-w-[9px]" />
-                        {person.Division || "Autre"}
+                        <Icon name="Cake" className="ika-h-2.5 ika-w-2.5" />
                       </span>
-                    </div>
+                    )}
                   </div>
 
-                  <div className="ika-p-4">
-                    <h3 className="ika-truncate ika-font-bold ika-text-slate-900 ika-transition-colors group-hover:ika-text-brand-accent">
+                  {/* `min-w-0` : sans lui, un item flex refuse de descendre sous la
+                      largeur de son texte et `truncate` ne s'applique jamais. */}
+                  <div className="ika-min-w-0 ika-flex-1">
+                    <h3 className="ika-truncate ika-text-xs ika-font-bold ika-leading-tight ika-text-slate-900 ika-transition-colors group-hover:ika-text-brand-accent">
                       {person.Title}
                     </h3>
-                    <p className="ika-mt-0.5 ika-flex ika-items-center ika-gap-1 ika-text-xs ika-text-slate-400">
-                      <Icon name="Briefcase" className="ika-h-2.5 ika-w-2.5" />
-                      {person.JobTitle}
+                    <p className="ika-mt-0.5 ika-flex ika-items-center ika-gap-1 ika-text-[10px] ika-leading-tight ika-text-slate-400">
+                      <Icon name="Briefcase" className="ika-h-2 ika-w-2 ika-shrink-0" />
+                      <span className="ika-truncate">{person.JobTitle}</span>
                     </p>
-                    <div className="ika-mt-3 ika-flex ika-items-center ika-gap-1 ika-border-t ika-border-slate-100 ika-pt-3 ika-text-[11px] ika-text-slate-400">
-                      <Icon name="Cake" className="ika-h-[11px] ika-w-[11px] ika-text-amber-500" />
-                      <span>{formatBirthdate(person.Birthdate)}</span>
-                      {age !== null ? (
-                        <span className="ika-ml-auto ika-font-bold ika-text-slate-700">
-                          {age} ans
-                        </span>
-                      ) : null}
-                    </div>
                   </div>
+
+                  <span
+                    className={cn(
+                      "ika-flex ika-max-w-[6.5rem] ika-shrink-0 ika-items-center ika-gap-1 ika-rounded-full ika-px-1.5 ika-py-0.5 ika-text-[9px] ika-font-bold",
+                      cfg.bg,
+                      cfg.color
+                    )}
+                  >
+                    <Icon name={cfg.icon} className="ika-h-[9px] ika-w-[9px] ika-shrink-0" />
+                    <span className="ika-truncate">{person.Division || "Autre"}</span>
+                  </span>
                 </div>
               );
             })}

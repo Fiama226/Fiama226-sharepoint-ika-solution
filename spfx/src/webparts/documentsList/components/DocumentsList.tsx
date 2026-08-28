@@ -10,7 +10,7 @@ import { cn, getFileExtension } from "../../../common/utils/spUtils";
  * fichiers avec tuile d'icône colorée + pastilles « Aperçu / Ouvrir ».
  */
 
-function iconColor(ext: string): string {
+export function iconColor(ext: string): string {
   switch (ext) {
     case "ts":
     case "tsx":
@@ -48,7 +48,7 @@ function iconColor(ext: string): string {
   }
 }
 
-function fileIcon(ext: string): string {
+export function fileIcon(ext: string): string {
   switch (ext) {
     case "ts":
     case "tsx":

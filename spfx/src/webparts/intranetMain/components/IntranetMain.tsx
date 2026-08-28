@@ -25,6 +25,7 @@ import { SearchResults } from "../../searchResults/components/SearchResults";
 import { AgendaView } from "../../groupCalendar/components/AgendaView";
 import { FaqList } from "../../faqList/components/FaqList";
 import { ListTable } from "../../listTable/components/ListTable";
+import { HomeHighlights } from "../../homeHighlights/components/HomeHighlights";
 
 // Header & Footer
 import { IkaHeader } from "../../../extensions/ikaChrome/components/IkaHeader";
@@ -601,6 +602,10 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                       - `lg:w-1/2` + `lg:min-w-0` : sans `min-w-0`, un item flex
                         garde `min-width:auto` et refuse de descendre sous la
                         largeur intrinsèque de sa grille → le 50/50 sautait.
+                      - `lg:h-full` + `lg:min-h-0` : même piège sur l'axe
+                        vertical. `min-height:auto` laisse la colonne dépasser la
+                        hauteur de bande au lieu de s'y plier, et son contenu
+                        sortait alors de la section.
                       - `border-t` porté ici (et non par chaque composant, qui
                         en mode `compact` n'en pose plus) : un seul filet de
                         bande, plus un séparateur vertical entre les colonnes. */}
@@ -633,7 +638,8 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                       <div
                         className={cn(
                           "ika-w-full",
-                          props.showGallery && "lg:ika-w-1/2 lg:ika-min-w-0"
+                          props.showGallery &&
+                            "lg:ika-h-full lg:ika-w-1/2 lg:ika-min-h-0 lg:ika-min-w-0"
                         )}
                       >
                         <TeamHome
@@ -652,7 +658,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                         className={cn(
                           "ika-w-full",
                           props.showTeam &&
-                            "ika-border-t ika-border-slate-200 lg:ika-w-1/2 lg:ika-min-w-0 lg:ika-border-l lg:ika-border-t-0"
+                            "ika-border-t ika-border-slate-200 lg:ika-h-full lg:ika-w-1/2 lg:ika-min-h-0 lg:ika-min-w-0 lg:ika-border-l lg:ika-border-t-0"
                         )}
                       >
                         <Gallery
@@ -683,6 +689,26 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
                     loading={false}
                     showEmployee={props.showEmployee}
                     showProjects={props.showProjects}
+                  />
+                </RevealSection>
+              ) : null}
+
+              {/* 7. DERNIÈRE BANDE : FAQ · DOCUMENTS RÉCENTS · COMPTE À REBOURS
+                  Trois cartes sur une ligne (`lg:grid-cols-3`), alimentées par
+                  des données déjà chargées : aucun appel réseau supplémentaire.
+                  `featuredDocs` vient de `getDocuments(20)`, requêté en
+                  `$orderby=Modified desc` — c'est bien « les plus récents ». */}
+              {props.showHighlights ? (
+                <RevealSection enabled={animate}>
+                  <HomeHighlights
+                    faqTitle="Questions fréquentes"
+                    documentsTitle="Documents récents"
+                    countdownTitle="Prochaine échéance"
+                    faqItems={props.faqItems}
+                    documents={props.featuredDocs}
+                    events={props.events}
+                    loading={false}
+                    onNavigate={handleNavigate}
                   />
                 </RevealSection>
               ) : null}

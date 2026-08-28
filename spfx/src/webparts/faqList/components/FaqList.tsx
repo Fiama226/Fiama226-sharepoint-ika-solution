@@ -170,7 +170,7 @@ export const FaqList: React.FC<IFaqListProps> = (props) => {
 
   return (
     <div className="ika-root">
-      <section aria-labelledby="ika-faq-title">
+      <section aria-labelledby={title ? "ika-faq-title" : undefined}>
         {title ? (
           <h2
             id="ika-faq-title"

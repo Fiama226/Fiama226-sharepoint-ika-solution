@@ -75,6 +75,7 @@ export interface IIntranetMainWebPartProps {
   showTeam: boolean;
   showEmployee: boolean;
   showProjects: boolean;
+  showHighlights: boolean;
   defaultView?: string;
   fournisseursListTitle?: string;
   equipementsListTitle?: string;
@@ -212,6 +213,7 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
         showTeam: this.properties.showTeam !== false,
         showEmployee: this.properties.showEmployee !== false,
         showProjects: this.properties.showProjects !== false,
+        showHighlights: this.properties.showHighlights !== false,
         showHeader: true,
         showFooter: true,
         initialView: this.properties.defaultView || "accueil",
@@ -517,6 +519,11 @@ export default class IntranetMainWebPart extends BaseClientSideWebPart<IIntranet
                 }),
                 PropertyPaneToggle("showProjects", {
                   label: "Tableau de bord Projets",
+                  onText: "Afficher",
+                  offText: "Masquer",
+                }),
+                PropertyPaneToggle("showHighlights", {
+                  label: "FAQ + Documents récents + Compte à rebours",
                   onText: "Afficher",
                   offText: "Masquer",
                 }),
