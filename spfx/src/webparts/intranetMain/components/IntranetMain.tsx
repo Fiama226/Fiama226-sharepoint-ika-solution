@@ -562,7 +562,7 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
               {props.showMarquee ? (
                 <RevealSection enabled={animate}>
                   <AnnouncementMarquee
-                    eyebrow="Actualités"
+                    eyebrow="Annonces"
                     title="Célébrations & événements"
                     announcements={props.announcements}
                     loading={false}

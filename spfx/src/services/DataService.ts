@@ -6,6 +6,7 @@ import {
 
 import {
   IAnnouncement,
+  AnnouncementType,
   ICollaborateur,
   ICompanyInfo,
   IDepartement,
@@ -619,19 +620,109 @@ export class DataService {
     }
   }
 
+  /**
+   * Normalise une ligne brute de la liste `Annonces`.
+   *
+   * La liste d'un site réel n'a pas forcément les colonnes du modèle de
+   * démonstration (`Detail`, `AnnouncementDate`, `AnnouncementType`…). On
+   * accepte donc les noms usuels d'une liste SharePoint générique, et on
+   * retombe en dernier ressort sur les colonnes système (`Title`, `Created`),
+   * toujours présentes quel que soit le schéma.
+   */
+  private static _normalizeAnnouncement(
+    raw: Record<string, unknown>
+  ): IAnnouncement {
+    const pick = (...keys: string[]): string => {
+      for (let i = 0; i < keys.length; i++) {
+        const value = raw[keys[i]];
+        if (typeof value === "string" && value.trim() !== "") return value;
+      }
+      return "";
+    };
+
+    const detail = pick("Detail", "Description", "Body", "Comments", "Resume");
+    const priority = pick("Priority");
+
+    return {
+      Id: typeof raw.Id === "number" ? raw.Id : 0,
+      Title: pick("Title", "LinkTitle") || "Sans titre",
+      AnnouncementType: (pick("AnnouncementType", "Category", "Type") ||
+        "Événement") as AnnouncementType,
+      // Le champ « Détail » peut être une colonne texte enrichi : on retire le
+      // balisage, le bandeau l'affiche en texte brut.
+      Detail: detail.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim(),
+      Emoji: pick("Emoji") || undefined,
+      AnnouncementDate: pick(
+        "AnnouncementDate",
+        "EventDate",
+        "PublishDate",
+        "Created"
+      ),
+      DisplayUntil: pick("DisplayUntil"),
+      Priority: priority === "Haute" ? "Haute" : "Normale",
+      Created: pick("Created"),
+      Modified: pick("Modified"),
+    };
+  }
+
+  /**
+   * Annonces de la liste `Annonces` du site (bandeau d'accueil + vue
+   * `#annonces`).
+   *
+   * Deux tentatives, de la plus précise à la plus tolérante. Auparavant une
+   * seule requête stricte était émise : il suffisait qu'UNE colonne du modèle
+   * de démonstration manque dans la liste réelle pour que SharePoint réponde
+   * 400 et que tout le bandeau bascule silencieusement sur des annonces
+   * fictives. Même chose quand la liste répondait correctement mais que le
+   * filtre `DisplayUntil` écartait toutes les lignes.
+   */
   public async getAnnouncements(): Promise<IAnnouncement[]> {
     if (this._useMocks) return Mocks.MOCK_ANNOUNCEMENTS;
 
-    try {
-      const today = new Date().toISOString();
-      const endpoint =
-        `lists/getByTitle('Annonces')/items` +
-        `?$select=Id,Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,Created,Modified` +
-        `&$filter=DisplayUntil ge datetime'${today}'` +
-        `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
+    const today = new Date().toISOString();
+    const strict =
+      `lists/getByTitle('Annonces')/items` +
+      `?$select=Id,Title,AnnouncementType,Detail,Emoji,AnnouncementDate,DisplayUntil,Priority,Created,Modified` +
+      `&$filter=DisplayUntil ge datetime'${today}'` +
+      `&$orderby=Priority desc,AnnouncementDate asc&$top=20`;
 
-      const items = await this._get<IAnnouncement>(this._hubUrl, endpoint, "announcements");
-      return items && items.length > 0 ? items : Mocks.MOCK_ANNOUNCEMENTS;
+    // Ni `$select` ni `$filter` : SharePoint renvoie les colonnes par défaut
+    // de la liste, quel que soit son schéma. C'est le filet qui garantit que
+    // les vraies annonces s'affichent même sur une liste générique.
+    const permissive =
+      `lists/getByTitle('Annonces')/items?$orderby=Modified desc&$top=20`;
+
+    // Une fois la requête stricte connue comme inopérante, inutile de la
+    // rejouer à chaque navigation : on mémorise le verdict pour la session.
+    const strictKnownBad = this._readCache<boolean>("announcements.strictKO");
+
+    if (!strictKnownBad) {
+      try {
+        const items = await this._get<IAnnouncement>(
+          this._hubUrl,
+          strict,
+          "announcements"
+        );
+        if (items && items.length > 0) return items;
+      } catch (e) {
+        console.warn(
+          "[DataService] Requête stricte 'Annonces' refusée, repli sur les colonnes par défaut:",
+          e
+        );
+        this._writeCache("announcements.strictKO", true, 30 * 60 * 1000);
+      }
+    }
+
+    try {
+      const rows = await this._get<Record<string, unknown>>(
+        this._hubUrl,
+        permissive,
+        "announcements.raw"
+      );
+      // Liste réellement vide : on renvoie une liste vide, PAS les données de
+      // démonstration. Le bandeau sait afficher un état vide, et afficher de
+      // fausses annonces serait plus trompeur que de n'en afficher aucune.
+      return (rows || []).map(DataService._normalizeAnnouncement);
     } catch (e) {
       console.warn("[DataService] Fallback mock pour annonces:", e);
       return Mocks.MOCK_ANNOUNCEMENTS;

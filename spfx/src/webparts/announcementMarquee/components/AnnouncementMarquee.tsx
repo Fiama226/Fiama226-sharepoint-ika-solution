@@ -78,7 +78,7 @@ export const AnnouncementMarquee: React.FC<IAnnouncementMarqueeProps> = (
                   <span className="ika-relative ika-inline-flex ika-h-2 ika-w-2 ika-rounded-full ika-bg-brand-cyan ika-shadow-lg ika-shadow-brand-cyan/50" />
                 </span>
                 <span className="ika-text-xs ika-font-bold ika-uppercase ika-tracking-[0.2em] ika-text-brand-navy/80">
-                  {eyebrow || "Actualités"}
+                  {eyebrow || "Annonces"}
                 </span>
                 <span className="ika-rounded-full ika-bg-brand-cyan/20 ika-px-2 ika-py-0.5 ika-text-[10px] ika-font-bold ika-text-brand-navy">
                   {hasAnnouncements ? announcements.length : 0}
