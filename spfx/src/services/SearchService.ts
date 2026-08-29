@@ -16,6 +16,21 @@ const CACHE_TTL_MS = 2 * 60 * 1000;
 /** Result source « Local People Results » — identique sur tous les tenants. */
 const PEOPLE_SOURCE_ID = "b09a7990-05ea-4af9-81ef-edfab16c4e31";
 
+/**
+ * Restreint la recherche au site courant (le hub de l'intranet) au lieu
+ * d'interroger tout le tenant.
+ *
+ * `postquery` interroge par défaut la source « Local SharePoint Results »,
+ * c'est-à-dire l'index du tenant entier. Un filtre `Path:` est donc ajouté au
+ * KQL pour ramener la portée au site — c'est le SEUL point à basculer pour
+ * revenir à une recherche à l'échelle du tenant.
+ *
+ * À noter : ceci ne change pas les droits. L'index est de toute façon élagué
+ * selon les permissions de l'utilisateur ; la portée ne fait que réduire le
+ * bruit des autres sites.
+ */
+const SCOPE_TO_CURRENT_SITE = true;
+
 /** Graph plafonne `size` à 25 pour `message` (et `from` doit valoir 0 au 1er appel). */
 const GRAPH_PAGE_SIZE = 25;
 const SP_PAGE_SIZE = 20;
@@ -135,7 +150,13 @@ export class SearchService {
 
   public constructor(context: ISPRequestContext, hubUrl?: string) {
     this._context = context;
-    this._siteUrl = hubUrl || context.pageContext.web.absoluteUrl;
+    // La barre oblique finale est retirée ici et pas ailleurs : elle
+    // produirait une URL d'API en `//_api/...` ET un filtre `Path:` en
+    // `…/ika//*` qui ne correspondrait à aucun résultat.
+    this._siteUrl = (hubUrl || context.pageContext.web.absoluteUrl).replace(
+      /\/+$/,
+      ""
+    );
 
     // Même règle que DataService : le Workbench (localhost) et `?useMocks=1`
     // servent des données factices, sinon la recherche serait morte en
@@ -352,11 +373,23 @@ export class SearchService {
     // La contrainte « fichiers » passe par le KQL plutôt que par un
     // RefinementFilter : `IsDocument:1` fonctionne sans dépendre du schéma de
     // recherche du tenant (un refiner exige une propriété affinable).
-    const kql = vertical === "fichiers" ? `${query} IsDocument:1` : query;
+    const typeFilter = vertical === "fichiers" ? " IsDocument:1" : "";
+
+    // Portée du site (cf. SCOPE_TO_CURRENT_SITE). Le joker est précédé d'une
+    // barre oblique — `…/sites/ika/*` et non `…/sites/ika*` — sinon le filtre
+    // remonterait aussi les collections de sites voisines dont l'URL commence
+    // pareil (« /sites/ika-archive »).
+    //
+    // Les personnes sont exclues de la contrainte : un profil utilisateur
+    // n'est rattaché à aucun site, le filtre ne renverrait jamais rien.
+    const scopeFilter =
+      SCOPE_TO_CURRENT_SITE && !isPeople ? ` Path:${this._siteUrl}/*` : "";
+
+    const kql = `${query}${typeFilter}${scopeFilter}`;
 
     const request: Record<string, unknown> = {
       __metadata: { type: "Microsoft.Office.Server.Search.REST.SearchRequest" },
-      Querytext: isPeople ? query : kql,
+      Querytext: kql,
       RowLimit: size,
       StartRow: page * size,
       TrimDuplicates: !isPeople,
@@ -555,10 +588,10 @@ export class SearchService {
    *    `IsDocument:1`, ce qui écarte les éléments de liste et les sites. Le
    *    menu déroulant est un sélecteur de documents ; la page de recherche
    *    native prend le relais pour le reste.
-   * 2. Aucun filtre `Path:` n'est ajouté — `postquery` interroge la source
-   *    « Local SharePoint Results », donc l'index du tenant entier (élagué
-   *    selon les droits de l'utilisateur), et pas la seule collection de
-   *    sites qui héberge l'appel.
+   * 2. Portée limitée au site courant par un filtre `Path:`, comme la page de
+   *    résultats — voir `SCOPE_TO_CURRENT_SITE`. Les suggestions et la page
+   *    de résultats DOIVENT partager la même portée, sinon le menu déroulant
+   *    proposerait des documents introuvables une fois la recherche validée.
    *
    * Volontairement limitée à SharePoint : appeler Graph à chaque frappe
    * ajouterait deux allers-retours réseau par caractère pour des sources que
