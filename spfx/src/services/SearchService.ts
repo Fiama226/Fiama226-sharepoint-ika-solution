@@ -499,7 +499,19 @@ export class SearchService {
   /* ---------------------------------------------------------------------- */
 
   /**
-   * Suggestions du menu déroulant de l'en-tête.
+   * Suggestions du menu déroulant de l'en-tête : des FICHIERS, à l'échelle de
+   * tout SharePoint.
+   *
+   * Deux choix de portée à ne pas défaire :
+   *
+   * 1. Verticale « fichiers » plutôt que « tout » — le KQL ajoute
+   *    `IsDocument:1`, ce qui écarte les éléments de liste et les sites. Le
+   *    menu déroulant est un sélecteur de documents ; la page de recherche
+   *    native prend le relais pour le reste.
+   * 2. Aucun filtre `Path:` n'est ajouté — `postquery` interroge la source
+   *    « Local SharePoint Results », donc l'index du tenant entier (élagué
+   *    selon les droits de l'utilisateur), et pas la seule collection de
+   *    sites qui héberge l'appel.
    *
    * Volontairement limitée à SharePoint : appeler Graph à chaque frappe
    * ajouterait deux allers-retours réseau par caractère pour des sources que
@@ -508,11 +520,16 @@ export class SearchService {
   public async suggest(query: string): Promise<ISearchResponse> {
     const term = query.trim();
     if (term.length < 2) {
-      return { results: [], total: 0, moreAvailable: false, vertical: "tout" };
+      return {
+        results: [],
+        total: 0,
+        moreAvailable: false,
+        vertical: "fichiers",
+      };
     }
 
     if (this._useMocks) {
-      return SearchService._mockFor(term, "tout", SUGGEST_SIZE);
+      return SearchService._mockFor(term, "fichiers", SUGGEST_SIZE);
     }
 
     const cacheKey = `suggest.${term.toLowerCase()}`;
@@ -520,13 +537,23 @@ export class SearchService {
     if (cached) return cached;
 
     try {
-      const payload = await this._searchSharePoint(term, "tout", 0, SUGGEST_SIZE);
+      const payload = await this._searchSharePoint(
+        term,
+        "fichiers",
+        0,
+        SUGGEST_SIZE
+      );
       this._writeCache(cacheKey, payload);
       return payload;
     } catch {
       // Une suggestion qui échoue ne doit pas produire d'erreur visible :
       // l'utilisateur est en train de taper, il peut toujours valider.
-      return { results: [], total: 0, moreAvailable: false, vertical: "tout" };
+      return {
+        results: [],
+        total: 0,
+        moreAvailable: false,
+        vertical: "fichiers",
+      };
     }
   }
 

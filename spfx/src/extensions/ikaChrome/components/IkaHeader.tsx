@@ -194,6 +194,15 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [showSearch]);
 
+  /**
+   * Valider la recherche ouvre TOUJOURS la page de recherche native
+   * SharePoint (`/_layouts/15/search.aspx/siteall`), et jamais la route
+   * interne `recherche` : la verticale « siteall » interroge l'index du
+   * tenant entier, avec ses affinements et sa pagination. Le menu déroulant
+   * de suggestions enrichit ce parcours, il ne le remplace pas — c'est
+   * pourquoi `onNavigate` n'est volontairement pas consulté ici, même quand
+   * l'en-tête est rendu à l'intérieur du portail plein écran.
+   */
   const runSearch = (term?: string): void => {
     const value = (term !== undefined ? term : query).trim();
     if (!value) return;
@@ -201,11 +210,7 @@ export const IkaHeader: React.FC<IExtendedHeaderProps> = (props) => {
     setSuggestOpen(false);
     setMenuOpen(false);
 
-    if (onNavigate) {
-      onNavigate(`recherche?q=${encodeURIComponent(value)}`);
-    } else {
-      window.location.href = `${context.hubUrl}/_layouts/15/search.aspx/siteall?q=${encodeURIComponent(value)}`;
-    }
+    window.location.href = `${context.hubUrl}/_layouts/15/search.aspx/siteall?q=${encodeURIComponent(value)}`;
   };
 
   const openResult = (result: ISearchResult): void => {

@@ -284,7 +284,7 @@ export const MOCK_COMPANY: ICompanyInfo = {
   address: "Ouagadougou, Burkina Faso",
   email: "contact@ikasolution.com",
   phone: "+226 70 70 70 70",
-  copyrightYears: "2015–2026",
+  copyrightYears: "2026-2027",
   social: {
     facebook: "#",
     linkedin: "#",
