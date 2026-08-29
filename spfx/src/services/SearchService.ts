@@ -307,6 +307,40 @@ export class SearchService {
     };
   }
 
+  /**
+   * Extrait le message d'erreur du corps de la réponse.
+   *
+   * Sans lui, un HTTP 400 ne dit rien de ce qui a déplu au service — alors
+   * que la cause est presque toujours précise et nommée dans le corps
+   * (propriété gérée inconnue, KQL invalide, en-tête OData incompatible).
+   * On ne relit donc JAMAIS une réponse en échec avec `json()` seul : le
+   * corps peut être du HTML ou vide, et l'exception masquerait le statut.
+   */
+  private static async _readError(
+    response: SPHttpClientResponse
+  ): Promise<string> {
+    try {
+      const raw = await response.text();
+      if (!raw) return "";
+
+      try {
+        const parsed = JSON.parse(raw) as {
+          error?: { message?: string | { value?: string } };
+          "odata.error"?: { message?: { value?: string } };
+        };
+        const message = parsed.error?.message || parsed["odata.error"]?.message;
+        if (typeof message === "string") return message;
+        if (message && message.value) return message.value;
+      } catch {
+        // Corps non JSON (page d'erreur HTML) : on renvoie le texte tronqué.
+      }
+
+      return raw.substring(0, 300);
+    } catch {
+      return "";
+    }
+  }
+
   private async _searchSharePoint(
     query: string,
     vertical: SearchVertical,
@@ -343,13 +377,26 @@ export class SearchService {
         headers: {
           Accept: "application/json;odata=nometadata",
           "Content-Type": "application/json;odata=verbose",
+          // INDISPENSABLE : `SPHttpClient` ajoute d'office `odata-version:
+          // 4.0`. Or le corps envoyé ici est du verbose (OData v3) —
+          // `__metadata` et les collections `{ results: [...] }` n'existent
+          // pas en v4, et le service rejette alors TOUTE la requête avec un
+          // HTTP 400, quel que soit le terme recherché. Il faut une chaîne
+          // vide et non une suppression : l'en-tête par défaut serait
+          // réinjecté.
+          "odata-version": "",
         },
         body: JSON.stringify({ request }),
       }
     );
 
     if (!response.ok) {
-      throw new Error(`Recherche SharePoint échouée (${response.status})`);
+      const detail = await SearchService._readError(response);
+      throw new Error(
+        `Recherche SharePoint échouée (${response.status})${
+          detail ? ` : ${detail}` : ""
+        }`
+      );
     }
 
     const json = (await response.json()) as ISearchPayload;
