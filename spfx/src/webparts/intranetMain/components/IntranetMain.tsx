@@ -365,20 +365,36 @@ export const IntranetMain: React.FC<IIntranetMainProps> = (props) => {
         );
 
       case "histoire":
+        // Pas de conteneur `max-w-7xl` ici : la bannière et la bande
+        // « chiffres » sont conçues pleine largeur. Les encadrer reproduisait
+        // un rendu différent de celui de la web part autonome pour la même
+        // page. Le cadrage interne est géré par la page elle-même.
         return (
-          <div className="ika-mx-auto ika-max-w-7xl ika-px-4 ika-py-8 sm:ika-px-6 lg:ika-px-8">
-            <Timeline
-              eyebrow="Depuis 2015"
-              title="Notre histoire & nos jalons"
-              description="Depuis sa fondation à Ouagadougou, IKA Solution transforme les idées en solutions technologiques à forte valeur ajoutée."
-              milestones={props.milestones}
-              values={props.missions}
-              stats={props.stats}
-              loading={false}
-              showValues={true}
-              showStats={true}
-            />
-          </div>
+          <Timeline
+            eyebrow="Notre histoire"
+            title="Notre histoire & nos jalons"
+            description="Depuis sa fondation à Ouagadougou, IKA Solution transforme les idées en solutions technologiques à forte valeur ajoutée."
+            // Une seule source pour l'année de création. Cet emplacement
+            // annonçait « Depuis 2015 » alors que la page affichait 2014.
+            foundedYear={2014}
+            heroImageUrl={`${chromeContext.siteUrl}/SiteAssets/histoire-hero.jpg`}
+            statsImageUrl={`${chromeContext.siteUrl}/SiteAssets/histoire-chiffres.jpg`}
+            // TODO(portail) : exposer ces valeurs en propriétés de la web part
+            // IntranetMain, comme c'est déjà le cas dans la web part Timeline.
+            founder={{
+              name: "YAYA Ouattara",
+              role: "Fondateur & Directeur Général",
+              quote:
+                "Notre mission est de prouver que l'excellence technologique n'a pas de frontières.",
+              photoUrl: `${chromeContext.siteUrl}/SiteAssets/team/DG.jpg`,
+            }}
+            milestones={props.milestones}
+            values={props.missions}
+            stats={props.stats}
+            loading={false}
+            showValues={true}
+            showStats={true}
+          />
         );
 
       case "organigramme":
